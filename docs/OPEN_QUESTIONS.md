@@ -14,3 +14,8 @@ Status: [ ] menunggu · [x] terjawab
 - [ ] Kebijakan retensi arsip (berapa tahun)?
 - [ ] Domain/URL internal & sertifikat HTTPS (CA internal)?
 - [ ] Logo resmi BPRS Sragen (SVG/PNG) dan warna identitas resmi? (token warna di docs/07 §5 hanya nilai awal)
+# Pertanyaan Terbuka
+
+## 2026-10-20 — Ukuran huruf pengguna
+
+- `// ASSUMPTION:` Pada M0 pilihan ukuran huruf disimpan di browser pengguna (`localStorage`) karena kolom `users.ui_font_scale` termasuk perubahan profil pengguna M1. Saat M1, pindahkan preferensi ini ke akun agar mengikuti pengguna lintas perangkat.

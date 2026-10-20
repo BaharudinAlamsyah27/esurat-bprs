@@ -8,6 +8,7 @@ use App\Filament\Pages\Profile;
 use App\Filament\Support\LocalFontProvider;
 use App\Filament\Widgets\FontScaleWidget;
 use App\Filament\Widgets\GreetingWidget;
+use App\Filament\Widgets\MyDispositionsWidget;
 use App\Filament\Widgets\SummaryCardsWidget;
 use App\Http\Middleware\IdleSessionTimeout;
 use Filament\Http\Middleware\Authenticate;
@@ -65,6 +66,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 GreetingWidget::class,
                 SummaryCardsWidget::class,
+                MyDispositionsWidget::class,
                 FontScaleWidget::class,
             ])
             ->middleware([

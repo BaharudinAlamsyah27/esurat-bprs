@@ -76,6 +76,15 @@ class VisibleToUserScope implements Scope
     public static function canSee(User $user, IncomingLetter $letter): bool
     {
         $directlyInvolved = $letter->isDirectlyInvolved($user);
+        $inDisposition = $letter->dispositions()->where(function (Builder $query) use ($user): void {
+            $query->where('from_user_id', $user->id)
+                ->orWhereHas('recipients', function (Builder $recipients) use ($user): void {
+                    $recipients->where('recipient_user_id', $user->id);
+                    if ($user->unit_id !== null) {
+                        $recipients->orWhere('recipient_unit_id', $user->unit_id);
+                    }
+                });
+        })->exists();
         $isAdmin = $user->hasRole('admin_persuratan');
         $isDirector = $user->hasRole('direksi');
         $isAuditor = $user->hasRole('auditor');
@@ -84,9 +93,9 @@ class VisibleToUserScope implements Scope
             && $letter->initialRecipient()->where('unit_id', $user->unit_id)->exists();
 
         return match ($letter->confidentiality) {
-            LetterConfidentiality::Ordinary => $isAdmin || $isDirector || $isAuditor || $directlyInvolved || $isUnitHead,
-            LetterConfidentiality::Restricted => $isAdmin || $isDirector || $directlyInvolved || $isUnitHead,
-            LetterConfidentiality::Secret => $isAdmin || $isDirector || $directlyInvolved,
+            LetterConfidentiality::Ordinary => $isAdmin || $isDirector || $isAuditor || $directlyInvolved || $inDisposition || $isUnitHead,
+            LetterConfidentiality::Restricted => $isAdmin || $isDirector || $directlyInvolved || $inDisposition || $isUnitHead,
+            LetterConfidentiality::Secret => $isAdmin || $isDirector || $directlyInvolved || $inDisposition,
         };
     }
 
@@ -95,6 +104,21 @@ class VisibleToUserScope implements Scope
     {
         $query->orWhere('registered_by', $userId)
             ->orWhere('initial_recipient_id', $userId);
+        $this->includeDispositionInvolvement($query, $userId);
+    }
+
+    /** @param Builder<Model> $query */
+    private function includeDispositionInvolvement(Builder $query, int|string $userId): void
+    {
+        $unitId = auth()->user()?->unit_id;
+        $query->orWhereHas('dispositions', fn (Builder $dispositions): Builder => $dispositions
+            ->where('from_user_id', $userId)
+            ->orWhereHas('recipients', function (Builder $recipients) use ($userId, $unitId): void {
+                $recipients->where('recipient_user_id', $userId);
+                if ($unitId !== null) {
+                    $recipients->orWhere('recipient_unit_id', $unitId);
+                }
+            }));
     }
 
     /** @param Builder<Model> $query */

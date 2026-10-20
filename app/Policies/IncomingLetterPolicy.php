@@ -53,6 +53,14 @@ class IncomingLetterPolicy
             && $incomingLetter->status === IncomingLetterStatus::Completed;
     }
 
+    public function close(User $user, IncomingLetter $incomingLetter): bool
+    {
+        return $user->can('disposition.close')
+            && ! in_array($incomingLetter->status, [IncomingLetterStatus::Completed, IncomingLetterStatus::Archived], true)
+            && $incomingLetter->dispositions()->where('from_user_id', $user->id)->exists()
+            && $this->viewContents($user, $incomingLetter);
+    }
+
     public function delete(User $user, IncomingLetter $incomingLetter): bool
     {
         return false;

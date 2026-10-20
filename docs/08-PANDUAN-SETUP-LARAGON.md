@@ -195,6 +195,8 @@ Tip: gunakan beberapa tab terminal Laragon — satu untuk `npm run dev`, satu un
 | `Unknown database 'esurat'` | Database belum dibuat → ulangi Langkah 4. |
 | `Connection refused` ke MySQL | MySQL belum jalan → **Start All**; cek port 3306 tidak dipakai MySQL lain. |
 | Apache/Nginx gagal start (port 80) | Port dipakai program lain (IIS, Skype, XAMPP) → matikan program itu atau ganti port di Laragon → Menu → Preferences. |
+| Codex: `dubious ownership` / `setup refresh had errors` | Folder dimiliki akun Anda, Codex memakai akun sandbox lain. Tutup Codex → Laragon *Run as administrator* → `rmdir /s /q .git` (bila ada `.git` buatan Codex; bila access denied pakai `takeown /f .git /r /d y` + `icacls .git /grant %USERNAME%:F /t`) → `git config --system --add safe.directory C:/laragon/www/esurat` → `git init -b main`, `git add .`, `git commit` sendiri → buka ulang Codex. Bila masih gagal: biarkan Codex hanya menulis kode, Anda yang commit (aturan ada di AGENTS.md). |
+| Codex: `curl error 6` (Composer/npm gagal), tak bisa membuat branch | Sandbox Codex tidak punya internet & izin `.git`. Pasang dependency dan buat branch/commit sendiri di Terminal Laragon biasa (bukan Administrator); Codex hanya menulis kode (aturan di AGENTS.md). |
 | `esurat.test` tidak terbuka | Pastikan **Auto Virtual Hosts** aktif (Preferences → General), **Stop All → Start All**, atau pakai `php artisan serve`. |
 | Perubahan `.env` tidak terbaca | Jalankan `php artisan config:clear`. |
 | Tampilan berantakan/tanpa gaya | Jalankan `npm run build` atau biarkan `npm run dev` hidup. |

@@ -1,22 +1,14 @@
-# Pertanyaan Terbuka & Asumsi
+# Pertanyaan Terbuka & Asumsi (v2)
 
 Status: [ ] menunggu · [x] terjawab
 
-- [ ] Format nomor surat resmi BPRS Sragen (contoh default: `045/DIR/SKR/BPRS-SRG/X/2026`)?
-- [ ] Format nomor agenda surat masuk resmi? Asumsi sementara: `001/2026`, urutan tahunan berdasarkan tahun pencatatan.
-- [ ] Struktur organisasi sebenarnya (Direksi, divisi/bagian, kantor cabang/kas, DPS, Komisaris)?
-- [ ] Perkiraan jumlah pengguna, jumlah kantor cabang, volume surat/bulan?
-- [ ] Apakah ada daftar klasifikasi/kode arsip resmi?
-- [ ] Apakah ada sistem/arsip existing yang datanya harus dimigrasi?
-- [ ] Kop surat resmi (logo, alamat, warna) & contoh surat keluar yang berlaku?
-- [ ] Apakah tanda tangan digital + QR cukup secara internal, atau perlu PSrE tersertifikasi?
-- [ ] Apakah surat internal (nota dinas/memo) termasuk lingkup? (default: TIDAK, fase 2)
-- [ ] SMTP internal tersedia untuk email notifikasi? Perlu WhatsApp gateway? (default: in-app + email)
-- [ ] Kebijakan retensi arsip (berapa tahun)?
-- [ ] Domain/URL internal & sertifikat HTTPS (CA internal)?
-- [ ] Logo resmi BPRS Sragen (SVG/PNG) dan warna identitas resmi? (token warna di docs/07 §5 hanya nilai awal)
-# Pertanyaan Terbuka
-
-## Terjawab pada M1
-
-- [x] Preferensi ukuran huruf disimpan pada `users.ui_font_scale`; perubahan pilihan dari widget Beranda dan halaman Profil tersimpan pada akun pengguna.
+- [ ] Hak akses **User**: boleh menambah surat masuk/keluar dan mengubah yang ia buat, tidak boleh menghapus, dan hanya mencetak disposisi (default sekarang). Apakah sesuai?
+- [ ] Apakah perlu level ketiga untuk **pimpinan/Direksi** (hanya lihat + cetak laporan)? Default: tidak, hanya Admin dan User.
+- [ ] Apakah ada surat yang harus dirahasiakan dari sebagian pegawai? Default: semua pengguna aktif melihat semua surat.
+- [ ] Format nomor surat keluar resmi BPRS Sragen (default `{seq:3}/{kode_klasifikasi}/BPRS-SRG/{bulan_romawi}/{tahun}`)?
+- [ ] Daftar klasifikasi/kode arsip resmi BPRS (default 9 klasifikasi umum)?
+- [ ] Logo resmi, warna identitas, nama & jabatan pimpinan untuk tanda tangan Lembar Disposisi?
+- [ ] Contoh Lembar Disposisi resmi BPRS (jika ada) agar cetakan menyerupai format yang sudah dipakai?
+- [ ] Opsi "Diteruskan kepada": cukup teks bebas + saran dari nama pengguna, atau perlu daftar jabatan tetap?
+- [ ] Ada data surat lama yang harus diimpor (Excel)? Default: tidak ada impor di v1.
+- [ ] Kebijakan retensi arsip dan frekuensi backup?

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attachment;
+use App\Models\Disposition;
 use App\Models\IncomingLetter;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -12,22 +13,25 @@ class SecureFileController
 {
     public function show(Attachment $attachment): Response
     {
-        abort_unless($attachment->attachable instanceof IncomingLetter, 404);
+        $attachable = $attachment->attachable;
+        abort_unless($attachable instanceof IncomingLetter || $attachable instanceof Disposition, 404);
 
-        /** @var IncomingLetter $letter */
-        $letter = $attachment->attachable;
-        Gate::authorize('viewAttachments', $letter);
+        if ($attachable instanceof IncomingLetter) {
+            Gate::authorize('viewAttachments', $attachable);
+        } else {
+            Gate::authorize('view', $attachable);
+        }
 
         abort_unless($attachment->disk === 'private', 404);
 
         $disk = Storage::disk('private');
         abort_unless($disk->exists($attachment->path), 404);
 
-        activity('incoming_letter')
+        activity($attachable instanceof IncomingLetter ? 'incoming_letter' : 'disposition')
             ->causedBy(auth()->user())
             ->event('download_attachment')
             ->withProperties([
-                'incoming_letter_id' => $letter->getKey(),
+                'incoming_letter_id' => $attachable instanceof IncomingLetter ? $attachable->getKey() : $attachable->incoming_letter_id,
                 'attachment_id' => $attachment->getKey(),
                 'ip' => request()->ip(),
             ])

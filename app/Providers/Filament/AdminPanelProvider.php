@@ -35,6 +35,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('')
             ->login(Login::class)
             ->brandName('E-Surat BPRS Sragen')
+            ->darkMode(false)
             ->font('Plus Jakarta Sans', provider: LocalFontProvider::class)
             ->colors([
                 'primary' => Color::hex('#0F5C46'),

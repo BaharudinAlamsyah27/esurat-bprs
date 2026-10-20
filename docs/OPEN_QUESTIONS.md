@@ -3,6 +3,7 @@
 Status: [ ] menunggu · [x] terjawab
 
 - [ ] Format nomor surat resmi BPRS Sragen (contoh default: `045/DIR/SKR/BPRS-SRG/X/2026`)?
+- [ ] Format nomor agenda surat masuk resmi? Asumsi sementara: `001/2026`, urutan tahunan berdasarkan tahun pencatatan.
 - [ ] Struktur organisasi sebenarnya (Direksi, divisi/bagian, kantor cabang/kas, DPS, Komisaris)?
 - [ ] Perkiraan jumlah pengguna, jumlah kantor cabang, volume surat/bulan?
 - [ ] Apakah ada daftar klasifikasi/kode arsip resmi?

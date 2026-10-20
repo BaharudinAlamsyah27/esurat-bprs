@@ -1,7 +1,7 @@
 # Log Progres
 
 ## Status saat ini
-- Milestone aktif: M1 selesai; siap direview/diintegrasikan sebelum M2
+- Milestone aktif: M2 Surat Masuk (implementasi tersedia; Pest/UAT masih pending di `feature/m2-surat-masuk`)
 
 ## Riwayat
 ### 2026-10-20 — M0 (selesai)
@@ -18,3 +18,10 @@
 - Catatan untuk tahap berikut: lanjutkan M2 Surat Masuk setelah perubahan M1 direview/diintegrasikan. Pilih implementasi Laravel yang sederhana dan mudah dirawat; hindari abstraksi, dependensi, atau otomasi tambahan yang tidak diperlukan. Jangan menjalankan `migrate:fresh` pada database pengguna.
 - Perbaikan tampilan login (2026-10-20): penyebab utama tampilan polos adalah tema kustom hanya memuat Tailwind tanpa stylesheet inti Filament 3. Tema kini mengimpor stylesheet Filament bawaan, kartu login dirapikan, dan mode gelap dimatikan agar tampilan konsisten. `npm run build` berhasil; halaman `http://esurat.test/login` diperiksa di browser dan tombol **Masuk** sudah terlihat. Jika setelah pembaruan halaman masih tersimpan di cache, muat ulang paksa dengan `Ctrl+F5`.
 - Catatan aset Filament: jalankan `php artisan filament:assets` bila aset publik Filament belum tersedia; Composer menjalankan perintah ini otomatis setelah autoload/package discovery.
+
+### 2026-10-20 — M2 Surat Masuk (dimulai)
+- Selesai: branch `feature/m2-surat-masuk` dibuat dari M1 agar perubahan M1 yang dibutuhkan M2 tetap tersedia; akun demo `admin_persuratan`, `direksi`, `kepala_unit`, `staf`, dan `auditor` ditemukan di database lokal. Semua memakai kata sandi demo lokal yang sama dengan akun superadmin.
+- Selesai: migration tabel `incoming_letters`, `attachments`, `letter_sequences`; enum, model/factory, nomor agenda tahunan terkunci transaksi, registrasi + peringatan duplikat, lampiran PDF/JPG/PNG privat maks. 10 MB dengan MIME dan hash SHA-256, scope/policy kerahasiaan, unduhan terautentikasi dan tercatat di audit, Resource daftar/form/detail/teruskan/arsip, serta lembar disposisi PDF dengan DomPDF. Migration dijalankan pada database Laragon tanpa reset.
+- Pemeriksaan: `vendor\bin\pint` lulus; PHPStan level 6 tanpa error; `composer validate --no-check-publish` lulus; rute Resource, unduh, dan cetak terdaftar. Pest dan UAT browser untuk alur surat masuk belum dijalankan.
+- Asumsi terbuka: nomor agenda sementara berformat `001/2026` dan tahun ditentukan saat pencatatan; konfirmasi format resmi BPRS masih menunggu di `docs/OPEN_QUESTIONS.md`.
+- Berikutnya: jalankan Pest/UAT M2 lalu lanjut M3 Disposisi Berjenjang setelah alur surat masuk disetujui.

@@ -1,27 +1,47 @@
 # Log Progres
 
 ## Status saat ini
-- Milestone aktif: M2 Surat Masuk (implementasi tersedia; Pest/UAT masih pending di `feature/m2-surat-masuk`)
+- M0 Fondasi: selesai; sesuai urutan awal proyek siap ke M1. M1 dan M2 juga sudah dikerjakan, dan pengguna mengonfirmasi aplikasi M2 berjalan.
+- Milestone aktif: M3 Disposisi Berjenjang (implementasi dan migration tersedia; Pest/UAT alur masih perlu dijalankan).
+- Setelah M3 diverifikasi, tahap berikutnya M4 Surat Keluar. Tidak ada fitur baru yang dikerjakan pada sesi sinkronisasi spesifikasi ini.
+
+## Roadmap terbaru (2026-10-20)
+- **M0 — Fondasi Proyek:** selesai.
+- **M1 — Auth, Pengguna, Peran, Master Data:** selesai.
+- **M2 — Surat Masuk:** implementasi tersedia dan aplikasi dikonfirmasi berjalan oleh pengguna; verifikasi formal alur masih perlu dicatat.
+- **M3 — Disposisi Berjenjang:** implementasi tersedia; uji alur Direksi → Kepala Unit → Staf dan otorisasi masih tertunda.
+- **M4 — Surat Keluar: Draft & Penomoran:** belum dimulai. `LetterNumberGenerator` harus mendukung kategori surat keluar dan tiga kategori surat internal.
+- **M5 — Persetujuan Berjenjang + Delegasi:** belum dimulai. `approval_steps` dan `ApprovalService` harus polimorfik/generik untuk surat keluar dan surat internal.
+- **M6 — Tanda Tangan, QR, PDF Final, Verifikasi:** belum dimulai. `LetterPdfService`, `QrService`, `verification_logs`, dan verifikasi publik harus generik untuk kedua jenis surat.
+- **M6B — Surat Internal:** milestone baru, belum dimulai; mencakup Nota Dinas, Surat Edaran, Surat Tugas, balasan, penerima massal, konfirmasi baca, dan pemakaian ulang mesin generik M4–M6.
+- **M7 — Notifikasi & Pengingat:** belum dimulai; mencakup notifikasi dan pengingat untuk peristiwa surat internal.
+- **M8 — Dashboard, Pencarian, Laporan:** belum dimulai; menambahkan grafik infografis Filament ChartWidget dan pencarian yang hanya mencocokkan perihal, pengirim, serta nomor surat. OCR tidak dibuat.
+- **M9 — Hardening & Deploy:** belum dimulai.
+
+## Dampak sinkronisasi spesifikasi
+- M0–M1 tidak memerlukan perubahan lingkup dari pembaruan ini.
+- M2 tetap pada pencarian perihal/pengirim/nomor surat; pencarian OCR berada di luar lingkup.
+- M3 tidak berubah alur bisnisnya. Tabel `notifications` yang dibutuhkan Filament sudah ditambahkan dan migration-nya berhasil dijalankan saat memperbaiki error sebelumnya.
+- M4–M6 perlu merancang generator nomor, persetujuan, PDF, QR, dan verifikasi agar dapat dipakai bersama oleh surat keluar dan surat internal.
+- M6B menambah satu milestone sesudah M6; M7 perlu menampung peristiwa surat internal; M8 mencakup enam grafik dan batasan pencarian di atas.
+- Tidak ada kode fitur yang ditulis dalam sesi sinkronisasi ini; hanya catatan progres/roadmap yang diperbarui.
 
 ## Riwayat
-### 2026-10-20 — M0 (selesai)
-- Selesai: pasang Filament 3.3.57, Pest 3.8.7, Pest Laravel plugin 3.2.0, dan Larastan 3.13.0; panel Filament root dengan login Indonesia, navigasi grup, notifikasi, menu pengguna, dashboard sapaan + kartu ringkasan, tema kustom hijau/krem, font Plus Jakarta Sans lokal, tombol besar, pilihan ukuran huruf; konfigurasi `id`/`Asia/Jakarta`, MySQL, antrean dan sesi database; struktur direktori, README, lisensi, serta script `composer ci`/`composer lint`.
-- Pemeriksaan: `composer ci` lulus (Pint, PHPStan level 6, 2 test / 7 assertions); `npm run build` lulus; `composer validate --no-check-publish` lulus; `php artisan route:list` menunjukkan dashboard `/` dan login `/login`.
-- Cara menjalankan: `composer install`, `npm install`, salin `.env.example` ke `.env`, `php artisan key:generate`, `php artisan migrate --seed`, `npm run build`, lalu buka `http://esurat.test`.
-- Catatan: kerja berada di branch `feature/m0-fondasi`. Pilihan ukuran huruf M0 disimpan di browser; ikuti pertanyaan terbuka dan pindahkan ke preferensi akun saat M1. User demo/seed peran dikerjakan pada M1.
+### 2026-10-20 — M3 Disposisi Berjenjang
+- M2 sudah dikonfirmasi berjalan oleh pengguna. Implementasi M3 dibuat pada branch `feature/m3-disposisi-berjenjang` di atas M2.
+- Selesai: migration tabel disposisi, penerima, dan pivot instruksi; model, enum status, policy, aksi membuat disposisi/sub-disposisi, tindak lanjut berurutan, lampiran laporan privat dengan MIME/hash, penutupan manual beralasan, status surat otomatis, kerahasiaan untuk peserta rantai disposisi, timeline di detail, serta widget "Disposisi untuk saya" yang mengurutkan tenggat dan menandai keterlambatan.
+- Migration MySQL sempat gagal karena nama foreign key pivot terlalu panjang. Ketiga tabel M3 dipastikan kosong, hanya tabel-tabel baru itu yang dibersihkan, nama constraint dipendekkan, lalu migration berhasil dijalankan. Tidak ada data surat sebelumnya yang dihapus.
+- Perbaikan lanjutan setelah UAT pengguna: tabel notifikasi Laravel yang dipakai Filament ternyata belum ada. Migration `create_notifications_table` ditambahkan dan berhasil dijalankan; daftar notifikasi kini punya tabel yang diperlukan.
+- Pemeriksaan: Pint lulus; PHPStan level 6 lulus; migration M3 tercatat berhasil; `git diff --check` lulus; `http://esurat.test` merespons dan mengarahkan ke login. Pest dan uji browser alur disposisi belum dijalankan.
+- Cara mencoba: buka `http://esurat.test`, masuk sebagai Direksi/Kepala Unit penerima surat, buka surat yang sudah diteruskan, buat disposisi; penerima membuka surat untuk menandai telah dibaca, lalu ubah menjadi dikerjakan dan selesai dengan laporan.
+- Berikutnya: jalankan uji alur Direksi → Kepala Unit → Staf → selesai, termasuk hak akses dan penutupan manual, lalu lanjut M4 setelah disetujui.
 
-### 2026-10-20 — M1 (selesai)
-- Selesai: autentikasi email/nama pengguna dengan akun nonaktif ditolak; permission Spatie untuk enam peran; migration/model/factory/policy untuk unit, jabatan, klasifikasi, jenis surat, instruksi disposisi, pengaturan, dan profil pengguna; resource Filament tambah/lihat/ubah; unggah tanda tangan/paraf PNG pada disk privat oleh super admin atau pemilik melalui Profil; aturan kata sandi kuat, throttle bawaan login Filament (5 percobaan), timeout sesi idle configurable (default 30 menit), audit log autentikasi dan perubahan data, master data + akun demo lokal; ukuran huruf tersimpan per akun.
-- Pemeriksaan: `composer ci` lulus (Pint, PHPStan level 6, 15 test / 68 assertion). Route `/login`, `/profil-saya`, dan `/users` terdaftar; dashboard, halaman profil, serta layar daftar/tambah user dan master berhasil dirender. Migration dan seluruh seeder M1 juga berhasil dijalankan pada SQLite in-memory; database MySQL Laragon tidak diubah.
-- Cara menjalankan dan mencoba login di Laragon: pastikan database `esurat` sudah ada (lihat `docs/08-PANDUAN-SETUP-LARAGON.md` langkah 4); isi `DEMO_USER_PASSWORD` pada `.env` dengan kata sandi lokal minimal 10 karakter, huruf besar/kecil dan angka; dari root proyek jalankan `php artisan migrate --seed`; kemudian buka `http://esurat.test` atau `http://127.0.0.1:8000/login`. Akun demo `superadmin` atau `superadmin@esurat.test` memakai kata sandi yang Anda tentukan tadi.
-- Catatan Git: cabang `feature/m1-auth-master-data` dibuat bertumpuk di atas commit M0 karena cabang `develop` belum tersedia pada checkout. Perubahan M0 tidak diubah.
-- Catatan untuk tahap berikut: lanjutkan M2 Surat Masuk setelah perubahan M1 direview/diintegrasikan. Pilih implementasi Laravel yang sederhana dan mudah dirawat; hindari abstraksi, dependensi, atau otomasi tambahan yang tidak diperlukan. Jangan menjalankan `migrate:fresh` pada database pengguna.
-- Perbaikan tampilan login (2026-10-20): penyebab utama tampilan polos adalah tema kustom hanya memuat Tailwind tanpa stylesheet inti Filament 3. Tema kini mengimpor stylesheet Filament bawaan, kartu login dirapikan, dan mode gelap dimatikan agar tampilan konsisten. `npm run build` berhasil; halaman `http://esurat.test/login` diperiksa di browser dan tombol **Masuk** sudah terlihat. Jika setelah pembaruan halaman masih tersimpan di cache, muat ulang paksa dengan `Ctrl+F5`.
-- Catatan aset Filament: jalankan `php artisan filament:assets` bila aset publik Filament belum tersedia; Composer menjalankan perintah ini otomatis setelah autoload/package discovery.
+## Perintah untuk dijalankan pengguna
+- Tidak ada perintah migrasi baru untuk sinkronisasi spesifikasi ini. Migration M3 dan tabel notifikasi sudah dijalankan.
+- Untuk memenuhi pemeriksaan penuh M3 setelah UAT, jalankan `composer ci` dari Terminal Laragon di folder proyek.
 
-### 2026-10-20 — M2 Surat Masuk (dimulai)
-- Selesai: branch `feature/m2-surat-masuk` dibuat dari M1 agar perubahan M1 yang dibutuhkan M2 tetap tersedia; akun demo `admin_persuratan`, `direksi`, `kepala_unit`, `staf`, dan `auditor` ditemukan di database lokal. Semua memakai kata sandi demo lokal yang sama dengan akun superadmin.
-- Selesai: migration tabel `incoming_letters`, `attachments`, `letter_sequences`; enum, model/factory, nomor agenda tahunan terkunci transaksi, registrasi + peringatan duplikat, lampiran PDF/JPG/PNG privat maks. 10 MB dengan MIME dan hash SHA-256, scope/policy kerahasiaan, unduhan terautentikasi dan tercatat di audit, Resource daftar/form/detail/teruskan/arsip, serta lembar disposisi PDF dengan DomPDF. Migration dijalankan pada database Laragon tanpa reset.
-- Pemeriksaan: `vendor\bin\pint` lulus; PHPStan level 6 tanpa error; `composer validate --no-check-publish` lulus; rute Resource, unduh, dan cetak terdaftar. Pest dan UAT browser untuk alur surat masuk belum dijalankan.
-- Asumsi terbuka: nomor agenda sementara berformat `001/2026` dan tahun ditentukan saat pencatatan; konfirmasi format resmi BPRS masih menunggu di `docs/OPEN_QUESTIONS.md`.
-- Berikutnya: jalankan Pest/UAT M2 lalu lanjut M3 Disposisi Berjenjang setelah alur surat masuk disetujui.
+## Belum bisa diverifikasi
+- Uji Pest dan UAT browser M3 belum dijalankan.
+- Belum ada pemeriksaan end-to-end untuk M4–M9; milestone tersebut belum dimulai.
+
+(Agent menambah entri baru DI ATAS bagian ini di akhir setiap sesi: tanggal, milestone, selesai, tersisa, cara menjalankan, catatan.)

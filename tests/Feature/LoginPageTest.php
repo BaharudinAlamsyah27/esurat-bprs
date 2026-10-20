@@ -6,6 +6,6 @@ it('shows the Indonesian login page', function () {
         ->assertSee('lang="id"', false)
         ->assertDontSee('fonts.bunny.net')
         ->assertSee('Masuk ke E-Surat BPRS Sragen')
-        ->assertSee('Alamat email')
+        ->assertSee('Email atau nama pengguna')
         ->assertSee('Kata sandi');
 });

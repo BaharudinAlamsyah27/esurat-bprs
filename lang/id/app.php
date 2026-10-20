@@ -20,4 +20,8 @@ return [
     'font_normal' => 'Normal',
     'font_large' => 'Besar',
     'font_largest' => 'Sangat besar',
+    'edit' => 'Ubah',
+    'delete' => 'Hapus',
+    'create' => 'Tambah',
+    'search' => 'Cari',
 ];

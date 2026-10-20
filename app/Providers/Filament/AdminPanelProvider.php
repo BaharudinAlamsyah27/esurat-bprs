@@ -2,15 +2,19 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Dashboard;
+use App\Filament\Pages\Profile;
 use App\Filament\Support\LocalFontProvider;
 use App\Filament\Widgets\FontScaleWidget;
 use App\Filament\Widgets\GreetingWidget;
 use App\Filament\Widgets\SummaryCardsWidget;
+use App\Http\Middleware\IdleSessionTimeout;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -29,13 +33,19 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('')
-            ->login()
+            ->login(Login::class)
             ->brandName('E-Surat BPRS Sragen')
             ->font('Plus Jakarta Sans', provider: LocalFontProvider::class)
             ->colors([
                 'primary' => Color::hex('#0F5C46'),
             ])
             ->databaseNotifications()
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label(__('m1.profile'))
+                    ->url(fn (): string => Profile::getUrl())
+                    ->icon('heroicon-o-user-circle'),
+            ])
             ->sidebarCollapsibleOnDesktop(false)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->navigationGroups([
@@ -48,6 +58,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Dashboard::class,
+                Profile::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
@@ -68,6 +79,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                IdleSessionTimeout::class,
             ]);
     }
 }

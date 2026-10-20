@@ -16,6 +16,6 @@ Status: [ ] menunggu · [x] terjawab
 - [ ] Logo resmi BPRS Sragen (SVG/PNG) dan warna identitas resmi? (token warna di docs/07 §5 hanya nilai awal)
 # Pertanyaan Terbuka
 
-## 2026-10-20 — Ukuran huruf pengguna
+## Terjawab pada M1
 
-- `// ASSUMPTION:` Pada M0 pilihan ukuran huruf disimpan di browser pengguna (`localStorage`) karena kolom `users.ui_font_scale` termasuk perubahan profil pengguna M1. Saat M1, pindahkan preferensi ini ke akun agar mengikuti pengguna lintas perangkat.
+- [x] Preferensi ukuran huruf disimpan pada `users.ui_font_scale`; perubahan pilihan dari widget Beranda dan halaman Profil tersimpan pada akun pengguna.

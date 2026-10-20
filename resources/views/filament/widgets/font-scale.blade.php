@@ -1,11 +1,11 @@
 <section class="esurat-font-control" x-data="{
-    scale: localStorage.getItem('esurat-font-scale') ?? 'normal',
+    scale: @js($this->getFontScale()),
     apply(value) {
         this.scale = value;
-        localStorage.setItem('esurat-font-scale', value);
         document.documentElement.classList.remove('esurat-font-large', 'esurat-font-largest');
         if (value === 'large') document.documentElement.classList.add('esurat-font-large');
         if (value === 'largest') document.documentElement.classList.add('esurat-font-largest');
+        $wire.updateFontScale(value);
     }
 }" x-init="apply(scale)">
     <label for="font-scale">{{ __('app.font_size') }}</label>

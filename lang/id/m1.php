@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'audit_login' => 'Pengguna berhasil masuk.',
+    'audit_logout' => 'Pengguna keluar.',
+    'audit_failed_login' => 'Percobaan masuk gagal.',
+    'demo_password_required' => 'Isi DEMO_USER_PASSWORD pada berkas .env dengan kata sandi minimal 10 karakter yang berisi huruf besar, huruf kecil, dan angka sebelum menjalankan seeder.',
+    'login_identity' => 'Email atau nama pengguna',
+    'users' => 'Pengguna', 'user' => 'Pengguna', 'units' => 'Unit Kerja', 'unit' => 'Unit Kerja',
+    'positions' => 'Jabatan', 'position' => 'Jabatan', 'classifications' => 'Klasifikasi Surat', 'classification' => 'Klasifikasi Surat',
+    'letter_types' => 'Jenis Surat', 'letter_type' => 'Jenis Surat',
+    'disposition_instructions' => 'Instruksi Disposisi', 'disposition_instruction' => 'Instruksi Disposisi',
+    'settings' => 'Pengaturan', 'setting' => 'Pengaturan', 'name' => 'Nama', 'username' => 'Nama pengguna',
+    'nip' => 'NIP', 'email' => 'Alamat email', 'phone' => 'Nomor telepon', 'unit_id' => 'Unit kerja',
+    'position_id' => 'Jabatan', 'roles' => 'Peran', 'password' => 'Kata sandi', 'password_confirmation' => 'Ulangi kata sandi',
+    'active' => 'Aktif', 'inactive' => 'Nonaktif', 'signature' => 'Tanda tangan', 'paraf' => 'Paraf',
+    'code' => 'Kode', 'unit_type' => 'Jenis unit', 'unit_types' => ['direksi' => 'Direksi', 'divisi' => 'Divisi', 'bagian' => 'Bagian', 'cabang' => 'Cabang', 'kas' => 'Kantor Kas', 'lainnya' => 'Lainnya'],
+    'parent_unit' => 'Unit induk', 'unit_head' => 'Kepala unit', 'level' => 'Tingkat jabatan', 'signer_eligible' => 'Dapat menjadi penandatangan',
+    'parent_classification' => 'Klasifikasi induk', 'retention_years' => 'Masa simpan (tahun)', 'category' => 'Kategori',
+    'letter_categories' => ['incoming' => 'Surat masuk', 'outgoing' => 'Surat keluar', 'both' => 'Keduanya'],
+    'instruction' => 'Instruksi', 'sort_order' => 'Urutan tampil', 'key' => 'Nama pengaturan', 'json_value' => 'Nilai (format JSON)', 'updated_at' => 'Terakhir diubah',
+    'save' => 'Simpan', 'cancel' => 'Batal', 'new_user' => 'Tambah pengguna', 'edit_user' => 'Ubah pengguna',
+    'profile' => 'Profil saya', 'profile_saved' => 'Profil berhasil disimpan.', 'password_optional' => 'Kosongkan jika tidak ingin mengganti kata sandi.',
+    'signature_help' => 'Unggah PNG, maksimal 2 MB. Berkas disimpan secara privat.',
+    'active_filter' => 'Status pengguna', 'demo_seed_note' => 'Akun demo hanya dibuat pada lingkungan lokal.',
+    'role_labels' => ['super_admin' => 'Super Admin', 'admin_persuratan' => 'Admin Persuratan', 'direksi' => 'Direksi', 'kepala_unit' => 'Kepala Unit', 'staf' => 'Staf', 'auditor' => 'Auditor'],
+];

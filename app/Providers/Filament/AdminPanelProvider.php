@@ -10,6 +10,7 @@ use App\Filament\Widgets\FontScaleWidget;
 use App\Filament\Widgets\GreetingWidget;
 use App\Filament\Widgets\SummaryCardsWidget;
 use App\Http\Middleware\IdleSessionTimeout;
+use App\Models\Institution;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -35,6 +36,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('')
             ->login(Login::class)
             ->brandName('E-Surat BPRS Sragen')
+            ->brandLogo(fn (): ?string => Institution::query()->whereKey(1)->value('logo_path') ? route('institution.logo') : null)
+            ->brandLogoHeight('2.5rem')
             ->darkMode(false)
             ->font('Plus Jakarta Sans', provider: LocalFontProvider::class)
             ->colors([

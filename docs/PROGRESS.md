@@ -2,7 +2,7 @@
 
 ## Status saat ini
 
-- Milestone aktif: **M4 — Data Surat Keluar** (implementasi + CI selesai; menunggu migrasi dan UAT Laragon)
+- Milestone aktif: **M5 — Laporan** (implementasi berjalan di branch `feature/m5-laporan`; M4 sudah di-commit dan migrasi Laragon selesai)
 - M0: **Selesai untuk kode dan smoke test**; tampilan admin juga sudah terlihat pada screenshot browser pengguna. Tidak ada klaim UAT dengan pegawai akhir.
 - Lingkup v2: aplikasi surat masuk/keluar sederhana; disposisi satu lembar cetak adalah M3.
 - Database lama tidak dihapus. Migration baru diatur agar instalasi baru tidak membuat tabel fitur lama yang dibatalkan.
@@ -15,11 +15,20 @@
 | M1 — Data Master, Pengguna, Profil | Selesai (implementasi + CI + migrasi Laragon) | Data Instansi tunggal dengan logo privat, 9 klasifikasi, kelola pengguna/reset kata sandi, profil, audit baca-saja, policy dan proteksi Admin aktif terakhir. `composer ci` lulus; pengguna mengonfirmasi langkah M1 sudah dijalankan. |
 | M2 — Surat Masuk | Selesai (implementasi + CI) | CRUD, agenda 4 digit/tahun, file privat, pencarian tiga kolom sesuai PRD, filter tahun/klasifikasi, duplikat dengan konfirmasi, soft delete Admin dan hak ubah pemilik. 6 tes M2 lulus. Perlu UAT browser oleh pengguna. |
 | M3 — Lembar Disposisi sederhana | Implementasi + CI selesai; migrasi/UAT Laragon menunggu | Satu lembar per surat masuk, satu form, PDF A4 satu halaman, filter/lencana, penghitung cetak. Tabel alur lama diarsipkan tanpa menghapus data. |
-| M4 — Surat Keluar | Implementasi + CI dan migrasi Laragon selesai; UAT browser menunggu | CRUD, nomor agenda/surat terkunci per tahun tanggal surat, pola tersimpan di `settings`, nomor manual Admin, lampiran privat, policy pemilik, soft delete Admin. `composer ci` lulus: 37 tes/183 assertion. |
-| M5 — Laporan | Belum dimulai | Laporan surat masuk/keluar, cetak, PDF, Excel. |
+| M4 — Surat Keluar | Implementasi + CI, migrasi Laragon, dan commit selesai; UAT browser menunggu | CRUD, nomor agenda/surat terkunci per tahun tanggal surat, pola tersimpan di `settings`, nomor manual Admin, lampiran privat, policy pemilik, soft delete Admin. `composer ci` lulus: 37 tes/183 assertion. |
+| M5 — Laporan | Implementasi + CI + UAT browser selesai; commit/integrasi menunggu | Pengguna mengonfirmasi laporan berhasil diuji di browser dan `composer ci` lulus. Halaman laporan masuk/keluar, filter tanggal/klasifikasi, cetak A4, PDF, dan ekspor XLSX tersedia. Test otomatis khusus laporan belum ditambahkan. |
 | M6 — Dashboard & Penyelesaian | Sebagian tersedia | Sapaan, kartu placeholder, pengaturan ukuran huruf, dan font lokal tersedia; grafik, ringkasan nyata, bantuan, hardening, backup, panduan, dan UAT tersisa. |
 
 ## Riwayat
+
+### 2026-10-21 — M5 Laporan (implementasi awal)
+
+- **Dikerjakan:** halaman laporan masuk/keluar dengan rentang tanggal (default bulan berjalan), pilihan tanggal surat/diterima/keluar, filter klasifikasi, batas rentang 366 hari, hasil berpaginasi, tampilan cetak berkop, PDF A4 lanskap, dan ekspor XLSX dengan heading berbahasa Indonesia.
+- **Dependency:** pengguna menjalankan `composer require maatwebsite/excel`; versi 3.1.70 kini ada di `composer.lock` dan `vendor`. Composer menyimpan constraint wildcard `*` di `composer.json`; patok ke `^3.1.70` dengan `composer require "maatwebsite/excel:^3.1.70"` agar tidak mencoba versi 4 yang meminta PHP 8.3.
+- **Perbaikan kualitas:** Pint dan PHPStan sempat menemukan masalah format serta 17 masalah tipe pada ekspor/paginasi/tanggal; sudah diperbaiki. Pengguna mengonfirmasi `composer ci` lulus setelah perbaikan.
+- **UAT:** pengguna mengonfirmasi UAT laporan sudah berjalan dan berhasil. `composer ci` juga dikonfirmasi lulus.
+- **Tersisa:** test otomatis khusus laporan belum ditambahkan; perubahan M5 belum di-commit. Pemeriksaan Git menunjukkan `develop` masih di M3 (`4c1240a`) dan M5 berisi M4 sebagai commit induk. Integrasikan M4 lalu M5 sebelum membuat branch M6.
+- **Catatan Git:** branch aktif `feature/m5-laporan`; pemeriksaan awal menunjukkan `develop` masih di commit M3 (`4c1240a`), sementara branch M5 membawa kode M4. Pastikan M4 digabung ke `develop` saat integrasi.
 
 ### 2026-10-21 — M4 Data Surat Keluar
 

@@ -2,11 +2,15 @@
 
 use App\Http\Controllers\DispositionPrintController;
 use App\Http\Controllers\InstitutionLogoController;
+use App\Http\Controllers\ReportPrintController;
 use App\Http\Controllers\SecureFileController;
 use App\Http\Middleware\IdleSessionTimeout;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', IdleSessionTimeout::class])->group(function (): void {
+    Route::get('/laporan/{type}/cetak', ReportPrintController::class)->name('reports.print');
+    Route::get('/laporan/{type}/pdf', ReportPrintController::class)->name('reports.pdf');
+    Route::get('/laporan/{type}/excel', ReportPrintController::class)->name('reports.excel');
     Route::get('/surat-masuk/berkas/{attachment}', [SecureFileController::class, 'show'])
         ->name('incoming-letters.attachments.show');
 

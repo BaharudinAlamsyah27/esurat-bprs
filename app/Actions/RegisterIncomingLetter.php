@@ -48,8 +48,7 @@ class RegisterIncomingLetter
                     ->firstOrFail();
 
                 $sequence->increment('last_number');
-                // ASSUMPTION: nomor agenda memakai urutan 3 digit/tahun pencatatan (contoh 001/2026).
-                $agendaNumber = str_pad((string) $sequence->last_number, 3, '0', STR_PAD_LEFT).'/'.$year;
+                $agendaNumber = str_pad((string) $sequence->last_number, 4, '0', STR_PAD_LEFT).'/'.$year;
 
                 $letter = IncomingLetter::query()->create(array_merge($data, [
                     'agenda_year' => $year,

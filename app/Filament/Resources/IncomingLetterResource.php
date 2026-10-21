@@ -92,8 +92,9 @@ class IncomingLetterResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->searchPlaceholder(__('incoming.search_hint'))
             ->columns([
-                TextColumn::make('agenda_number')->label(__('incoming.agenda_number'))->searchable()->sortable(),
+                TextColumn::make('agenda_number')->label(__('incoming.agenda_number'))->sortable(),
                 TextColumn::make('letter_number')->label(__('incoming.letter_number'))->searchable(),
                 TextColumn::make('sender_name')->label(__('incoming.sender_name'))->searchable(),
                 TextColumn::make('subject')->label(__('incoming.subject'))->searchable()->limit(45),

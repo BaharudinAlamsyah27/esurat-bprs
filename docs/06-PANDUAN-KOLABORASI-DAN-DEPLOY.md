@@ -45,48 +45,42 @@ Mx — nama
 
 ## 3. Prompt QA untuk Antigravity
 ```
-Kamu adalah QA engineer. Repo: E-Surat BPRS Sragen (Laravel + Filament). Baca AGENTS.md dan docs/03-ALUR-BISNIS-DAN-RBAC.md.
-1. Siapkan aplikasi: composer install, cp .env.example .env, key:generate, migrate --seed, jalankan server + queue worker.
+Kamu adalah QA engineer. Repo: E-Surat BPRS Sragen (Laravel + Filament). Baca AGENTS.md dan docs/03-ALUR-DAN-HAK-AKSES.md.
+1. Siapkan aplikasi: composer install, salin `.env.example` menjadi `.env`, atur kata sandi Admin dengan aman, jalankan `php artisan key:generate`, `php artisan migrate --seed`, lalu jalankan server lokal.
 2. Uji milestone {Mx} di browser memakai user demo tiap peran (daftar di seeder/README). Untuk setiap skenario di bawah, catat LULUS/GAGAL, langkah reproduksi, dan screenshot bila gagal.
-3. Uji kemudahan sesuai docs/07 §10 (jumlah klik, istilah, ukuran huruf/tombol) seolah-olah kamu pengguna lansia yang gaptek.
-4. Fokus khusus: hak akses (coba akses URL langsung dengan peran yang tidak berhak), tingkat kerahasiaan, validasi form, upload file tidak valid, tampilan di lebar tablet/ponsel, teks bahasa Indonesia yang salah/hilang.
+3. Uji kemudahan sesuai docs/07 §9 (jumlah klik, istilah, ukuran huruf/tombol) seolah-olah kamu pengguna lansia yang gaptek.
+4. Fokus khusus: hak akses Admin/User (coba akses URL Admin langsung sebagai User), validasi form, upload file tidak valid, tampilan di lebar tablet/ponsel, teks bahasa Indonesia yang salah/hilang. Kerahasiaan per surat dan notifikasi bukan scope v2.
 5. Jangan memperbaiki kode. Hasilkan laporan docs/qa/{Mx}-laporan.md berisi: ringkasan, tabel skenario, daftar bug (Kritis/Tinggi/Sedang/Rendah), saran.
 Skenario {Mx}: {salin dari daftar di bawah}
 ```
 
 ### Daftar skenario uji ringkas
-- **M1:** login tiap peran; menu sesuai peran; user nonaktif ditolak; password lemah ditolak; unggah tanda tangan non-PNG ditolak; akses `/users` oleh staf = ditolak.
-- **M2:** registrasi surat; nomor agenda berurutan; duplikat memunculkan peringatan; surat rahasia tak terlihat oleh staf; unduh file via URL langsung tanpa login = ditolak; cetak lembar disposisi.
-- **M3:** Direksi disposisi ke Kepala Divisi; Kepala Divisi sub-disposisi ke Staf; Staf selesai → surat completed; staf lain tak bisa mendisposisi; penutupan manual wajib alasan.
-- **M4:** buat draft dengan template; pratinjau PDF ber-watermark DRAFT; staf tak bisa mengubah draft orang lain.
-- **M5:** submit → review → sign; minta revisi lalu submit ulang; tolak; coba menyetujui surat sendiri; delegasi cuti.
-- **M6:** nomor + PDF + QR terbit; pindai QR → halaman verifikasi benar; batalkan → status DIBATALKAN; token ngawur; edit surat signed ditolak.
-- **M7:** tiap peristiwa memunculkan notifikasi ke orang yang tepat; email tidak ganda; pengingat jatuh tempo.
-- **M8:** angka dashboard cocok; ekspor laporan; filter pencarian; auditor tidak bisa ubah data.
-- **M9:** UAT end-to-end dengan perwakilan BPRS; uji restore backup.
+- **M0:** login admin dan user dengan username; pengguna nonaktif ditolak; password salah menampilkan pesan ramah; tampilan huruf besar berfungsi.
+- **M1:** menu user tidak memuat DATA MASTER dan membuka URL admin = ditolak ramah; Data Pengguna TIDAK menampilkan password; atur ulang password; admin terakhir tidak bisa dihapus; Data Instansi (satu data) tersimpan & logo tampil; riwayat aktivitas mencatat perubahan.
+- **M2:** tambah surat masuk (agenda 0001/2026 lalu 0002/2026); duplikat memunculkan peringatan; cari berdasarkan nomor/asal/perihal; unggah file valid & file palsu (.php→.pdf) ditolak; unduh file via URL langsung tanpa login = ditolak; user tidak bisa mengubah surat orang lain atau menghapus.
+- **M3:** dari daftar surat → Disposisi → isi → Simpan & Cetak dalam ≤ 4 klik; PDF A4 satu halaman memuat semua field + nama pimpinan; tombol berubah menjadi Cetak/Ubah Disposisi; lencana Sudah didisposisi; user bisa mencetak tetapi tidak bisa membuat/mengubah.
+- **M4:** nomor surat keluar otomatis sesuai pola; agenda berurutan; nomor ganda ditolak; hanya admin yang menimpa nomor; pencarian & unduh file.
+- **M5:** laporan per rentang tanggal cocok dengan data; cetak rapi di A4 dengan kop; unduh PDF & Excel terbuka; rentang kosong → pesan ramah; rentang > 366 hari ditolak.
+- **M6:** angka dashboard & grafik cocok dengan data; grafik terbaca (label/legenda teks); kartu bisa diklik; tampil rapi di tablet; uji kemudahan docs/07 §9 dengan pengguna senior; uji restore backup.
 
 ## 4. Deployment On-Premise (panduan ringkas)
 
 **Server:** Ubuntu Server LTS (22.04/24.04), 4 vCPU, 8 GB RAM, 100 GB SSD (cukup untuk awal); VM di jaringan internal.
-**Komponen:** Nginx, PHP-FPM 8.3 (ext: mbstring, xml, intl, gd, zip, mysql, bcmath), MySQL 8, Supervisor, Composer, (opsional) ClamAV untuk memindai upload.
+**Komponen:** Nginx, PHP-FPM 8.3 (ext: mbstring, xml, intl, gd, zip, mysql, bcmath), MySQL 8, Composer, (opsional) ClamAV untuk memindai upload.
 **Langkah umum:**
 1. Buat user non-root `esurat`; clone repo ke `/var/www/esurat`.
 2. `composer install --no-dev --optimize-autoloader`; salin `.env` produksi (`APP_ENV=production`, `APP_DEBUG=false`, DB, SMTP internal, `APP_URL=https://esurat.bprs-sragen.local` — sesuaikan).
-3. `php artisan key:generate`, `migrate --force`, `db:seed --class=ProductionSeeder` (peran, izin, super admin — BUKAN seeder demo), `storage:link` TIDAK diperlukan untuk file private, `config:cache`, `route:cache`, `view:cache`, `filament:optimize` bila tersedia.
+3. `php artisan key:generate`, `php artisan migrate --force`, `php artisan db:seed` (akun Admin dari konfigurasi deployment yang aman; jangan memakai password demo), `storage:link` TIDAK diperlukan untuk file private, `config:cache`, `route:cache`, `view:cache`.
 4. Nginx: root `public/`, HTTPS dengan sertifikat CA internal, `client_max_body_size 12M`, blok akses ke dotfiles.
-5. Supervisor: `php artisan queue:work --sleep=3 --tries=3 --max-time=3600`.
-6. Cron: `* * * * * php /var/www/esurat/artisan schedule:run`.
+5. V2 tidak memerlukan worker antrean atau scheduler.
 7. Backup harian 01:00: dump DB + arsip `storage/app/private`; simpan salinan di media/server terpisah; **uji restore berkala**.
 8. Hardening: firewall hanya 80/443 dari LAN, SSH key-only, update keamanan otomatis, batasi akses DB ke localhost, rotasi log.
-9. Verifikasi QR: pastikan domain internal dalam URL QR dapat dibuka dari perangkat yang akan memindai (mis. ponsel di Wi-Fi kantor). Bila surat dikirim ke pihak luar, pertimbangkan domain publik terbatas khusus `/verifikasi/*`.
 
 ## 5. Risiko & Mitigasi
 | Risiko | Mitigasi |
 |---|---|
 | Agent salah paham spesifikasi | Milestone kecil, kriteria selesai jelas, review Claude + QA Antigravity |
 | Nomor surat ganda | Lock transaksi + test konkurensi |
-| Kebocoran surat rahasia | Global scope + policy + test per peran + pengaman file |
-| Keabsahan hukum TTD | Konfirmasi Kepatuhan/Legal; rencana integrasi PSrE bila diwajibkan |
-| QR tak bisa dipindai dari luar | Rencanakan domain/verifikasi publik terbatas |
+| Akses data/file tanpa hak | Policy per level + test + file privat lewat route terautentikasi |
 | Kehilangan data | Backup terjadwal + uji restore |
 | Ketergantungan versi paket (Filament/Laravel) | Kunci `composer.lock`, upgrade terencana |

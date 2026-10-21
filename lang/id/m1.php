@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'profile' => 'Profil Saya',
+    'save' => 'Simpan',
+    'profile_saved' => 'Perubahan profil berhasil disimpan.',
+    'name' => 'Nama',
+    'username' => 'Nama pengguna',
+    'email' => 'Alamat email',
+    'level' => 'Level akses',
+    'user' => 'Pengguna',
+    'users' => 'Data Pengguna',
+    'active' => 'Aktif',
+    'inactive' => 'Tidak aktif',
+    'active_filter' => 'Status pengguna',
+    'password' => 'Kata sandi',
+    'current_password' => 'Kata sandi saat ini',
+    'new_password' => 'Kata sandi baru',
+    'password_confirmation' => 'Ulangi kata sandi baru',
+    'classifications' => 'Data Klasifikasi',
+    'classification' => 'Klasifikasi',
+    'code' => 'Kode',
+    'description' => 'Keterangan',
+    'audit_login' => 'Pengguna masuk.',
+    'audit_logout' => 'Pengguna keluar.',
+    'audit_failed_login' => 'Percobaan masuk gagal.',
+];

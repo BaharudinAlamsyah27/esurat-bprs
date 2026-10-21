@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'name' => 'E-Surat BPRS Sragen',
+    'login' => 'Masuk',
+    'email' => 'Alamat email',
+    'username' => 'Nama pengguna',
+    'password' => 'Kata sandi',
+    'user_levels' => ['admin' => 'Admin', 'user' => 'Pengguna'],
+    'initial_admin_password_required' => 'Isi INITIAL_ADMIN_PASSWORD pada berkas .env dengan kata sandi minimal 10 karakter, huruf besar dan kecil, serta angka sebelum membuat admin awal.',
+    'welcome' => 'Selamat datang di E-Surat BPRS Sragen',
+    'dashboard' => 'Beranda',
+    'dashboard_intro' => 'Berikut ringkasan pekerjaan surat Anda.',
+    'greeting_morning' => 'Selamat pagi',
+    'greeting_afternoon' => 'Selamat siang',
+    'greeting_evening' => 'Selamat sore',
+    'greeting_night' => 'Selamat malam',
+    'incoming_this_month' => 'Surat Masuk Bulan Ini',
+    'outgoing_this_month' => 'Surat Keluar Bulan Ini',
+    'font_size' => 'Ukuran huruf',
+    'font_normal' => 'Normal',
+    'font_large' => 'Besar',
+    'font_largest' => 'Sangat besar',
+    'edit' => 'Ubah',
+    'delete' => 'Hapus',
+    'create' => 'Tambah',
+    'search' => 'Cari',
+];

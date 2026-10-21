@@ -1,175 +1,145 @@
-# 05 — Prompt Siap Pakai
+# 05 — Prompt Siap Pakai (v2 — disederhanakan)
 
-Salin-tempel prompt ke Codex (atau agent coding lain). Satu prompt = satu sesi = satu milestone.
-Ganti `{…}` bila ada. Jangan gabungkan beberapa milestone dalam satu sesi.
+Salin-tempel ke Codex. Satu prompt = satu sesi = satu milestone. Urutan: **Prompt Pembuka + Prompt Rombakan Total (sekali)** → M0 (bila belum selesai) → M1 → … → M6.
 
 ---
-## PROMPT PEMBUKA (dipakai di SETIAP sesi, tempel di awal)
+## PROMPT PEMBUKA (tempel di awal SETIAP sesi)
 ```
-Kamu adalah engineer senior Laravel yang bekerja di repo "E-Surat BPRS Sragen".
+Kamu adalah engineer senior Laravel di repo "E-Surat BPRS Sragen".
 Sebelum menulis kode:
-1. Baca AGENTS.md sampai habis dan patuhi semua aturannya.
+1. Baca AGENTS.md sampai habis dan patuhi semua aturannya (terutama SCOPE v2, §5 Keamanan, §8 Windows/Sandbox).
 2. Baca docs/PROGRESS.md untuk tahu posisi terakhir.
-3. Baca docs/07-PANDUAN-UX-SEDERHANA.md — semua tampilan HARUS mengikutinya (desain orisinal BPRS Sragen: sederhana, huruf & tombol besar, bahasa sehari-hari, form satu halaman; jangan menyalin desain/kode/aset pihak lain).
-4. Baca dokumen yang relevan di docs/ (01-PRD, 02-ARSITEKTUR-DAN-DATABASE, 03-ALUR-BISNIS-DAN-RBAC, 04-ROADMAP-MILESTONE).
-Aturan sesi: kerjakan HANYA milestone yang kusebut. Jika ada yang ambigu, tulis di docs/OPEN_QUESTIONS.md, pilih asumsi paling aman, tandai // ASSUMPTION:. Jangan mengganti stack. Jangan hard-code teks Indonesia di kode (pakai lang/id). Akhiri dengan menjalankan: composer ci (setara pest + pint --test + phpstan; di Windows/Laragon jangan memakai ./vendor/bin), lalu perbarui docs/PROGRESS.md dan commit. Beri ringkasan: file yang dibuat/diubah, cara menjalankan, apa yang belum selesai.
+3. Baca docs/07-PANDUAN-UX-SEDERHANA.md — tampilan harus sederhana, huruf & tombol besar, bahasa sehari-hari, form satu halaman, desain orisinal (jangan menyalin pihak lain).
+4. Baca docs/01-PRD.md, 02-DATABASE-DAN-ARSITEKTUR.md, 03-ALUR-DAN-HAK-AKSES.md, 04-ROADMAP.md.
+Kerjakan HANYA milestone yang kusebut. Jika ambigu, tulis di docs/OPEN_QUESTIONS.md, ambil asumsi paling sederhana, tandai // ASSUMPTION:. Jangan mengganti stack. Jangan hardcode teks Indonesia di kode (pakai lang/id). Folder docs/future/ adalah ARSIP fase 2 — jangan dikerjakan. Akhiri dengan: composer ci, perbarui docs/PROGRESS.md, dan beri ringkasan: file yang dibuat/diubah, bagian "Perintah untuk dijalankan pengguna", dan bagian "Belum bisa diverifikasi".
 ```
 
 ---
-## M0 — Fondasi
+## PROMPT ROMBAKAN TOTAL (pakai SEKALI sekarang)
 ```
 [PROMPT PEMBUKA]
 
-Tugas: Kerjakan Milestone M0 (docs/04-ROADMAP-MILESTONE.md).
-- Jika Laravel BELUM terpasang: inisialisasi Laravel 12.x (`laravel/laravel:^12.0`) di root repo ini (jangan buat subfolder); PHP lokal 8.2 jadi jangan memakai Laravel 13 maupun fitur PHP 8.3+. Jika SUDAH terpasang (pemeriksaan: ada `artisan` dan `composer.json`), lewati langkah ini. Lalu pasang Filament, Pest, Pint, Larastan.
-- Konfigurasi: APP_LOCALE=id, timezone Asia/Jakarta, DB MySQL (.env.example), queue driver database, session driver database.
-- Buat panel Filament di path "/" bernama "E-Surat BPRS Sragen" dengan login bawaan dan terjemahan Indonesia.
-- Buat tema kustom Filament orisinal sesuai docs/07 §1, §5, §9: sidebar terang dengan item aktif "pil" hijau dan grup menu (SURAT, ARSIP & LAPORAN, PENGELOLAAN, LANJUTAN), bilah atas dengan notifikasi + menu pengguna, Beranda berisi sapaan + kartu ringkasan (data sementara boleh dummy), token warna dari §5, font 18px dibundel lokal, tombol ≥ 48px, pilihan ukuran huruf. Tulis CSS sendiri. Buat docs/LICENSES.md untuk mencatat lisensi font/ikon.
-- Buat struktur folder sesuai docs/02 §1 (folder kosong boleh diberi .gitkeep).
-- Tambahkan script composer: "ci" (pint --test, phpstan, pest).
-- Perbarui README.md dengan langkah setup lokal.
-- Buat 1 test smoke: halaman login dapat dibuka.
-Kriteria selesai: lihat M0 di roadmap. Branch: feature/m0-fondasi dari develop.
+ROMBAKAN TOTAL SCOPE dari Product Owner atas arahan mentor. Alasan: rancangan lama (disposisi berjenjang, persetujuan berjenjang, tanda tangan + QR, surat internal, notifikasi, kerahasiaan, unit hierarkis) terlalu rumit dipakai. Versi 1 sekarang = aplikasi surat masuk & surat keluar yang SEDERHANA:
+- Admin: Data Klasifikasi, Data Instansi (satu data), Data Pengguna, Data Surat Masuk, Data Surat Keluar, Laporan Surat Masuk, Laporan Surat Keluar, Profil, Riwayat Aktivitas.
+- User: Data Surat Masuk, Data Surat Keluar, Laporan Surat Masuk, Laporan Surat Keluar, Profil.
+- Dashboard: kartu ringkasan + 2 grafik sederhana + surat terbaru.
+- DISPOSISI = SEDERHANA: dari surat masuk, tombol "Disposisi" membuka satu form (Sifat, Diteruskan kepada, Isi disposisi [checklist], Catatan) → "Simpan & Cetak" menghasilkan PDF A4 "LEMBAR DISPOSISI" (kop dari Data Instansi + tanda tangan pimpinan). Tanpa pelacakan status, berjenjang, batas waktu, notifikasi, atau akun penerima.
+- Hak akses hanya dua level (users.level = admin | user) memakai Policy, TANPA spatie/laravel-permission.
+
+SEMUA spesifikasi lama (persetujuan berjenjang, TTD digital/QR, surat internal, delegasi, notifikasi, kerahasiaan, unit hierarkis, disposisi berjenjang, OCR) sudah dipindah ke docs/future/ sebagai ARSIP. JANGAN dikerjakan dan JANGAN membuat tabel/model/menu/permission/seeder/teks terjemahan untuknya. Jika ragu apakah sesuatu termasuk scope, jangan dibuat; catat di docs/OPEN_QUESTIONS.md.
+
+Baca ulang AGENTS.md dan docs/01 sampai docs/07 yang BARU. Lalu TUGAS SEKARANG (tanpa menulis fitur baru):
+a. Audit kode yang sudah ada: cari sisa rancangan lama (mis. spatie/laravel-permission, tabel/model/enum untuk unit hierarkis, approval, disposisi berjenjang, surat internal, notifikasi, kerahasiaan, menu/lang terkait). Hapus/rapikan yang sudah terlanjur dibuat dan laporkan daftarnya. Pertahankan fondasi M0 yang masih berlaku (panel Filament, tema, script ci).
+b. Perbarui docs/PROGRESS.md dengan roadmap baru (M0..M6) dan status tiap milestone berdasarkan kode yang ada.
+c. Lanjutkan M0 versi baru bila belum selesai (login memakai USERNAME, kolom users.username/level/is_active, helper isAdmin()). Jika paket perlu dipasang, tulis perintah persisnya di "Perintah untuk dijalankan pengguna" (sandbox tanpa internet).
+d. Tutup dengan "Perintah untuk dijalankan pengguna" dan "Belum bisa diverifikasi".
 ```
 
-## M1 — Auth, Pengguna, Peran, Master Data
-```
-[PROMPT PEMBUKA]
-
-Tugas: Kerjakan Milestone M1.
-- Migration & model: units (hierarki), positions, perluasan users (docs/02 "Pengguna & organisasi"), classifications, letter_types, disposition_instructions, settings.
-- Pasang spatie/laravel-permission dan spatie/laravel-activitylog. Buat seeder RolesAndPermissionsSeeder persis mengikuti matriks docs/03 §5 (peran: super_admin, admin_persuratan, direksi, kepala_unit, staf, auditor).
-- Filament Resource (dengan Policy) untuk: User, Unit, Position, Classification, LetterType, DispositionInstruction, Setting. Menu dikelompokkan "Master Data" dan "Administrasi".
-- User: upload tanda tangan & paraf PNG ke disk private, validasi, hanya pemilik/super_admin yang boleh mengganti.
-- Keamanan: validasi password kuat (min 10, huruf besar/kecil, angka), throttle login, idle timeout 30 menit (dari settings), nonaktifkan user is_active=false tidak bisa login.
-- Seeder demo (hanya environment local): unit Direksi/Operasional/Pembiayaan/Dana & Jasa/Kepatuhan/Cabang, 1 user per peran + beberapa staf.
-- Tulis test Pest: otorisasi tiap peran terhadap tiap Resource, user nonaktif ditolak, audit log tercatat saat master diubah.
-Kriteria selesai: lihat M1.
-```
-
-## M2 — Surat Masuk
+---
+## M0 — Fondasi & Login
 ```
 [PROMPT PEMBUKA]
 
-Tugas: Kerjakan Milestone M2 (docs/01 F3, docs/02, docs/03 §1 & §4).
-- Migration/model/enum untuk incoming_letters, attachments (polimorfik), letter_sequences.
-- Action RegisterIncomingLetter: nomor agenda via DB::transaction + lockForUpdate pada letter_sequences (category incoming_agenda, scope tahun). Cek duplikat (letter_number+sender_name+letter_date) → beri peringatan di form tetapi izinkan lanjut dengan konfirmasi.
-- Upload scan: disk private, validasi MIME asli (pdf/jpg/png), max 10MB, simpan sha256. SecureFileController untuk unduh/pratinjau dengan pengecekan Policy.
-- IncomingLetterResource: form registrasi, tabel (filter tahun, status, sifat, kerahasiaan, jenis, klasifikasi; pencarian perihal/pengirim/nomor), halaman detail, aksi "Teruskan ke penerima awal" (ubah status via Action, bukan update langsung).
-- VisibleToUserScope + IncomingLetterPolicy sesuai tabel kerahasiaan docs/03 §4.
-- Cetak lembar disposisi (PDF, dompdf) berisi kop (dari settings), data surat, kolom instruksi & tanda tangan.
-- Test Pest: konkurensi nomor agenda (jalankan generator berulang/paralel dan pastikan unik berurutan), visibilitas per tingkat kerahasiaan per peran, akses file tanpa izin = 403, validasi upload menolak file berbahaya (mis. .php diberi ekstensi .pdf).
+Tugas: Kerjakan Milestone M0 (docs/04-ROADMAP.md). Jika Laravel/Filament sudah terpasang, lewati instalasi dan sesuaikan.
+- Laravel 12.x + Filament; panel di path "/" bernama "E-Surat BPRS Sragen"; bahasa Indonesia, timezone Asia/Jakarta, MySQL (.env.example), session/cache driver sederhana.
+- Tema kustom orisinal sesuai docs/07 §1, §5, §8: sidebar terang dengan item aktif "pil" hijau, bilah atas (nama pengguna + avatar), font 18px dibundel lokal, tombol ≥ 48px, token warna, menu pengguna dengan pilihan Ukuran Huruf (users.ui_font_scale). Buat docs/LICENSES.md.
+- Login memakai USERNAME (kustomisasi halaman login Filament), pesan error ramah. Kolom users: username (unik), level (enum admin|user), is_active, last_login_at, ui_font_scale. Pengguna nonaktif tidak bisa login. Throttle login, idle timeout 30 menit dari settings.
+- Helper User::isAdmin(); Policy dasar; seeder admin (password dari .env/diminta saat setup — jangan hardcode password lemah) dan 1 user demo hanya di environment local.
+- Script composer "ci" (pint --test, phpstan, pest) dan "lint". Test Pest smoke: halaman login terbuka, admin & user dapat login, nonaktif ditolak.
+Kriteria selesai: lihat M0.
+```
+
+## M1 — Data Master, Pengguna, Profil
+```
+[PROMPT PEMBUKA]
+
+Tugas: Kerjakan Milestone M1 (docs/01 modul A,B,C,H,I; docs/03 §5).
+- Data Klasifikasi: Resource (kode unik, nama, keterangan) + seeder 9 klasifikasi awal (docs/01 A). Klasifikasi yang dipakai surat tidak bisa dihapus (pesan ramah).
+- Data Instansi: SATU data saja (halaman edit, bukan daftar): nama, alamat, telepon, email, kota, logo, nama & jabatan pimpinan. Logo disimpan di disk private/terkontrol dan tampil di menu & cetakan.
+- Data Pengguna: Resource (username, nama, email opsional, level, aktif). Password di-hash; TIDAK ADA kolom/field yang menampilkan password; aksi "Atur Ulang Password" (Admin menetapkan password baru) dan Nonaktifkan; tidak boleh menghapus/menonaktifkan diri sendiri atau admin terakhir.
+- Profil Saya: ubah nama, email, ganti password (wajib password lama), pilihan Ukuran Huruf.
+- Riwayat Aktivitas: pasang spatie/laravel-activitylog; Resource baca-saja untuk Admin; catat login/logout/gagal login serta perubahan master & pengguna.
+- Policy & menu per level: User tidak melihat grup DATA MASTER dan ditolak (403 ramah) bila membuka URL-nya.
+- Test Pest: otorisasi tiap Resource per level, password tak pernah muncul di respons/tabel, admin terakhir terlindungi, audit tercatat.
+Paket baru? tulis perintah di "Perintah untuk dijalankan pengguna". Kriteria selesai: lihat M1.
+```
+
+## M2 — Data Surat Masuk
+```
+[PROMPT PEMBUKA]
+
+Tugas: Kerjakan Milestone M2 (docs/01 modul D; docs/02; docs/03 §1, §4).
+- Migration/model: incoming_letters, letter_sequences (docs/02). Action RegisterIncomingLetter: nomor agenda "0001/2026" via DB::transaction + lockForUpdate (category incoming_agenda, scope tahun).
+- IncomingLetterResource: tabel (No Agenda, Nomor Surat, Asal Surat, Perihal, Tgl Surat, kolom Disposisi [placeholder sampai M3], Aksi berteks Lihat/Ubah/Hapus); kotak Cari (nomor surat, asal surat, perihal); filter Tahun & Klasifikasi; tombol "+ Tambah Surat Masuk"; form satu halaman (Keterangan di "Isian tambahan" tertutup); halaman detail dengan pratinjau/unduh file dan tombol Kembali; peringatan duplikat (nomor+asal+tanggal) dengan konfirmasi lanjut.
+- File: disk private, validasi MIME asli (pdf/jpg/png) maks 10 MB, simpan sha256, nama acak; unduh/pratinjau lewat SecureFileController (login + Policy). Ganti file = hapus file lama.
+- Policy: semua pengguna aktif boleh lihat & tambah; User hanya mengubah surat buatannya; hanya Admin menghapus (SoftDeletes, konfirmasi, tercatat di audit).
+- Test Pest: agenda unik berurutan pada pemanggilan paralel & reset tahun baru; User tidak bisa mengubah surat orang lain/menghapus; file tanpa login = ditolak; upload .php berekstensi .pdf ditolak; duplikat memunculkan peringatan.
 Kriteria selesai: lihat M2.
 ```
 
-## M3 — Disposisi Berjenjang
+## M3 — Lembar Disposisi (sederhana)
 ```
 [PROMPT PEMBUKA]
 
-Tugas: Kerjakan Milestone M3 (docs/01 F4, docs/03 §1).
-- Migration/model/enum: dispositions (parent_id untuk sub-disposisi), disposition_recipients, pivot instruksi.
-- Action: CreateDisposition (penerima pengguna dan/atau unit, instruksi checklist, catatan, urgensi, due_at), UpdateRecipientStatus (pending→read→in_progress→done + report_notes + lampiran), CloseDispositionManually (wajib alasan). Penerima yang membuka detail otomatis ditandai read.
-- Surat masuk berubah status otomatis: forwarded→in_disposition (disposisi pertama), →in_progress, →completed (semua penerima aktif done) lewat DispositionService.
-- UI: komponen timeline pohon disposisi di halaman IncomingLetter; widget "Disposisi untuk saya" (terurut due_at, penanda terlambat); form sub-disposisi hanya untuk penerima.
-- Policy: hanya pemegang surat yang boleh mendisposisikan; penerima hanya mengubah statusnya sendiri.
-- Test: skenario Direksi→Kepala Divisi→Staf→selesai ⇒ surat completed; pengguna tak berkaitan tidak bisa mendisposisi/melihat; penutupan manual tanpa alasan ditolak.
-Kriteria selesai: lihat M3.
+Tugas: Kerjakan Milestone M3 (docs/01 modul E; docs/07 §4 "Lembar Disposisi"). Ini fitur kunci kemudahan: harus SANGAT mudah. TIDAK ada pelacakan status, penerima berakun, batas waktu, atau notifikasi.
+- Migration/model dispositions (docs/02): incoming_letter_id unik, urgency, forwarded_to (JSON), instructions (JSON), instruction_other, note, disposition_date, created_by/updated_by, printed_at, print_count. Enum Urgency (biasa, penting, segera, sangat_segera) dan daftar instruksi baku di config/enum (bukan master data): Untuk diketahui, Segera tindak lanjuti, Koordinasikan, Siapkan konsep jawaban, Mohon pendapat, Arsipkan, Lainnya.
+- Action modal "Disposisi" di surat masuk (baris & detail): Sifat (pilihan besar), Diteruskan kepada (TagsInput dengan saran dari nama/jabatan pengguna, boleh teks bebas, minimal 1), Isi disposisi (CheckboxList + "Lainnya" teks), Catatan. Tombol "Simpan & Cetak" (utama) dan "Simpan saja". Jika sudah ada, tombol berubah menjadi "Cetak Disposisi" dan "Ubah Disposisi".
+- DispositionPdfService (dompdf): PDF A4 satu halaman "LEMBAR DISPOSISI" sesuai docs/07 (kop dari Data Instansi, tabel field, kotak ☑ instruksi, tanggal & kota, jabatan + nama pimpinan, ruang tanda tangan). Route cetak terautentikasi (DispositionPrintController); setiap cetak menambah print_count dan tercatat di audit.
+- Kolom "Disposisi" di daftar: lencana "✔ Sudah didisposisi"/"Belum" + filter.
+- Policy: hanya Admin membuat/mengubah; Admin & User boleh mencetak.
+- Test Pest: simpan & cetak menghasilkan PDF (header application/pdf, tidak error); satu surat satu lembar (simpan kedua = ubah); User tidak dapat membuat/mengubah tetapi dapat mencetak; validasi (Diteruskan kepada & Isi disposisi wajib); print_count bertambah.
+Paket baru (barryvdh/laravel-dompdf)? tulis perintahnya di "Perintah untuk dijalankan pengguna". Kriteria selesai: lihat M3.
 ```
 
-## M4 — Surat Keluar: Draft & Penomoran
+## M4 — Data Surat Keluar
 ```
 [PROMPT PEMBUKA]
 
-Tugas: Kerjakan Milestone M4 (docs/01 F5, docs/02, docs/03 §2 "Penomoran").
-- Migration/model/enum: outgoing_letters, outgoing_letter_versions, letter_templates, numbering_formats (+ seeder pola default).
-- OutgoingLetterResource: form draft SATU halaman, bukan wizard, dengan dua tombol "Simpan Konsep" dan "Kirim untuk Disetujui" (tujuan, perihal, jenis, klasifikasi, sifat, kerahasiaan, penandatangan (hanya user dengan position.is_signer_eligible), tembusan, lampiran, tautan "balasan atas surat masuk", editor isi dengan pilihan template). Pembuat hanya bisa edit draft/revision miliknya.
-- Service LetterNumberGenerator: render pola (token {seq:N}, {classification}, {unit}, {roman_month}, {year}), reset tahunan, transaksi + lockForUpdate. JANGAN dipanggil saat draft; hanya disediakan untuk M6.
-- Pratinjau PDF draft dengan watermark "DRAFT" (belum ada nomor/QR).
-- Test: render pola benar untuk berbagai tanggal; 50 pemanggilan berturut-turut menghasilkan nomor unik berurutan; tahun baru reset ke 1; otorisasi edit draft.
+Tugas: Kerjakan Milestone M4 (docs/01 modul F; docs/02; docs/03 §2).
+- Migration/model outgoing_letters; LetterNumberGenerator (dipakai agenda & nomor surat; transaksi + lockForUpdate; pola dari settings `outgoing_number_pattern`, token {seq:N}, {kode_klasifikasi}, {bulan_romawi}, {tahun}; reset tahunan).
+- OutgoingLetterResource: tabel (No Agenda, Nomor Surat, Tujuan, Perihal, Tgl Surat, Aksi), pencarian (nomor surat, tujuan, perihal), filter Tahun & Klasifikasi, tombol "+ Tambah Surat Keluar", form satu halaman (Nomor Surat terisi otomatis dan hanya Admin boleh menimpa — harus unik; Tujuan, Perihal, Klasifikasi, Tanggal Surat, Tanggal Keluar, File Surat; Keterangan di "Isian tambahan"), detail + unduh file. Hak akses sama seperti surat masuk.
+- File: sama seperti M2 (gunakan ulang FileStorageService/SecureFileController).
+- Test Pest: 50 pemanggilan paralel/berurutan menghasilkan nomor surat & agenda unik; pola sesuai contoh "045/500/BPRS-SRG/X/2026" pada tanggal uji; tahun baru reset ke 1; timpa manual oleh User ditolak; nomor ganda ditolak.
 Kriteria selesai: lihat M4.
 ```
 
-## M5 — Persetujuan Berjenjang + Delegasi
+## M5 — Laporan
 ```
 [PROMPT PEMBUKA]
 
-Tugas: Kerjakan Milestone M5 (docs/03 §2–§3).
-- Migration/model: approval_flows, approval_flow_steps, approval_steps, delegations (+ seeder alur default: review Kepala Unit → sign Penandatangan; alur panjang: review → approve Direktur → sign Direktur Utama).
-- Action: SubmitOutgoingLetter (validasi kelengkapan, snapshot versi, pilih alur, resolve approver, buat approval_steps round ke-n, aktifkan langkah 1), ApproveStep, RequestRevision (catatan wajib), RejectStep (alasan wajib). Hanya satu langkah pending; langkah berikutnya diaktifkan setelah approve. Pembuat tidak boleh menyetujui suratnya sendiri.
-- DelegationResolver + dukungan acting_for pada approval_steps dan disposisi.
-- UI: halaman "Menunggu persetujuan saya", panel riwayat approval di detail surat, aksi setujui/revisi/tolak dengan modal catatan, pengelolaan alur untuk super_admin (Resource ApprovalFlow dengan repeater langkah).
-- Pada langkah type=sign: untuk M5 cukup ubah status ke `signed` dengan placeholder TODO (penomoran/PDF/QR dikerjakan M6) — beri tanda jelas.
-- Test: alur 2 dan 3 langkah; revisi menaikkan round; penolakan final; self-approval ditolak; delegat bisa bertindak dan tercatat; non-approver ditolak.
-Kriteria selesai: lihat M5.
+Tugas: Kerjakan Milestone M5 (docs/01 modul G; docs/07 §4 "Laporan").
+- Dua halaman: Laporan Surat Masuk dan Laporan Surat Keluar. Kartu "Pilih Tanggal" (Tanggal Awal, Tanggal Akhir, default bulan berjalan, opsi dasar tanggal: Tanggal Surat / Tanggal Diterima(Keluar), filter Klasifikasi opsional) + tombol "Tampilkan"; hasil tampil sebagai tabel dengan judul "Laporan Surat Masuk 01-10-2026 s/d 31-10-2026" (kolom sesuai docs/01 G).
+- Tombol Cetak (halaman Blade siap cetak dengan kop Data Instansi, CSS @media print, A4), Unduh PDF (dompdf), Unduh Excel (maatwebsite/excel). Batas rentang 366 hari; rentang kosong → pesan "Belum ada data pada periode ini."
+- ReportService satu sumber data untuk tabel, cetak, PDF, Excel. Hanya data non-terhapus. Admin & User boleh.
+- Test Pest: hasil = data seed pada rentang; batas tanggal inklusif; PDF/Excel terunduh; rentang > 366 hari ditolak dengan pesan ramah.
+Paket baru (maatwebsite/excel)? tulis perintahnya di "Perintah untuk dijalankan pengguna". Kriteria selesai: lihat M5.
 ```
 
-## M6 — Tanda Tangan, QR, PDF Final, Verifikasi
+## M6 — Dashboard & Penyelesaian
 ```
 [PROMPT PEMBUKA]
 
-Tugas: Kerjakan Milestone M6 (docs/01 F6, docs/03 §2).
-- Saat langkah sign disetujui, dalam SATU transaksi: LetterNumberGenerator → letter_number + letter_date, buat verification_token (random 40 char, unik), status=signed, signed_at; setelah commit dispatch job GenerateFinalPdf.
-- QrService membuat QR (URL /verifikasi/{token}). LetterPdfService merender PDF final dari blade `resources/views/pdf/outgoing-letter.blade.php`: kop (settings), nomor, isi, gambar tanda tangan penandatangan (dari users.signature_path), QR di pojok bawah, kalimat pengesahan elektronik. Simpan ke disk private, hitung & simpan final_pdf_hash (sha256). Tombol "Buat ulang PDF" untuk admin_persuratan/super_admin jika job gagal.
-- Route publik GET /verifikasi/{token} (tanpa login, throttle 30/menit/IP): tampilkan nomor, tanggal, perihal, penandatangan, status SAH atau DIBATALKAN, hash dokumen; token tak dikenal ⇒ halaman "tidak ditemukan" yang tidak membocorkan informasi. Tidak menampilkan isi surat. Catat ke verification_logs.
-- Fitur tambahan: unggah PDF di halaman verifikasi untuk mencocokkan hash.
-- Aksi: "Tandai dikirim" (tanggal, cara kirim, bukti kirim) → sent; "Arsipkan"; "Batalkan" untuk surat signed (hanya super_admin/direksi, alasan wajib) → QR menampilkan DIBATALKAN.
-- Setelah signed: form isi & lampiran read-only; PDF final tidak dapat diganti lewat UI.
-- Test: nomor+token terbentuk pada sign; hash PDF tersimpan dan cocok; halaman verifikasi untuk sah/batal/salah; throttle bekerja; isi surat tidak bocor di halaman publik; surat signed tak dapat diedit.
+Tugas: Kerjakan Milestone M6 (docs/01 modul J; docs/07 §3, §7, §9).
+- Dashboard: sapaan, kartu klik-terfilter (Surat Masuk, Surat Keluar, Sudah Didisposisi, Belum Didisposisi; Admin + Data Klasifikasi & Data Pengguna), 2 ChartWidget (Surat masuk & keluar 6 bulan terakhir — batang; Surat per klasifikasi 5 teratas — donat; judul + kalimat penjelas, legenda teks, angka tampil, tinggi ≥ 280px), TableWidget "Surat Terbaru". Kosong → "Belum ada data." Cache 60 detik.
+- Tombol "? Bantuan" di halaman utama + docs/USER-GUIDE.md (1 halaman per level, huruf besar).
+- LargeDatasetSeeder (10.000 surat, tidak jalan di produksi) dan cek kinerja daftar; index DB.
+- Hardening: header keamanan (middleware), APP_DEBUG=false contoh produksi, cookie secure/httponly/samesite; audit kode terhadap AGENTS.md §5.
+- deploy/backup.sh (mysqldump + tar storage, retensi 30 hari), deploy/restore.md, contoh Nginx, deploy/INSTALL.md (Ubuntu LTS, lihat docs/06 §4), docs/UAT-SCRIPT.md.
+- Test Pest: angka kartu & data grafik = data seed; User tidak melihat kartu Admin; kondisi kosong aman.
 Kriteria selesai: lihat M6.
 ```
 
-## M7 — Notifikasi & Pengingat
-```
-[PROMPT PEMBUKA]
-
-Tugas: Kerjakan Milestone M7 (docs/03 §6).
-- Buat class Notification (ShouldQueue, channel database + mail) untuk SETIAP peristiwa di tabel docs/03 §6; teks di lang/id. Aktifkan Filament database notifications dengan polling 30 detik.
-- Panggil notifikasi dari Action terkait (bukan dari Resource).
-- Preferensi pengguna: toggle email on/off (in-app selalu aktif).
-- Command letters:send-reminders: pengingat H-1, overdue harian, approval menggantung > N hari (N dari settings). Jadwalkan di routes/console.php (07:30 & 13:00 WIB). Tambahkan last_reminded_at agar tidak ganda dalam hari yang sama.
-- Test dengan Notification::fake dan Carbon::setTestNow: penerima benar tiap peristiwa, tak ada kiriman ganda, preferensi email dihormati.
-Kriteria selesai: lihat M7.
-```
-
-## M8 — Dashboard, Pencarian, Laporan
-```
-[PROMPT PEMBUKA]
-
-Tugas: Kerjakan Milestone M8 (docs/01 F8–F10).
-- Beranda sesuai docs/07 §3: sapaan, kartu ringkasan per peran (klik = daftar terfilter), daftar "Perlu Tindakan Saya" (maks 5 baris). Tanpa grafik rumit.
-- Halaman Arsip & Pencarian (FULLTEXT) dengan filter tahun/jenis/klasifikasi/status/unit/sifat; hormati kerahasiaan.
-- Laporan: Buku Agenda Surat Masuk, Buku Agenda Surat Keluar, Rekap Disposisi, Kinerja Tindak Lanjut (rata-rata waktu, % tepat waktu). Ekspor PDF (dompdf) dan Excel (maatwebsite/excel).
-- Audit Log viewer (super_admin & auditor) dengan filter pengguna/aksi/tanggal.
-- Index DB sesuai kebutuhan query; uji dengan seeder 10.000 surat (buat factory + seeder terpisah `LargeDatasetSeeder`, tidak jalan di produksi).
-- Test: angka widget = data seed; laporan tidak memuat surat yang tak boleh dilihat peminta; auditor tidak punya aksi tulis.
-Kriteria selesai: lihat M8.
-```
-
-## M9 — Hardening & Deploy
-```
-[PROMPT PEMBUKA]
-
-Tugas: Kerjakan Milestone M9.
-- Audit kode terhadap checklist keamanan AGENTS.md §5 dan OWASP Top 10; perbaiki temuan. Tambahkan header keamanan (middleware: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, CSP wajar untuk Filament/Livewire).
-- Pastikan APP_DEBUG=false di contoh produksi, cookie secure/httponly/samesite, session timeout.
-- Buat skrip `deploy/backup.sh` (mysqldump + tar storage, retensi 30 hari, enkripsi opsional) dan `deploy/restore.md` (prosedur pemulihan), contoh konfigurasi Nginx, supervisor (queue worker), cron (schedule:run), dan `deploy/INSTALL.md` untuk Ubuntu LTS sesuai docs/06 §4.
-- Buat docs/USER-GUIDE.md ringkas per peran dan docs/UAT-SCRIPT.md (skenario uji penerimaan).
-- Jalankan seluruh test, laporkan cakupan area kritis yang belum diuji.
-Kriteria selesai: lihat M9.
-```
-
 ---
-## PROMPT REVIEW (untuk Claude di claude.ai — tempel diff/ringkasan PR)
+## PROMPT REVIEW (untuk Claude — tempel diff/ringkasan)
 ```
-Berikut hasil kerja Codex untuk milestone {Mx}. Tolong review terhadap AGENTS.md dan docs/. Periksa: (1) kesesuaian spesifikasi & kriteria selesai, (2) keamanan (otorisasi, kerahasiaan, upload, SQL/XSS/mass-assignment), (3) race condition pada penomoran/approval, (4) kualitas & kelengkapan test, (5) hal yang terlewat. Beri daftar temuan berprioritas (Kritis/Tinggi/Sedang/Rendah) dan prompt perbaikan yang bisa langsung kutempel ke Codex.
+Berikut hasil kerja Codex untuk milestone {Mx}. Review terhadap AGENTS.md dan docs/: (1) kesesuaian scope v2 dan kriteria selesai — pastikan TIDAK ada fitur dari docs/future/, (2) kemudahan pakai (docs/07), (3) keamanan (otorisasi per level, password, upload, XSS/SQL), (4) race condition penomoran, (5) kualitas & kelengkapan test. Beri temuan berprioritas (Kritis/Tinggi/Sedang/Rendah) + prompt perbaikan siap tempel.
 [tempel diff / daftar file / ringkasan Codex]
 ```
-
-## PROMPT PERBAIKAN GENERIK
+## PROMPT PERBAIKAN
 ```
 [PROMPT PEMBUKA]
 
 Perbaiki temuan review berikut pada milestone {Mx}, tanpa mengubah hal lain:
 {daftar temuan}
-Tambahkan test regresi untuk tiap temuan. Jalankan pest/pint/phpstan lalu perbarui docs/PROGRESS.md.
+Tambahkan test regresi untuk tiap temuan. Jalankan composer ci lalu perbarui docs/PROGRESS.md.
 ```

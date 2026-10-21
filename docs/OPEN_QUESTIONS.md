@@ -1,16 +1,9 @@
-# Pertanyaan Terbuka & Asumsi
+# Pertanyaan Terbuka & Asumsi (scope v2)
 
-Status: [ ] menunggu · [x] terjawab
+Pertanyaan di sini hanya untuk keputusan yang masih diperlukan pada milestone terkait. Fitur yang secara tegas ditunda di `docs/future/` tidak dibuka kembali.
 
-- [ ] Format nomor surat resmi BPRS Sragen (contoh default: `045/DIR/SKR/BPRS-SRG/X/2026`)?
-- [ ] Struktur organisasi sebenarnya (Direksi, divisi/bagian, kantor cabang/kas, DPS, Komisaris)?
-- [ ] Perkiraan jumlah pengguna, jumlah kantor cabang, volume surat/bulan?
-- [ ] Apakah ada daftar klasifikasi/kode arsip resmi?
-- [ ] Apakah ada sistem/arsip existing yang datanya harus dimigrasi?
-- [ ] Kop surat resmi (logo, alamat, warna) & contoh surat keluar yang berlaku?
-- [ ] Apakah tanda tangan digital + QR cukup secara internal, atau perlu PSrE tersertifikasi?
-- [ ] Apakah surat internal (nota dinas/memo) termasuk lingkup? (default: TIDAK, fase 2)
-- [ ] SMTP internal tersedia untuk email notifikasi? Perlu WhatsApp gateway? (default: in-app + email)
-- [ ] Kebijakan retensi arsip (berapa tahun)?
-- [ ] Domain/URL internal & sertifikat HTTPS (CA internal)?
-- [ ] Logo resmi BPRS Sragen (SVG/PNG) dan warna identitas resmi? (token warna di docs/07 §5 hanya nilai awal)
+- [ ] **M1 — Data Instansi:** mohon nilai resmi alamat, telepon, email, kota, logo, nama pimpinan, dan jabatan pimpinan. Untuk pengembangan gunakan data contoh yang jelas bertanda contoh.
+- [ ] **M3 — Diteruskan Kepada:** karena tidak ada master jabatan/unit pada scope v2, default paling sederhana adalah teks bebas dengan saran dari nama pengguna yang aktif.
+- [ ] **M4 — Nomor surat keluar:** konfirmasi pola resmi BPRS Sragen. Default dokumentasi: `{seq:3}/{kode_klasifikasi}/BPRS-SRG/{bulan_romawi}/{tahun}`.
+- [ ] **M5 — Impor data lama:** default v1 tidak mengimpor data lama dari Excel.
+- [ ] **M6 — Backup:** konfirmasi lokasi penyimpanan backup dan retensi setelah server produksi tersedia.

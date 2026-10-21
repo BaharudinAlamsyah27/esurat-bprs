@@ -1,0 +1,65 @@
+@import '../../../../vendor/filament/filament/dist/theme.css';
+
+:root {
+    color-scheme: light;
+    --esurat-green: #0f5c46;
+    --esurat-green-hover: #0b4938;
+    --esurat-gold: #b8912f;
+    --esurat-page: #f7f5f0;
+    --esurat-ink: #1f2933;
+    --esurat-muted: #52606d;
+    --esurat-font-scale: 1;
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('../../../fonts/PlusJakartaSans/PlusJakartaSans-Variable.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 200 800;
+    font-display: swap;
+}
+
+html { font-size: calc(18px * var(--esurat-font-scale)); }
+body, .fi-body { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }
+.fi-body { background-color: var(--esurat-page); color: var(--esurat-ink); }
+.fi-simple-layout {
+    background:
+        radial-gradient(ellipse at top left, rgb(15 92 70 / 10%), transparent 38rem),
+        var(--esurat-page);
+    padding: 1.5rem;
+}
+.fi-simple-main {
+    width: min(100% - 2rem, 30rem);
+    border: 1px solid #e6e9e5;
+    border-radius: 1.25rem;
+    padding: 2.25rem;
+    box-shadow: 0 1.25rem 3rem rgb(31 41 51 / 9%);
+}
+.fi-simple-header { margin-bottom: 1.75rem; }
+.fi-simple-header-heading { color: var(--esurat-ink); }
+.fi-simple-main .fi-btn { width: 100%; min-height: 3.25rem; border-radius: .75rem; }
+.fi-simple-main .fi-input-wrp { border-radius: .75rem; }
+.fi-sidebar { background-color: #fff; }
+.fi-sidebar-item-active > a,
+.fi-sidebar-item-active > button { border-radius: 9999px; background: #e5f3ed; color: var(--esurat-green); }
+.fi-btn { min-height: 3rem; border-radius: .75rem; }
+.fi-topbar { background: #fff; }
+.esurat-summary-card { min-height: 8rem; border: 1px solid #e5e7eb; border-radius: 1rem; background: #fff; padding: 1.25rem; }
+.esurat-summary-card strong { display: block; color: var(--esurat-green); font-size: 1.75rem; }
+.esurat-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.esurat-greeting { border-left: .35rem solid var(--esurat-gold); padding: .5rem 1rem; }
+.esurat-greeting p { margin: 0; font-size: 1.5rem; font-weight: 700; }
+.esurat-greeting span { color: var(--esurat-muted); }
+.esurat-font-control { display: flex; align-items: center; gap: .75rem; }
+.esurat-font-control select { min-height: 3rem; border: 1px solid #9ca3af; border-radius: .5rem; padding: .5rem .75rem; }
+.esurat-font-large { --esurat-font-scale: 1.12; }
+.esurat-font-largest { --esurat-font-scale: 1.25; }
+
+@media (max-width: 900px) {
+    .esurat-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+    .fi-simple-layout { padding: .75rem; }
+    .fi-simple-main { padding: 1.5rem; }
+}

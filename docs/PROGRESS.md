@@ -2,7 +2,7 @@
 
 ## Status saat ini
 
-- Milestone aktif berikutnya: **M2 — Surat Masuk (audit kriteria dan pelengkapan yang tersisa)**
+- Milestone aktif berikutnya: **M3 — Lembar Disposisi sederhana** (setelah perubahan M2 di-commit pengguna)
 - M0: **Selesai untuk kode dan smoke test**; tampilan admin juga sudah terlihat pada screenshot browser pengguna. Tidak ada klaim UAT dengan pegawai akhir.
 - Lingkup v2: aplikasi surat masuk/keluar sederhana; disposisi satu lembar cetak adalah M3.
 - Database lama tidak dihapus. Migration baru diatur agar instalasi baru tidak membuat tabel fitur lama yang dibatalkan.
@@ -12,8 +12,8 @@
 | Milestone | Status | Catatan |
 |---|---|---|
 | M0 — Fondasi & Login | Selesai (kode + smoke test) | Login username, level admin/user, seeder awal, timeout 30 menit, font lokal; `composer ci` lulus pada 2026-10-21 (6 test/28 assertion). Screenshot pengguna menunjukkan admin berhasil membuka aplikasi lokal. |
-| M1 — Data Master, Pengguna, Profil | Selesai (implementasi + CI); migrasi Laragon menunggu | Data Instansi tunggal dengan logo privat, 9 klasifikasi, kelola pengguna/reset kata sandi, profil, audit baca-saja, policy dan proteksi Admin aktif terakhir. `composer ci` lulus. |
-| M2 — Surat Masuk | Sebagian tersedia | Resource, nomor agenda, upload privat, detail, duplikat, policy tersedia. Belum seluruh kriteria M2/test diverifikasi. |
+| M1 — Data Master, Pengguna, Profil | Selesai (implementasi + CI + migrasi Laragon) | Data Instansi tunggal dengan logo privat, 9 klasifikasi, kelola pengguna/reset kata sandi, profil, audit baca-saja, policy dan proteksi Admin aktif terakhir. `composer ci` lulus; pengguna mengonfirmasi langkah M1 sudah dijalankan. |
+| M2 — Surat Masuk | Selesai (implementasi + CI) | CRUD, agenda 4 digit/tahun, file privat, pencarian tiga kolom sesuai PRD, filter tahun/klasifikasi, duplikat dengan konfirmasi, soft delete Admin dan hak ubah pemilik. 6 tes M2 lulus. Perlu UAT browser oleh pengguna. |
 | M3 — Lembar Disposisi sederhana | Belum dimulai | Buat satu form + PDF satu halaman. Tidak ada alur status, penerima berakun, tenggat, atau notifikasi. |
 | M4 — Surat Keluar | Belum dimulai | CRUD, agenda dan nomor otomatis, unggah privat. |
 | M5 — Laporan | Belum dimulai | Laporan surat masuk/keluar, cetak, PDF, Excel. |
@@ -46,3 +46,12 @@
 - **Tersisa:** jalankan migrasi dan seeder tambahan di Laragon; lengkapi alamat, telepon, email, logo, serta identitas pimpinan resmi pada Data Instansi sebelum dipakai mencetak dokumen. Nilai resmi tetap pertanyaan terbuka dan data awal hanya nama/kota.
 - **Perintah Laragon:** `php artisan migrate --seed`, lalu `composer ci`. Jangan gunakan `migrate:fresh`/`db:wipe`.
 - **Berikutnya:** M2 — audit kelengkapan Surat Masuk terhadap PRD, terutama pencarian, upload privat, nomor agenda, duplikat, soft delete, dan policy.
+
+### 2026-10-21 — M2 Data Surat Masuk
+
+- **Selesai:** audit dan pelengkapan M2. Nomor agenda kini mengikuti format PRD `0001/YYYY`; pencarian hanya mencakup nomor surat, nama pengirim, dan perihal; placeholder pencarian diperjelas.
+- **Selesai:** perubahan surat masuk tercatat di riwayat aktivitas dengan daftar nama kolom yang berubah saja (tanpa menyalin isi surat ke log). Peringatan duplikat tetap meminta konfirmasi sebelum penyimpanan.
+- **Validasi:** `composer ci` lulus (Pint, PHPStan, 23 test/102 assertion). Enam tes M2 mencakup nomor agenda berurutan, duplikat, upload privat + SHA-256, penolakan tipe file, akses login untuk berkas, dan hak ubah/hapus/audit.
+- **Migrasi Laragon:** `php artisan migrate:status` menunjukkan semua migrasi sudah berjalan; tidak ada migrasi baru pada sesi M2.
+- **Belum diverifikasi:** pengguna perlu mencoba daftar/cari surat, catat/edit surat, pratinjau file, dan hapus sebagai Admin dari browser Laragon. Rendering tabel Livewire tidak dapat diuji di runtime ini karena ekstensi PHP `intl` tidak tersedia; `composer ci` tetap lulus.
+- **Berikutnya:** setelah pengguna menyimpan perubahan M2 pada Git, lanjutkan M3 — Lembar Disposisi sederhana.

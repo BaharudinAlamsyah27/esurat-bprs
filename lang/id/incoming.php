@@ -21,7 +21,7 @@ return [
     'registered_by' => 'Dicatat oleh',
     'status' => 'Status',
     'year' => 'Tahun agenda',
-    'search_hint' => 'Cari nomor agenda, pengirim, perihal, atau nomor surat',
+    'search_hint' => 'Cari nomor surat, nama pengirim, atau perihal',
     'scan_help' => 'PDF atau gambar JPG/PNG, maksimal 10 MB per berkas. Berkas disimpan secara privat.',
     'duplicate_warning' => 'Surat dengan nomor, pengirim, dan tanggal yang sama sudah tercatat.',
     'confirm_duplicate' => 'Saya sudah memeriksa dan tetap ingin mencatat surat ini.',
@@ -29,6 +29,7 @@ return [
     'invalid_upload' => 'Berkas harus berupa PDF, JPG, atau PNG yang valid dan berukuran paling besar 10 MB.',
     'upload_failed' => 'Berkas tidak dapat disimpan. Silakan coba lagi.',
     'audit_download' => 'Berkas surat masuk diunduh.',
+    'audit_updated' => 'Isian surat masuk diperbarui.',
     'empty' => 'Belum ada surat masuk yang tercatat.',
     'statuses' => [
         'registered' => 'Tercatat',

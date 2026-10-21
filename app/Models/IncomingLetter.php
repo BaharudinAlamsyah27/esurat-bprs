@@ -26,6 +26,24 @@ class IncomingLetter extends Model
     use RecordsActivity;
     use SoftDeletes;
 
+    protected static function booted(): void
+    {
+        static::updated(function (self $letter): void {
+            $changedFields = array_values(array_diff(array_keys($letter->getChanges()), ['updated_at']));
+
+            if ($changedFields === []) {
+                return;
+            }
+
+            activity('incoming_letter')
+                ->causedBy(auth()->user())
+                ->performedOn($letter)
+                ->event('updated')
+                ->withProperties(['changed_fields' => $changedFields])
+                ->log(__('incoming.audit_updated'));
+        });
+    }
+
     protected $fillable = [
         'agenda_year', 'agenda_seq', 'agenda_number', 'received_at', 'letter_date', 'letter_number',
         'sender_name', 'subject', 'note', 'classification_id', 'status', 'registered_by',

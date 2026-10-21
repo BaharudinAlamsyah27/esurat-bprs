@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\Models\Classification;
+use App\Models\Disposition;
 use App\Models\IncomingLetter;
 use App\Models\Institution;
 use App\Models\User;
 use App\Policies\ActivityLogPolicy;
 use App\Policies\ClassificationPolicy;
+use App\Policies\DispositionPolicy;
 use App\Policies\IncomingLetterPolicy;
 use App\Policies\InstitutionPolicy;
 use App\Policies\UserPolicy;
@@ -39,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
         Password::defaults(fn (): Password => Password::min(10)->mixedCase()->numbers());
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Classification::class, ClassificationPolicy::class);
+        Gate::policy(Disposition::class, DispositionPolicy::class);
         Gate::policy(Institution::class, InstitutionPolicy::class);
         Gate::policy(Activity::class, ActivityLogPolicy::class);
         Gate::policy(IncomingLetter::class, IncomingLetterPolicy::class);

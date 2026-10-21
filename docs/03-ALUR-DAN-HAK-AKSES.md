@@ -3,7 +3,7 @@
 ## 1. Alur Surat Masuk
 1. **+ Tambah Surat Masuk** → isi form satu halaman → Simpan. Nomor agenda otomatis (transaksi + `lockForUpdate`). Peringatan duplikat (nomor surat + asal + tanggal) dengan opsi lanjut.
 2. Di daftar/detail: **Lihat · Ubah · Disposisi · Hapus (Admin)**.
-3. **Disposisi:** tombol "Disposisi" → modal/halaman kecil → isi Sifat, Diteruskan Kepada, Isi Disposisi, Catatan → **Simpan & Cetak** → PDF terbuka di tab baru untuk dicetak. Jika sudah ada: tombol berganti menjadi **"Cetak Disposisi"** dan **"Ubah Disposisi"**. Setiap cetak menambah `print_count` dan tercatat di audit.
+3. **Disposisi:** Admin memilih "Disposisi" → satu form berisi Sifat, Diteruskan kepada (satu tujuan per baris), Isi Disposisi, Catatan, Tanggal → **Simpan & Cetak** atau **Simpan saja**. PDF A4 terbuka untuk dicetak. Jika sudah ada: Admin dapat "Ubah Disposisi"; Admin dan User dapat "Cetak Disposisi". Setiap cetak menambah `print_count` dan tercatat di audit.
 4. Tidak ada status lanjutan. Satu-satunya status turunan: Sudah/Belum didisposisi.
 
 ## 2. Alur Surat Keluar
@@ -27,7 +27,7 @@ Legenda: ✔ penuh · ◐ terbatas · — tidak.
 | Ubah surat | ✔ semua | ◐ hanya yang ia buat |
 | Hapus surat (soft delete) | ✔ | — |
 | Buat/ubah Lembar Disposisi | ✔ | — |
-| Cetak Lembar Disposisi | ✔ | ✔ |
+| Cetak Lembar Disposisi | ✔ | ✔ (jika sudah dibuat Admin) |
 | Laporan (tampil, cetak, PDF, Excel) | ✔ | ✔ |
 | Data Klasifikasi, Data Instansi, Data Pengguna | ✔ | — |
 | Riwayat Aktivitas | ✔ | — |

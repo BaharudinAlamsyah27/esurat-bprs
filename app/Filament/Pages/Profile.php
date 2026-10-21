@@ -66,8 +66,17 @@ class Profile extends Page implements HasForms
         /** @var User $user */
         $user = auth()->user();
         $state = $this->form->getState();
+        $passwordChanged = filled($state['password'] ?? null);
 
         $user->fill(array_intersect_key($state, array_flip(['name', 'email', 'password'])))->save();
+
+        if ($passwordChanged) {
+            activity('users')
+                ->causedBy($user)
+                ->performedOn($user)
+                ->event('profile_password_changed')
+                ->log(__('m1.audit_profile_password_changed'));
+        }
 
         Notification::make()->title(__('m1.profile_saved'))->success()->send();
     }

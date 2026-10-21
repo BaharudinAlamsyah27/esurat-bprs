@@ -11,6 +11,7 @@ trait RecordsActivity
         return LogOptions::defaults()
             ->logFillable()
             ->logOnlyDirty()
+            ->setDescriptionForEvent(fn (string $eventName): string => __('m1.audit_model_'.$eventName))
             ->dontSubmitEmptyLogs();
     }
 }

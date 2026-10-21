@@ -4,9 +4,12 @@ namespace App\Providers;
 
 use App\Models\Classification;
 use App\Models\IncomingLetter;
+use App\Models\Institution;
 use App\Models\User;
+use App\Policies\ActivityLogPolicy;
 use App\Policies\ClassificationPolicy;
 use App\Policies\IncomingLetterPolicy;
+use App\Policies\InstitutionPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
@@ -16,6 +19,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Activitylog\Models\Activity;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
         Password::defaults(fn (): Password => Password::min(10)->mixedCase()->numbers());
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Classification::class, ClassificationPolicy::class);
+        Gate::policy(Institution::class, InstitutionPolicy::class);
+        Gate::policy(Activity::class, ActivityLogPolicy::class);
         Gate::policy(IncomingLetter::class, IncomingLetterPolicy::class);
 
         Event::listen(Login::class, function (Login $event): void {

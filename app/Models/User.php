@@ -64,6 +64,7 @@ class User extends Authenticatable implements FilamentUser
         return LogOptions::defaults()
             ->logOnly(['name', 'username', 'email', 'level', 'is_active'])
             ->logOnlyDirty()
+            ->setDescriptionForEvent(fn (string $eventName): string => __('m1.audit_model_'.$eventName))
             ->dontSubmitEmptyLogs();
     }
 }

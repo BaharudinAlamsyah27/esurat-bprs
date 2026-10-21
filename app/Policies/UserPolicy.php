@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserLevel;
 use App\Models\User;
 
 class UserPolicy
@@ -23,13 +24,13 @@ class UserPolicy
 
     public function update(User $user, User $record): bool
     {
-        return $user->isAdmin() || $user->is($record);
+        return $user->isAdmin();
     }
 
     public function delete(User $user, User $record): bool
     {
         return $user->isAdmin() && $user->isNot($record)
-            && (! $record->isAdmin() || User::query()->where('level', 'admin')->where('is_active', true)->count() > 1);
+            && (! $record->isAdmin() || ! $record->is_active || User::query()->where('level', UserLevel::Admin->value)->where('is_active', true)->count() > 1);
     }
 
     public function restore(User $user, User $record): bool

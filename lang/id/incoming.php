@@ -22,6 +22,7 @@ return [
     'status' => 'Status',
     'year' => 'Tahun agenda',
     'search_hint' => 'Cari nomor surat, nama pengirim, atau perihal',
+    'table_help' => 'Cari nomor surat, pengirim, atau perihal. Gunakan filter untuk tahun, klasifikasi, dan status disposisi.',
     'scan_help' => 'PDF atau gambar JPG/PNG, maksimal 10 MB per berkas. Berkas disimpan secara privat.',
     'duplicate_warning' => 'Surat dengan nomor, pengirim, dan tanggal yang sama sudah tercatat.',
     'confirm_duplicate' => 'Saya sudah memeriksa dan tetap ingin mencatat surat ini.',
@@ -31,6 +32,8 @@ return [
     'audit_download' => 'Berkas surat masuk diunduh.',
     'audit_updated' => 'Isian surat masuk diperbarui.',
     'empty' => 'Belum ada surat masuk yang tercatat.',
+    'help_title' => 'Bantuan Surat Masuk',
+    'help_body' => '1. Pilih Catat Surat Masuk untuk mengisi nomor, pengirim, perihal, klasifikasi, dan tanggal. 2. Tekan Simpan. 3. Gunakan Cari untuk menemukan surat. Admin dapat memilih Disposisi pada surat untuk membuat Lembar Disposisi.',
     'statuses' => [
         'registered' => 'Tercatat',
     ],

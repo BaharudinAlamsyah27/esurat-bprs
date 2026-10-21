@@ -3,8 +3,10 @@
 namespace App\Filament\Pages;
 
 use App\Models\Institution;
+use App\Models\Setting;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -53,7 +55,10 @@ class InstitutionSettings extends Page implements HasForms
             ['name' => 'BPRS Sragen', 'city' => 'Sragen'],
         );
 
-        $this->form->fill($institution->attributesToArray());
+        $this->form->fill([
+            ...$institution->attributesToArray(),
+            'theme_color' => Setting::query()->where('key', 'ui_theme_color')->first()?->value['color'] ?? 'green',
+        ]);
     }
 
     public function form(Form $form): Form
@@ -85,6 +90,18 @@ class InstitutionSettings extends Page implements HasForms
                         TextInput::make('leader_name')->label(__('m1.leader_name'))->maxLength(120),
                         TextInput::make('leader_position')->label(__('m1.leader_position'))->maxLength(120),
                     ]),
+                Section::make(__('m1.appearance'))
+                    ->schema([
+                        Select::make('theme_color')
+                            ->label(__('m1.theme_color'))
+                            ->options([
+                                'green' => __('m1.theme_green'),
+                                'blue' => __('m1.theme_blue'),
+                                'maroon' => __('m1.theme_maroon'),
+                            ])
+                            ->required()
+                            ->helperText(__('m1.theme_color_help')),
+                    ]),
             ])
             ->statePath('data');
     }
@@ -92,9 +109,12 @@ class InstitutionSettings extends Page implements HasForms
     public function save(): void
     {
         $state = $this->form->getState();
+        $themeColor = $state['theme_color'];
+        unset($state['theme_color']);
         $oldLogo = Institution::query()->whereKey(1)->value('logo_path');
 
         Institution::query()->updateOrCreate(['id' => 1], $state);
+        Setting::query()->updateOrCreate(['key' => 'ui_theme_color'], ['value' => ['color' => $themeColor]]);
 
         $newLogo = $state['logo_path'] ?? null;
         if (is_string($oldLogo) && $oldLogo !== '' && $oldLogo !== $newLogo) {

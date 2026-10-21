@@ -2,7 +2,7 @@
 
 ## Status saat ini
 
-- Milestone aktif: **M5 — Laporan** (implementasi berjalan di branch `feature/m5-laporan`; M4 sudah di-commit dan migrasi Laragon selesai)
+- Milestone aktif: **M6 — Dashboard & Penyelesaian** (branch `feature/m6-dashboard`; M5 telah di-commit dan masuk ke `develop`)
 - M0: **Selesai untuk kode dan smoke test**; tampilan admin juga sudah terlihat pada screenshot browser pengguna. Tidak ada klaim UAT dengan pegawai akhir.
 - Lingkup v2: aplikasi surat masuk/keluar sederhana; disposisi satu lembar cetak adalah M3.
 - Database lama tidak dihapus. Migration baru diatur agar instalasi baru tidak membuat tabel fitur lama yang dibatalkan.
@@ -16,10 +16,23 @@
 | M2 — Surat Masuk | Selesai (implementasi + CI) | CRUD, agenda 4 digit/tahun, file privat, pencarian tiga kolom sesuai PRD, filter tahun/klasifikasi, duplikat dengan konfirmasi, soft delete Admin dan hak ubah pemilik. 6 tes M2 lulus. Perlu UAT browser oleh pengguna. |
 | M3 — Lembar Disposisi sederhana | Implementasi + CI selesai; migrasi/UAT Laragon menunggu | Satu lembar per surat masuk, satu form, PDF A4 satu halaman, filter/lencana, penghitung cetak. Tabel alur lama diarsipkan tanpa menghapus data. |
 | M4 — Surat Keluar | Implementasi + CI, migrasi Laragon, dan commit selesai; UAT browser menunggu | CRUD, nomor agenda/surat terkunci per tahun tanggal surat, pola tersimpan di `settings`, nomor manual Admin, lampiran privat, policy pemilik, soft delete Admin. `composer ci` lulus: 37 tes/183 assertion. |
-| M5 — Laporan | Implementasi + CI + UAT browser selesai; commit/integrasi menunggu | Pengguna mengonfirmasi laporan berhasil diuji di browser dan `composer ci` lulus. Halaman laporan masuk/keluar, filter tanggal/klasifikasi, cetak A4, PDF, dan ekspor XLSX tersedia. Test otomatis khusus laporan belum ditambahkan. |
-| M6 — Dashboard & Penyelesaian | Sebagian tersedia | Sapaan, kartu placeholder, pengaturan ukuran huruf, dan font lokal tersedia; grafik, ringkasan nyata, bantuan, hardening, backup, panduan, dan UAT tersisa. |
+| M5 — Laporan | Implementasi + CI + UAT browser + commit selesai | Pengguna mengonfirmasi laporan berhasil diuji di browser dan `composer ci` lulus. Komit `19b147d` telah masuk ke `develop`. Test otomatis khusus laporan belum ditambahkan. |
+| M6 — Dashboard & Penyelesaian | Implementasi + CI selesai; UAT/staging menunggu | Kartu dinamis dan tautan filter, dua grafik enam bulan/klasifikasi, surat terbaru, bantuan kontekstual, header keamanan, cookie produksi, panduan pengguna/instalasi/backup/restore, skenario UAT, dan seeder data uji 10.000 surat tersedia. `composer ci` lulus (41 tes/211 assertion). Uji beban, restore staging, dan UAT belum dilakukan. |
 
 ## Riwayat
+
+### 2026-10-21 — M6 Dashboard & Penyelesaian (mulai)
+
+- **Status awal:** branch aktif `feature/m6-dashboard`, worktree bersih. M5 (`19b147d`) dan M4 (`f944fbf`) sudah terintegrasi ke `develop`.
+- **Dikerjakan:** dashboard dengan kartu yang terhubung ke daftar, grafik surat per bulan/klasifikasi, daftar surat terbaru, bantuan kontekstual; hardening header/cookie; seeder performa 10.000 surat dalam transaksi; panduan backup, instalasi, pengguna, dan UAT. Tes fitur M6 mencakup kartu, hak akses kartu Admin, data grafik, kondisi kosong, dan header keamanan.
+- **Perbaikan dari CI:** model `OutgoingLetter` diberi trait factory yang sebelumnya belum terpasang; grafik bulanan kini memakai ekspresi tanggal SQLite saat tes berjalan di SQLite dan fungsi MySQL saat aplikasi berjalan di MySQL.
+- **Polesan dashboard:** sumbu angka yang tidak relevan disembunyikan dari grafik donat; daftar surat terbaru diberi panel dan tata letak baris yang lebih rapi. CSS produksi dibangun dengan `npm run build` agar Laragon menyajikan tema terkini.
+- **Ukuran dashboard:** kartu ringkasan dibuat satu baris pada layar desktop lebar, grafik ditampilkan berdampingan dengan tinggi maksimum 150 px, dan daftar surat terbaru dirapatkan agar isi utama lebih banyak terlihat tanpa menggulir pada layar desktop. `npm run build` dan `composer ci` lulus setelah perubahan terakhir (41 tes/211 assertion). Pada layar sempit, konten tetap menyesuaikan lebar dan dapat memanjang ke bawah.
+- **Tata letak desktop:** widget kustom kini memakai pembungkus grid Filament supaya `columnSpan` berlaku; sapaan dipindah ke subjudul, kartu ringkasan mengisi satu baris pada layar lebar, dua grafik berdampingan, dan surat terbaru memakai satu baris penuh. Kartu, grafik, baris surat, dan jarak dipadatkan untuk mengurangi tinggi halaman.
+- **Penyegaran tampilan akhir:** sidebar sekarang dapat ditutup sepenuhnya pada desktop dengan tombol hamburger; logo BPRS Sragen yang diberikan pengguna dipasang di header panel; mode terang/gelap bawaan Filament tersedia dengan mode terang sebagai pilihan awal, sementara pilihan pengguna tetap dapat diubah. Mode gelap memakai latar abu-abu kebiruan, header/sidebar lebih terang dari latar halaman, ikon menu berkontras jelas, dan kartu dashboard ikut menyesuaikan. Logo antarmuka ini terpisah dari logo Data Instansi yang dipakai pada PDF dan laporan. CSS tetap memakai font lokal dan tanpa dependensi baru.
+- **Polesan daftar dan warna:** sidebar dipersempit menjadi 17rem agar ruang tabel lebih lega. Daftar surat, pengguna, klasifikasi, dan aktivitas memiliki petunjuk singkat serta baris selang-seling; laporan menampilkan jumlah hasil. Admin dapat memilih aksen Hijau BPRS, Biru, atau Merah Marun dari Data Instansi; pilihan tersimpan pada `settings` yang sudah ada dan berlaku untuk semua role setelah halaman dimuat ulang. Header/sidebar memakai rona pilihan, area kerja tetap netral, termasuk mode gelap.
+- **Pemeriksaan kode:** `composer ci` lulus (Pint, PHPStan, 41 tes/211 assertion), termasuk empat tes M6 (28 assertion); `git diff --check` bersih.
+- **Belum diverifikasi:** uji 10.000 data pada database lokal, backup dan restore di staging, serta UAT dengan sedikitnya tiga pegawai senior.
 
 ### 2026-10-21 — M5 Laporan (implementasi awal)
 
@@ -27,8 +40,8 @@
 - **Dependency:** pengguna menjalankan `composer require maatwebsite/excel`; versi 3.1.70 kini ada di `composer.lock` dan `vendor`. Composer menyimpan constraint wildcard `*` di `composer.json`; patok ke `^3.1.70` dengan `composer require "maatwebsite/excel:^3.1.70"` agar tidak mencoba versi 4 yang meminta PHP 8.3.
 - **Perbaikan kualitas:** Pint dan PHPStan sempat menemukan masalah format serta 17 masalah tipe pada ekspor/paginasi/tanggal; sudah diperbaiki. Pengguna mengonfirmasi `composer ci` lulus setelah perbaikan.
 - **UAT:** pengguna mengonfirmasi UAT laporan sudah berjalan dan berhasil. `composer ci` juga dikonfirmasi lulus.
-- **Tersisa:** test otomatis khusus laporan belum ditambahkan; perubahan M5 belum di-commit. Pemeriksaan Git menunjukkan `develop` masih di M3 (`4c1240a`) dan M5 berisi M4 sebagai commit induk. Integrasikan M4 lalu M5 sebelum membuat branch M6.
-- **Catatan Git:** branch aktif `feature/m5-laporan`; pemeriksaan awal menunjukkan `develop` masih di commit M3 (`4c1240a`), sementara branch M5 membawa kode M4. Pastikan M4 digabung ke `develop` saat integrasi.
+- **Tersisa:** test otomatis khusus laporan belum ditambahkan. Pengguna kemudian mengonfirmasi M5 telah di-commit dan perintah Git untuk memulai M6 sudah dijalankan.
+- **Catatan Git:** komit M5 `19b147d` berada di `develop`; M4 `f944fbf` menjadi induknya. Pekerjaan M6 berlangsung di branch `feature/m6-dashboard`.
 
 ### 2026-10-21 — M4 Data Surat Keluar
 

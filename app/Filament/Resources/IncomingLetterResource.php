@@ -103,6 +103,7 @@ class IncomingLetterResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('disposition'))
+            ->description(__('incoming.table_help'))
             ->searchPlaceholder(__('incoming.search_hint'))
             ->columns([
                 TextColumn::make('agenda_number')->label(__('incoming.agenda_number'))->sortable(),
@@ -224,6 +225,7 @@ class IncomingLetterResource extends Resource
                 DeleteAction::make()->label(__('app.delete'))->requiresConfirmation(),
             ])
             ->defaultSort('received_at', 'desc')
+            ->striped()
             ->paginated([10, 25])
             ->emptyStateHeading(__('incoming.empty'));
     }

@@ -11,11 +11,13 @@
         </section>
 
         @if ($this->hasGenerated)
+            @php($rows = $this->getReportRows())
             <section class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
                 <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 p-5 dark:border-gray-700">
                     <div>
                         <h2 class="text-xl font-semibold">{{ $this->getReportTitle() }}</h2>
                         <p class="mt-1 text-gray-600 dark:text-gray-300">{{ $this->getDateRangeLabel() }}</p>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('reports.result_count', ['first' => $rows->firstItem() ?? 0, 'last' => $rows->lastItem() ?? 0, 'total' => $rows->total()]) }}</p>
                     </div>
                     @php($filters = http_build_query($this->getReportFilters()))
                     <div class="flex flex-wrap gap-3">
@@ -24,7 +26,6 @@
                         <a class="inline-flex min-h-12 items-center rounded-lg border border-gray-300 px-4 font-medium text-gray-800 hover:bg-gray-50" href="{{ route('reports.excel', ['type' => $this->getReportType()]).'?'.$filters }}">{{ __('reports.download_excel') }}</a>
                     </div>
                 </div>
-                @php($rows = $this->getReportRows())
                 @if ($rows->isEmpty())
                     <p class="p-6 text-gray-600">{{ __('reports.no_results') }}</p>
                 @else

@@ -15,6 +15,7 @@ return [
     'classification' => 'Klasifikasi',
     'all_classifications' => 'Semua klasifikasi',
     'show' => 'Tampilkan laporan',
+    'result_count' => 'Menampilkan :first–:last dari :total surat',
     'print' => 'Cetak',
     'download_pdf' => 'Unduh PDF',
     'download_excel' => 'Unduh Excel',
@@ -29,4 +30,6 @@ return [
     'recipient' => 'Tujuan surat',
     'note' => 'Keterangan',
     'phone' => 'Telepon',
+    'help_title' => 'Bantuan Laporan',
+    'help_body' => '1. Pilih tanggal awal dan akhir. 2. Jika perlu, pilih tanggal yang dihitung dan klasifikasi. 3. Tekan Tampilkan, lalu pilih Cetak, Unduh PDF, atau Unduh Excel.',
 ];

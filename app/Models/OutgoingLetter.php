@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Models\Concerns\RecordsActivity;
+use Database\Factories\OutgoingLetterFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -13,6 +15,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
 /** @property int $created_by */
 class OutgoingLetter extends Model
 {
+    /** @use HasFactory<OutgoingLetterFactory> */
+    use HasFactory;
+
     use LogsActivity;
     use RecordsActivity;
     use SoftDeletes;

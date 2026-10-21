@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\IncomingLetterResource\Pages;
 
 use App\Filament\Resources\IncomingLetterResource;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -12,6 +13,14 @@ class ListIncomingLetters extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [CreateAction::make()->label(__('incoming.new'))];
+        return [
+            Action::make('help')
+                ->label(__('app.help'))
+                ->icon('heroicon-o-question-mark-circle')
+                ->modalHeading(__('incoming.help_title'))
+                ->modalDescription(__('incoming.help_body'))
+                ->modalSubmitActionLabel(__('app.close')),
+            CreateAction::make()->label(__('incoming.new')),
+        ];
     }
 }

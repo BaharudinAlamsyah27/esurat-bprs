@@ -32,6 +32,7 @@ abstract class MasterDataResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->description(__('m1.classification_table_help'))
             ->columns([
                 TextColumn::make('code')->label(__('m1.code'))->searchable()->sortable(),
                 TextColumn::make('name')->label(__('m1.name'))->searchable()->sortable(),
@@ -41,6 +42,7 @@ abstract class MasterDataResource extends Resource
                 EditAction::make()->label(__('app.edit')),
                 DeleteAction::make()->label(__('app.delete'))->requiresConfirmation(),
             ])
+            ->striped()
             ->paginated([10, 25]);
     }
 }

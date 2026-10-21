@@ -1,8 +1,8 @@
-<div class="esurat-summary-grid">
+<x-filament-widgets::widget class="esurat-summary-grid">
     @foreach ($this->getCards() as $card)
-        <article class="esurat-summary-card">
+        <a class="esurat-summary-card" href="{{ $card['url'] }}">
             <strong>{{ $card['value'] }}</strong>
             <span>{{ $card['label'] }}</span>
-        </article>
+        </a>
     @endforeach
-</div>
+</x-filament-widgets::widget>

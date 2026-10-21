@@ -6,6 +6,7 @@ use App\Models\Classification;
 use App\Models\IncomingLetter;
 use App\Models\OutgoingLetter;
 use App\Services\LetterReportService;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -54,6 +55,19 @@ abstract class LetterReportPage extends Page implements HasForms
             'date_field' => 'letter_date',
             'classification_id' => null,
         ]);
+    }
+
+    /** @return array<int, Action> */
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('help')
+                ->label(__('app.help'))
+                ->icon('heroicon-o-question-mark-circle')
+                ->modalHeading(__('reports.help_title'))
+                ->modalDescription(__('reports.help_body'))
+                ->modalSubmitActionLabel(__('app.close')),
+        ];
     }
 
     public function form(Form $form): Form

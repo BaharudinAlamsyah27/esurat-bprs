@@ -6,11 +6,14 @@ use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\Profile;
 use App\Filament\Support\LocalFontProvider;
+use App\Filament\Support\ThemePalette;
 use App\Filament\Widgets\FontScaleWidget;
-use App\Filament\Widgets\GreetingWidget;
+use App\Filament\Widgets\LatestLettersWidget;
+use App\Filament\Widgets\LettersByClassificationChart;
+use App\Filament\Widgets\LettersByMonthChart;
 use App\Filament\Widgets\SummaryCardsWidget;
 use App\Http\Middleware\IdleSessionTimeout;
-use App\Models\Institution;
+use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -18,12 +21,13 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -36,20 +40,21 @@ class AdminPanelProvider extends PanelProvider
             ->path('')
             ->login(Login::class)
             ->brandName('E-Surat BPRS Sragen')
-            ->brandLogo(fn (): ?string => Institution::query()->whereKey(1)->value('logo_path') ? route('institution.logo') : null)
+            ->brandLogo(asset('images/bprs-sragen.png'))
             ->brandLogoHeight('2.5rem')
-            ->darkMode(false)
+            ->darkMode()
+            ->defaultThemeMode(ThemeMode::Light)
             ->font('Plus Jakarta Sans', provider: LocalFontProvider::class)
-            ->colors([
-                'primary' => Color::hex('#0F5C46'),
-            ])
+            ->colors(fn (): array => ThemePalette::filamentColors())
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): HtmlString => new HtmlString(ThemePalette::styles()))
             ->userMenuItems([
                 MenuItem::make()
                     ->label(__('m1.profile'))
                     ->url(fn (): string => Profile::getUrl())
                     ->icon('heroicon-o-user-circle'),
             ])
-            ->sidebarCollapsibleOnDesktop(false)
+            ->sidebarFullyCollapsibleOnDesktop()
+            ->sidebarWidth('17rem')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->navigationGroups([
                 'DATA MASTER',
@@ -64,8 +69,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                GreetingWidget::class,
                 SummaryCardsWidget::class,
+                LettersByMonthChart::class,
+                LettersByClassificationChart::class,
+                LatestLettersWidget::class,
                 FontScaleWidget::class,
             ])
             ->middleware([

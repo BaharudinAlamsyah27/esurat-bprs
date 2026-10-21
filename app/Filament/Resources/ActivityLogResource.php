@@ -39,6 +39,7 @@ class ActivityLogResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->description(__('m1.activity_table_help'))
             ->columns([
                 TextColumn::make('created_at')->label(__('m1.activity_time'))->dateTime('d M Y, H:i')->sortable(),
                 TextColumn::make('causer.name')->label(__('m1.activity_user'))->placeholder(__('m1.system_user')),
@@ -49,6 +50,7 @@ class ActivityLogResource extends Resource
                     ->placeholder('—'),
             ])
             ->defaultSort('created_at', 'desc')
+            ->striped()
             ->paginated([10, 25]);
     }
 

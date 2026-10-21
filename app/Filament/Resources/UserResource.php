@@ -75,6 +75,7 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->description(__('m1.user_table_help'))
             ->columns([
                 TextColumn::make('name')->label(__('m1.name'))->searchable()->sortable(),
                 TextColumn::make('username')->label(__('m1.username'))->searchable()->sortable(),
@@ -133,6 +134,7 @@ class UserResource extends Resource
                     }),
             ])
             ->defaultSort('name')
+            ->striped()
             ->paginated([10, 25]);
     }
 

@@ -25,6 +25,7 @@ return [
     'created_by' => 'Dicatat oleh',
     'year' => 'Tahun agenda',
     'search_hint' => 'Cari nomor surat, tujuan, atau perihal',
+    'table_help' => 'Cari nomor surat, tujuan, atau perihal. Gunakan filter tahun agenda atau klasifikasi untuk mempersempit daftar.',
     'scan_help' => 'PDF atau gambar JPG/PNG, maksimal 10 MB. Berkas disimpan secara privat.',
     'invalid_upload' => 'Berkas harus berupa PDF, JPG, atau PNG yang valid dan berukuran paling besar 10 MB.',
     'upload_failed' => 'Berkas tidak dapat disimpan. Silakan coba lagi.',
@@ -36,4 +37,6 @@ return [
     'audit_updated' => 'Isian surat keluar diperbarui.',
     'audit_created' => 'Surat keluar dicatat.',
     'empty' => 'Belum ada surat keluar yang tercatat.',
+    'help_title' => 'Bantuan Surat Keluar',
+    'help_body' => '1. Pilih Catat Surat Keluar dan isi tujuan, perihal, klasifikasi, dan tanggal. 2. Nomor dibuat otomatis; Admin dapat memasukkan nomor manual. 3. Tekan Simpan, lalu gunakan Cari atau Laporan untuk menemukan surat.',
 ];

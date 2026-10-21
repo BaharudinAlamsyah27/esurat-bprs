@@ -24,13 +24,13 @@ lang/id/  database/{migrations,factories,seeders}  tests/
 **classifications** (SD): code* unik, name*, description.
 **incoming_letters** (SD): agenda_year*, agenda_seq* (unik bersama agenda_year), agenda_number* (teks `0001/2026`), letter_number*, sender*, subject*, note, classification_id* FK, letter_date*, received_date*, file_path, file_name, file_mime, file_size, file_sha256, created_by* FK.
  Index: (agenda_year, agenda_seq), letter_date, received_date, classification_id; FULLTEXT atau LIKE pada (letter_number, sender, subject).
-**outgoing_letters** (SD): agenda_year*, agenda_seq* (unik bersama agenda_year), agenda_number*, letter_number* unik, recipient*, subject*, note, classification_id* FK, letter_date*, sent_date null, file_* (sama seperti surat masuk), created_by* FK.
+**outgoing_letters** (SD): agenda_year*, agenda_seq* (unik bersama agenda_year), agenda_number* unik, letter_number* unik, recipient*, subject*, note, classification_id* FK, letter_date*, sent_date null, created_by* FK. Berkas surat final disimpan sebagai `attachments` polymorfik dengan `kind=final`, disk privat dan hash SHA-256.
 **dispositions**: incoming_letter_id* **unik** (satu surat satu lembar), nature* (enum), forwarded_to* (JSON array teks), instructions* (JSON array kode instruksi), instruction_other null, note null, disposition_date*, created_by*, updated_by null, printed_at null, print_count default 0.
 **letter_sequences**: category* (`incoming_agenda`/`outgoing_agenda`/`outgoing_number`), scope_key* (mis. `2026`), last_number* default 0; unik(category, scope_key). Dikunci `lockForUpdate` saat increment.
-**settings**: key* unik, value JSON — mis. `outgoing_number_pattern`, `session_idle_minutes`.
+**settings**: key* unik, value JSON — `outgoing_number_pattern` disimpan sebagai `{"pattern":"..."}`; pengaturan lain hanya ditambahkan bila dibutuhkan lingkup aplikasi.
 **activity_log**: bawaan spatie/laravel-activitylog.
 
-Relasi: Classification 1—N IncomingLetter/OutgoingLetter · IncomingLetter 1—1 Disposition · User 1—N surat (created_by).
+Relasi: Classification 1—N IncomingLetter/OutgoingLetter · IncomingLetter 1—1 Disposition · User 1—N surat (`registered_by`/`created_by`) · IncomingLetter/OutgoingLetter 1—N Attachment.
 
 ## 3. Ketentuan
 - Enum disimpan string. FK `restrictOnDelete`. Klasifikasi yang dipakai surat tidak boleh dihapus (hanya dinonaktifkan atau ditolak dengan pesan ramah).

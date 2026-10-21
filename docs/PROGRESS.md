@@ -2,7 +2,7 @@
 
 ## Status saat ini
 
-- Milestone aktif: **M3 — Lembar Disposisi sederhana** (implementasi selesai; menunggu migrasi dan UAT Laragon)
+- Milestone aktif: **M4 — Data Surat Keluar** (implementasi + CI selesai; menunggu migrasi dan UAT Laragon)
 - M0: **Selesai untuk kode dan smoke test**; tampilan admin juga sudah terlihat pada screenshot browser pengguna. Tidak ada klaim UAT dengan pegawai akhir.
 - Lingkup v2: aplikasi surat masuk/keluar sederhana; disposisi satu lembar cetak adalah M3.
 - Database lama tidak dihapus. Migration baru diatur agar instalasi baru tidak membuat tabel fitur lama yang dibatalkan.
@@ -15,11 +15,21 @@
 | M1 — Data Master, Pengguna, Profil | Selesai (implementasi + CI + migrasi Laragon) | Data Instansi tunggal dengan logo privat, 9 klasifikasi, kelola pengguna/reset kata sandi, profil, audit baca-saja, policy dan proteksi Admin aktif terakhir. `composer ci` lulus; pengguna mengonfirmasi langkah M1 sudah dijalankan. |
 | M2 — Surat Masuk | Selesai (implementasi + CI) | CRUD, agenda 4 digit/tahun, file privat, pencarian tiga kolom sesuai PRD, filter tahun/klasifikasi, duplikat dengan konfirmasi, soft delete Admin dan hak ubah pemilik. 6 tes M2 lulus. Perlu UAT browser oleh pengguna. |
 | M3 — Lembar Disposisi sederhana | Implementasi + CI selesai; migrasi/UAT Laragon menunggu | Satu lembar per surat masuk, satu form, PDF A4 satu halaman, filter/lencana, penghitung cetak. Tabel alur lama diarsipkan tanpa menghapus data. |
-| M4 — Surat Keluar | Belum dimulai | CRUD, agenda dan nomor otomatis, unggah privat. |
+| M4 — Surat Keluar | Implementasi + CI dan migrasi Laragon selesai; UAT browser menunggu | CRUD, nomor agenda/surat terkunci per tahun tanggal surat, pola tersimpan di `settings`, nomor manual Admin, lampiran privat, policy pemilik, soft delete Admin. `composer ci` lulus: 37 tes/183 assertion. |
 | M5 — Laporan | Belum dimulai | Laporan surat masuk/keluar, cetak, PDF, Excel. |
 | M6 — Dashboard & Penyelesaian | Sebagian tersedia | Sapaan, kartu placeholder, pengaturan ukuran huruf, dan font lokal tersedia; grafik, ringkasan nyata, bantuan, hardening, backup, panduan, dan UAT tersisa. |
 
 ## Riwayat
+
+### 2026-10-21 — M4 Data Surat Keluar
+
+- **Selesai:** membuat tabel/model surat keluar, pengaturan pola nomor, generator nomor surat dan agenda yang dikunci dengan `lockForUpdate`, CRUD Filament, pencarian tiga kolom, filter tahun/klasifikasi, halaman rincian, policy, audit perubahan, dan penghapusan lunak Admin.
+- **Berkas:** memakai ulang tabel attachment polymorfik dan route privat terautentikasi; validasi PDF/JPG/PNG maks. 10 MB, SHA-256, penggantian berkas menghapus berkas lama setelah transaksi berhasil.
+- **Nomor:** pola awal `{seq:3}/{kode_klasifikasi}/BPRS-SRG/{bulan_romawi}/{tahun}`. Admin dapat mengisi nomor manual yang unik; User selalu mendapat nomor otomatis. Tahun dan bulan mengikuti tanggal surat.
+- **Validasi kode:** `composer ci` lulus (Pint, PHPStan, 37 tes/183 assertion); `git diff --check` bersih. Tes mencakup 50 nomor berurutan, pola dari settings, pergantian tahun, nomor manual dan duplikat, nomor otomatis yang melewati benturan manual, form User, upload privat/hash, penggantian file, batas akses dan audit.
+- **Selesai:** migration M4 berhasil diterapkan di database MySQL Laragon. Database sudah memiliki tabel `settings` lama dengan skema yang cocok, sehingga migration disesuaikan agar tabel tersebut dipakai tanpa dibuat ulang atau dihapus saat rollback. `outgoing_letters` sekarang tersedia; migration berstatus `Ran`.
+- **Belum diverifikasi:** UAT browser oleh pengguna. Uji sebagai Admin dan User: catat surat, cocokkan perkiraan dan nomor final, cari/filter, lihat rincian/berkas, ubah data, ganti berkas, pastikan User tidak dapat mengubah surat orang lain dan Admin dapat hapus lunak.
+- **Perintah Laragon:** migration tidak perlu diulang; `composer ci` lulus. Setelah UAT, commit branch M4 sebelum menyiapkan M5.
 
 ### 2026-10-21 — Verifikasi login pengguna
 

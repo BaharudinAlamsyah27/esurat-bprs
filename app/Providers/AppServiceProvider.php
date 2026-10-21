@@ -6,12 +6,14 @@ use App\Models\Classification;
 use App\Models\Disposition;
 use App\Models\IncomingLetter;
 use App\Models\Institution;
+use App\Models\OutgoingLetter;
 use App\Models\User;
 use App\Policies\ActivityLogPolicy;
 use App\Policies\ClassificationPolicy;
 use App\Policies\DispositionPolicy;
 use App\Policies\IncomingLetterPolicy;
 use App\Policies\InstitutionPolicy;
+use App\Policies\OutgoingLetterPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
@@ -45,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Institution::class, InstitutionPolicy::class);
         Gate::policy(Activity::class, ActivityLogPolicy::class);
         Gate::policy(IncomingLetter::class, IncomingLetterPolicy::class);
+        Gate::policy(OutgoingLetter::class, OutgoingLetterPolicy::class);
 
         Event::listen(Login::class, function (Login $event): void {
             if (! $event->user instanceof User) {

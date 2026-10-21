@@ -24,4 +24,10 @@ class Classification extends Model
     {
         return $this->hasMany(IncomingLetter::class);
     }
+
+    /** @return HasMany<OutgoingLetter, $this> */
+    public function outgoingLetters(): HasMany
+    {
+        return $this->hasMany(OutgoingLetter::class);
+    }
 }

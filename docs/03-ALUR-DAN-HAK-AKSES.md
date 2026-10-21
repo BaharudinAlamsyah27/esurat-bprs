@@ -7,9 +7,9 @@
 4. Tidak ada status lanjutan. Satu-satunya status turunan: Sudah/Belum didisposisi.
 
 ## 2. Alur Surat Keluar
-1. **+ Tambah Surat Keluar** → form satu halaman. Nomor surat terisi otomatis (usulan) sesuai pola; Admin boleh menimpa (harus unik). Nomor agenda otomatis.
-2. Unggah file surat final (opsional tetapi disarankan). Simpan.
-3. Di daftar/detail: **Lihat · Ubah · Hapus (Admin)**.
+1. **+ Tambah Surat Keluar** → form satu halaman. Nomor agenda dan nomor surat dibuat otomatis saat disimpan sesuai pola; Admin boleh mengisi nomor surat manual (harus unik). Nomor urut memakai transaksi dan `lockForUpdate`, berdasarkan tahun tanggal surat.
+2. Unggah file surat final (opsional tetapi disarankan). Berkas disimpan privat, dengan hash SHA-256, dan hanya bisa dibuka setelah login.
+3. Di daftar/detail: **Lihat · Ubah · Hapus (Admin)**. User hanya dapat mengubah surat yang dicatatnya; hanya Admin dapat menghapus dan mengubah nomor manual.
 4. Tidak ada persetujuan berjenjang/tanda tangan digital/QR (ditunda).
 
 ## 3. Laporan

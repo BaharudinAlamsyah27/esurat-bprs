@@ -13,7 +13,7 @@ class ClassificationResource extends MasterDataResource
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static ?string $navigationGroup = 'PENGELOLAAN';
+    protected static ?string $navigationGroup = 'DATA MASTER';
 
     public static function getNavigationLabel(): string
     {

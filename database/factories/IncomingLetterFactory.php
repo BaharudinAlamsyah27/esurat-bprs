@@ -2,13 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Enums\IncomingDeliveryMethod;
 use App\Enums\IncomingLetterStatus;
-use App\Enums\IncomingLetterUrgency;
-use App\Enums\LetterConfidentiality;
 use App\Models\Classification;
 use App\Models\IncomingLetter;
-use App\Models\LetterType;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -28,18 +24,13 @@ class IncomingLetterFactory extends Factory
             'agenda_number' => str_pad((string) $sequence, 3, '0', STR_PAD_LEFT).'/'.$year,
             'received_at' => now()->toDateString(),
             'letter_date' => now()->subDays(fake()->numberBetween(0, 30))->toDateString(),
-            'letter_number' => fake()->optional()->bothify('###/???/##'),
+            'letter_number' => fake()->bothify('###/???/##'),
             'sender_name' => fake()->name(),
-            'sender_institution' => fake()->company(),
             'subject' => fake()->sentence(5),
-            'summary' => fake()->optional()->paragraph(),
-            'letter_type_id' => LetterType::factory(),
+            'note' => fake()->optional()->paragraph(),
             'classification_id' => Classification::factory(),
-            'urgency' => IncomingLetterUrgency::Normal,
-            'confidentiality' => LetterConfidentiality::Ordinary,
-            'delivery_method' => IncomingDeliveryMethod::Direct,
             'attachments_count' => 0,
-            'status' => IncomingLetterStatus::Registered,
+            'status' => IncomingLetterStatus::Registered->value,
             'registered_by' => User::factory(),
         ];
     }

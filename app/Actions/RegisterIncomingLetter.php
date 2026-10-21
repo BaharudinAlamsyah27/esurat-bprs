@@ -56,7 +56,7 @@ class RegisterIncomingLetter
                     'agenda_seq' => $sequence->last_number,
                     'agenda_number' => $agendaNumber,
                     'attachments_count' => 0,
-                    'status' => IncomingLetterStatus::Registered,
+                    'status' => IncomingLetterStatus::Registered->value,
                     'registered_by' => $user->getKey(),
                 ]));
 

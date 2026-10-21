@@ -46,10 +46,10 @@ Mx — nama
 ## 3. Prompt QA untuk Antigravity
 ```
 Kamu adalah QA engineer. Repo: E-Surat BPRS Sragen (Laravel + Filament). Baca AGENTS.md dan docs/03-ALUR-DAN-HAK-AKSES.md.
-1. Siapkan aplikasi: composer install, cp .env.example .env, key:generate, migrate --seed, jalankan server + queue worker.
+1. Siapkan aplikasi: composer install, salin `.env.example` menjadi `.env`, atur kata sandi Admin dengan aman, jalankan `php artisan key:generate`, `php artisan migrate --seed`, lalu jalankan server lokal.
 2. Uji milestone {Mx} di browser memakai user demo tiap peran (daftar di seeder/README). Untuk setiap skenario di bawah, catat LULUS/GAGAL, langkah reproduksi, dan screenshot bila gagal.
 3. Uji kemudahan sesuai docs/07 §9 (jumlah klik, istilah, ukuran huruf/tombol) seolah-olah kamu pengguna lansia yang gaptek.
-4. Fokus khusus: hak akses (coba akses URL langsung dengan peran yang tidak berhak), tingkat kerahasiaan, validasi form, upload file tidak valid, tampilan di lebar tablet/ponsel, teks bahasa Indonesia yang salah/hilang.
+4. Fokus khusus: hak akses Admin/User (coba akses URL Admin langsung sebagai User), validasi form, upload file tidak valid, tampilan di lebar tablet/ponsel, teks bahasa Indonesia yang salah/hilang. Kerahasiaan per surat dan notifikasi bukan scope v2.
 5. Jangan memperbaiki kode. Hasilkan laporan docs/qa/{Mx}-laporan.md berisi: ringkasan, tabel skenario, daftar bug (Kritis/Tinggi/Sedang/Rendah), saran.
 Skenario {Mx}: {salin dari daftar di bawah}
 ```
@@ -66,14 +66,13 @@ Skenario {Mx}: {salin dari daftar di bawah}
 ## 4. Deployment On-Premise (panduan ringkas)
 
 **Server:** Ubuntu Server LTS (22.04/24.04), 4 vCPU, 8 GB RAM, 100 GB SSD (cukup untuk awal); VM di jaringan internal.
-**Komponen:** Nginx, PHP-FPM 8.3 (ext: mbstring, xml, intl, gd, zip, mysql, bcmath), MySQL 8, Supervisor, Composer, (opsional) ClamAV untuk memindai upload.
+**Komponen:** Nginx, PHP-FPM 8.3 (ext: mbstring, xml, intl, gd, zip, mysql, bcmath), MySQL 8, Composer, (opsional) ClamAV untuk memindai upload.
 **Langkah umum:**
 1. Buat user non-root `esurat`; clone repo ke `/var/www/esurat`.
 2. `composer install --no-dev --optimize-autoloader`; salin `.env` produksi (`APP_ENV=production`, `APP_DEBUG=false`, DB, SMTP internal, `APP_URL=https://esurat.bprs-sragen.local` — sesuaikan).
-3. `php artisan key:generate`, `migrate --force`, `db:seed --class=ProductionSeeder` (peran, izin, super admin — BUKAN seeder demo), `storage:link` TIDAK diperlukan untuk file private, `config:cache`, `route:cache`, `view:cache`, `filament:optimize` bila tersedia.
+3. `php artisan key:generate`, `php artisan migrate --force`, `php artisan db:seed` (akun Admin dari konfigurasi deployment yang aman; jangan memakai password demo), `storage:link` TIDAK diperlukan untuk file private, `config:cache`, `route:cache`, `view:cache`.
 4. Nginx: root `public/`, HTTPS dengan sertifikat CA internal, `client_max_body_size 12M`, blok akses ke dotfiles.
-5. (Opsional — hanya bila kelak memakai antrean/queue) Supervisor: `php artisan queue:work --sleep=3 --tries=3 --max-time=3600`.
-6. (Opsional — hanya bila kelak ada tugas terjadwal) Cron: `* * * * * php /var/www/esurat/artisan schedule:run`.
+5. V2 tidak memerlukan worker antrean atau scheduler.
 7. Backup harian 01:00: dump DB + arsip `storage/app/private`; simpan salinan di media/server terpisah; **uji restore berkala**.
 8. Hardening: firewall hanya 80/443 dari LAN, SSH key-only, update keamanan otomatis, batasi akses DB ke localhost, rotasi log.
 

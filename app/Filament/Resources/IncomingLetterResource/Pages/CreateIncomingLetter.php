@@ -9,6 +9,7 @@ use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 
 class CreateIncomingLetter extends CreateRecord
@@ -17,9 +18,9 @@ class CreateIncomingLetter extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        $files = $data['scans'] ?? [];
+        $file = $data['scan'] ?? null;
         $confirmedDuplicate = (bool) ($data['confirm_duplicate'] ?? false);
-        unset($data['scans'], $data['confirm_duplicate']);
+        unset($data['scan'], $data['confirm_duplicate']);
 
         $letterNumber = trim((string) ($data['letter_number'] ?? ''));
         $isDuplicate = $letterNumber !== '' && IncomingLetter::query()
@@ -42,6 +43,6 @@ class CreateIncomingLetter extends CreateRecord
         /** @var User $user */
         $user = auth()->user();
 
-        return app(RegisterIncomingLetterAction::class)->execute($user, $data, is_array($files) ? $files : []);
+        return app(RegisterIncomingLetterAction::class)->execute($user, $data, $file instanceof UploadedFile ? [$file] : []);
     }
 }

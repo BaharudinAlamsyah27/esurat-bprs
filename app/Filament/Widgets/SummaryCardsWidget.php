@@ -18,8 +18,8 @@ class SummaryCardsWidget extends Widget
         return [
             ['label' => __('app.incoming_this_month'), 'value' => 0],
             ['label' => __('app.outgoing_this_month'), 'value' => 0],
-            ['label' => __('app.active_dispositions'), 'value' => 0],
-            ['label' => __('app.pending_approvals'), 'value' => 0],
+            ['label' => __('app.incoming_this_month'), 'value' => 0],
+            ['label' => __('app.outgoing_this_month'), 'value' => 0],
         ];
     }
 }

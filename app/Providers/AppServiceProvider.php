@@ -2,12 +2,18 @@
 
 namespace App\Providers;
 
+use App\Models\Classification;
+use App\Models\IncomingLetter;
 use App\Models\User;
+use App\Policies\ClassificationPolicy;
+use App\Policies\IncomingLetterPolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -27,6 +33,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Password::defaults(fn (): Password => Password::min(10)->mixedCase()->numbers());
+        Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(Classification::class, ClassificationPolicy::class);
+        Gate::policy(IncomingLetter::class, IncomingLetterPolicy::class);
 
         Event::listen(Login::class, function (Login $event): void {
             if (! $event->user instanceof User) {

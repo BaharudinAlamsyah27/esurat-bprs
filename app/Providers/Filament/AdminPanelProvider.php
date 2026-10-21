@@ -8,7 +8,6 @@ use App\Filament\Pages\Profile;
 use App\Filament\Support\LocalFontProvider;
 use App\Filament\Widgets\FontScaleWidget;
 use App\Filament\Widgets\GreetingWidget;
-use App\Filament\Widgets\MyDispositionsWidget;
 use App\Filament\Widgets\SummaryCardsWidget;
 use App\Http\Middleware\IdleSessionTimeout;
 use Filament\Http\Middleware\Authenticate;
@@ -41,7 +40,6 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::hex('#0F5C46'),
             ])
-            ->databaseNotifications()
             ->userMenuItems([
                 MenuItem::make()
                     ->label(__('m1.profile'))
@@ -51,10 +49,9 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop(false)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->navigationGroups([
+                'DATA MASTER',
                 'SURAT',
-                'ARSIP & LAPORAN',
-                'PENGELOLAAN',
-                'LANJUTAN',
+                'LAPORAN',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -66,7 +63,6 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 GreetingWidget::class,
                 SummaryCardsWidget::class,
-                MyDispositionsWidget::class,
                 FontScaleWidget::class,
             ])
             ->middleware([

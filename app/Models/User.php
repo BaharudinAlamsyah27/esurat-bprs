@@ -2,41 +2,32 @@
 
 namespace App\Models;
 
+use App\Enums\UserLevel;
 use App\Models\Concerns\RecordsActivity;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory;
 
-    use HasRoles;
     use LogsActivity;
-    use Notifiable;
     use RecordsActivity;
     use SoftDeletes;
 
     protected $fillable = [
         'name',
         'username',
-        'nip',
         'email',
-        'phone',
-        'unit_id',
-        'position_id',
+        'level',
         'is_active',
-        'signature_path',
-        'paraf_path',
         'last_login_at',
         'ui_font_scale',
         'password',
@@ -52,16 +43,9 @@ class User extends Authenticatable implements FilamentUser
         return $this->is_active && $panel->getId() === 'admin';
     }
 
-    /** @return BelongsTo<Unit, $this> */
-    public function unit(): BelongsTo
+    public function isAdmin(): bool
     {
-        return $this->belongsTo(Unit::class);
-    }
-
-    /** @return BelongsTo<Position, $this> */
-    public function position(): BelongsTo
-    {
-        return $this->belongsTo(Position::class);
+        return $this->getRawOriginal('level') === UserLevel::Admin->value;
     }
 
     protected function casts(): array
@@ -69,6 +53,7 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'level' => UserLevel::class,
             'is_active' => 'boolean',
             'password' => 'hashed',
         ];
@@ -77,7 +62,7 @@ class User extends Authenticatable implements FilamentUser
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'username', 'nip', 'email', 'phone', 'unit_id', 'position_id', 'is_active', 'signature_path', 'paraf_path'])
+            ->logOnly(['name', 'username', 'email', 'level', 'is_active'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }

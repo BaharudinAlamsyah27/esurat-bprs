@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserLevel;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -28,6 +29,7 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'username' => fake()->unique()->userName(),
             'email' => fake()->unique()->safeEmail(),
+            'level' => UserLevel::User,
             'email_verified_at' => now(),
             'is_active' => true,
             'password' => static::$password ??= Hash::make('password'),

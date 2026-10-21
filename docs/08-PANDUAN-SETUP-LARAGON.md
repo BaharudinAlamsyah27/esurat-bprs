@@ -86,8 +86,12 @@ DB_PORT=3306
 DB_DATABASE=esurat
 DB_USERNAME=root
 DB_PASSWORD=
+SESSION_DRIVER=file
+SESSION_LIFETIME=30
+CACHE_STORE=file
+QUEUE_CONNECTION=sync
 ```
-Simpan dan tutup Notepad. Lalu uji koneksi database:
+Jika ini instalasi baru, isi juga `INITIAL_ADMIN_PASSWORD` dengan kata sandi kuat di `.env` lokal. Jangan membagikan atau memasukkan kata sandi ke Git. Simpan dan tutup Notepad. Lalu uji koneksi database:
 ```bash
 php artisan migrate
 ```
@@ -115,17 +119,15 @@ xcopy C:\Users\NAMA\Downloads\surat-bprs\docs docs /E /I
 dir
 ```
 
-## Langkah 8 — Git: simpan sebagai repo
-```bash
-git config --global user.name "Nama Anda"
-git config --global user.email "email@anda.com"
+## Langkah 8 — Git: simpan perubahan
+Repo proyek ini sudah diinisialisasi. Jangan jalankan `git init` ulang, jangan hapus `.git`, dan jangan mengubah konfigurasi Git global/system. Operasi branch, staging, dan commit dijalankan pengguna di Terminal Laragon. Jika ada kendala izin atau `dubious ownership`, jangan mengambil alih kepemilikan folder; minta administrator workspace memperbaiki izin secara aman.
 
-git init -b main
+Untuk perubahan biasa, dari folder proyek:
+```bash
 git add .
-git commit -m "chore: inisialisasi proyek Laravel + dokumentasi"
-git checkout -b develop
+git commit -m "feat: lanjutkan proyek E-Surat"
 ```
-`.env` tidak ikut tersimpan (sudah diabaikan oleh Laravel) — itu benar dan memang harus begitu.
+Pastikan `.env` tidak masuk ke commit.
 
 **Hubungkan ke GitHub/GitLab (disarankan):** buat repo *private* kosong di situs, salin alamatnya, lalu:
 ```bash
@@ -176,15 +178,13 @@ Buka Laragon → **Start All** → **Terminal** → `cd C:\laragon\www\esurat`
 | Jalankan tampilan (saat mengembangkan) | `npm run dev` (biarkan terbuka) |
 | Bangun tampilan final | `npm run build` |
 | Buat/ubah tabel + data awal | `php artisan migrate --seed` |
-| Ulang database dari nol (data hilang!) | `php artisan migrate:fresh --seed` |
-| Worker notifikasi & PDF | `php artisan queue:work` |
-| Pengingat otomatis | `php artisan schedule:work` |
+| Periksa migration yang belum dijalankan | `php artisan migrate:status` |
 | Bersihkan cache | `php artisan optimize:clear` |
 | Cek kualitas (test + format + analisis) | `composer ci` |
 | Hanya test | `php artisan test` |
 | Simpan perubahan | `git add .` lalu `git commit -m "pesan"` |
 
-Tip: gunakan beberapa tab terminal Laragon — satu untuk `npm run dev`, satu untuk `queue:work`, satu untuk perintah lain.
+Tip: gunakan Terminal Laragon untuk perintah aplikasi. Queue dan scheduler tidak diperlukan pada scope v2.
 
 ## Masalah Umum
 | Gejala | Penyebab & solusi |
@@ -195,13 +195,13 @@ Tip: gunakan beberapa tab terminal Laragon — satu untuk `npm run dev`, satu un
 | `Unknown database 'esurat'` | Database belum dibuat → ulangi Langkah 4. |
 | `Connection refused` ke MySQL | MySQL belum jalan → **Start All**; cek port 3306 tidak dipakai MySQL lain. |
 | Apache/Nginx gagal start (port 80) | Port dipakai program lain (IIS, Skype, XAMPP) → matikan program itu atau ganti port di Laragon → Menu → Preferences. |
-| Codex: `dubious ownership` / `setup refresh had errors` | Folder dimiliki akun Anda, Codex memakai akun sandbox lain. Tutup Codex → Laragon *Run as administrator* → `rmdir /s /q .git` (bila ada `.git` buatan Codex; bila access denied pakai `takeown /f .git /r /d y` + `icacls .git /grant %USERNAME%:F /t`) → `git config --system --add safe.directory C:/laragon/www/esurat` → `git init -b main`, `git add .`, `git commit` sendiri → buka ulang Codex. Bila masih gagal: biarkan Codex hanya menulis kode, Anda yang commit (aturan ada di AGENTS.md). |
+| Codex: `dubious ownership` / izin `.git` | Jangan hapus `.git`, jangan jalankan `takeown`, dan jangan mengubah konfigurasi Git global/system. Catat pesan error persisnya; lanjutkan perubahan kode dan minta administrator workspace memperbaiki izin dengan cara yang sesuai. |
 | Codex: `curl error 6` (Composer/npm gagal), tak bisa membuat branch | Sandbox Codex tidak punya internet & izin `.git`. Pasang dependency dan buat branch/commit sendiri di Terminal Laragon biasa (bukan Administrator); Codex hanya menulis kode (aturan di AGENTS.md). |
 | `esurat.test` tidak terbuka | Pastikan **Auto Virtual Hosts** aktif (Preferences → General), **Stop All → Start All**, atau pakai `php artisan serve`. |
 | Perubahan `.env` tidak terbaca | Jalankan `php artisan config:clear`. |
 | Tampilan berantakan/tanpa gaya | Jalankan `npm run build` atau biarkan `npm run dev` hidup. |
 | `Class "Intl..." not found` | Ekstensi `intl` belum aktif (Langkah 2). |
-| `composer` memakan waktu sangat lama | Periksa koneksi internet; coba ulang. Perintah aman diulang. |
-| Salah hapus data saat uji | Ulangi `php artisan migrate:fresh --seed` (hanya di komputer pengembangan!). |
+| `composer` memakan waktu sangat lama / `curl error 6` | Periksa koneksi internet satu kali. Jangan mengulang berkali-kali; catat error dan lanjutkan saat koneksi pulih. |
+| Perlu mengulang data saat uji | Jangan menjalankan `migrate:fresh` atau `db:wipe` tanpa persetujuan eksplisit dan backup. |
 
-> **Jangan pernah** menjalankan `migrate:fresh` di server produksi. Perintah itu menghapus seluruh data.
+> `migrate:fresh` dan `db:wipe` menghapus data. Jangan jalankan tanpa persetujuan eksplisit dan backup, termasuk pada database pengembangan yang berisi data penting.

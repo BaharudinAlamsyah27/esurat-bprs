@@ -15,8 +15,7 @@ class ClassificationFactory extends Factory
         return [
             'code' => fake()->unique()->bothify('KLS-####'),
             'name' => fake()->words(2, true),
-            'retention_years' => 5,
-            'is_active' => true,
+            'description' => fake()->optional()->sentence(),
         ];
     }
 }

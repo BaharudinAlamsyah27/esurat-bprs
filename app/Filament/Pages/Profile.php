@@ -4,8 +4,6 @@ namespace App\Filament\Pages;
 
 use App\Models\User;
 use Filament\Actions\Action;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -40,12 +38,7 @@ class Profile extends Page implements HasForms
 
         $this->form->fill([
             'name' => $user->name,
-            'username' => $user->username,
             'email' => $user->email,
-            'phone' => $user->phone,
-            'ui_font_scale' => $user->ui_font_scale ?? 'normal',
-            'signature_path' => $user->signature_path,
-            'paraf_path' => $user->paraf_path,
         ]);
     }
 
@@ -54,13 +47,10 @@ class Profile extends Page implements HasForms
         return $form
             ->schema([
                 TextInput::make('name')->label(__('m1.name'))->required()->maxLength(120),
-                TextInput::make('username')->label(__('m1.username'))->required()->alphaDash()->unique(table: 'users', ignorable: auth()->user())->maxLength(60),
-                TextInput::make('email')->label(__('m1.email'))->email()->required()->unique(table: 'users', ignorable: auth()->user())->maxLength(190),
-                TextInput::make('phone')->label(__('m1.phone'))->tel()->maxLength(30),
-                TextInput::make('password')->label(__('m1.password'))->password()->revealable()->nullable()->rule(Password::defaults())->dehydrated(fn (?string $state): bool => filled($state))->helperText(__('m1.password_optional')),
-                Select::make('ui_font_scale')->label(__('app.font_size'))->options(['normal' => __('app.font_normal'), 'large' => __('app.font_large'), 'largest' => __('app.font_largest')])->required(),
-                FileUpload::make('signature_path')->label(__('m1.signature'))->disk('private')->directory('signatures')->visibility('private')->image()->acceptedFileTypes(['image/png'])->maxSize(2048)->helperText(__('m1.signature_help')),
-                FileUpload::make('paraf_path')->label(__('m1.paraf'))->disk('private')->directory('signatures')->visibility('private')->image()->acceptedFileTypes(['image/png'])->maxSize(2048)->helperText(__('m1.signature_help')),
+                TextInput::make('email')->label(__('m1.email'))->email()->nullable()->unique(table: 'users', ignorable: auth()->user())->maxLength(190),
+                TextInput::make('current_password')->label(__('m1.current_password'))->password()->revealable()->nullable()->requiredWith('password')->currentPassword(),
+                TextInput::make('password')->label(__('m1.new_password'))->password()->revealable()->nullable()->rule(Password::defaults())->confirmed()->dehydrated(fn (?string $state): bool => filled($state)),
+                TextInput::make('password_confirmation')->label(__('m1.password_confirmation'))->password()->revealable()->nullable()->dehydrated(false),
             ])
             ->statePath('data');
     }
@@ -77,9 +67,7 @@ class Profile extends Page implements HasForms
         $user = auth()->user();
         $state = $this->form->getState();
 
-        $user->fill(array_intersect_key($state, array_flip([
-            'name', 'username', 'email', 'phone', 'ui_font_scale', 'signature_path', 'paraf_path', 'password',
-        ])))->save();
+        $user->fill(array_intersect_key($state, array_flip(['name', 'email', 'password'])))->save();
 
         Notification::make()->title(__('m1.profile_saved'))->success()->send();
     }

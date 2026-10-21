@@ -33,12 +33,12 @@ Sapaan teks ("Selamat pagi, {Nama}") → **kartu** (ikon dalam lingkaran berwarn
 ## 4. Layar Utama
 **Data Surat Masuk** — tabel: No Agenda · Nomor Surat · Asal Surat · Perihal · Tgl Surat · **Disposisi** (✔ Sudah / Belum) · Aksi. Aksi berteks: **Lihat**, **Disposisi**, **Ubah**, **Hapus** (Admin saja, dengan konfirmasi "Hapus surat ini? Surat tidak bisa dikembalikan oleh pengguna biasa."). Tombol **"+ Tambah Surat Masuk"** → form satu halaman (Nomor Surat, Asal Surat, Perihal, Klasifikasi, Tanggal Surat, Tanggal Diterima, File Surat; "Keterangan" di bagian **Isian tambahan** tertutup; Nomor Agenda terlihat otomatis).
 
-**Lembar Disposisi (kunci kemudahan)** — pada baris/detail surat: tombol hijau **"Disposisi"** → panel kecil berisi ringkasan surat (baca-saja) lalu:
+**Lembar Disposisi (kunci kemudahan)** — pada baris surat: tombol hijau **"Disposisi"** → satu form sederhana lalu:
 1. **Sifat** — 4 tombol pilihan besar (Biasa · Penting · Segera · Sangat Segera).
-2. **Diteruskan kepada** — kotak isian dengan saran nama/jabatan (boleh ketik bebas), bisa lebih dari satu.
+2. **Diteruskan kepada** — kotak isian, satu nama/jabatan per baris; bisa lebih dari satu.
 3. **Isi disposisi** — kotak centang besar (Untuk diketahui, Segera tindak lanjuti, Koordinasikan, Siapkan konsep jawaban, Mohon pendapat, Arsipkan, Lainnya…).
 4. **Catatan** (opsional).
-Dua tombol: **"Simpan & Cetak"** (utama, besar) dan "Simpan saja". Setelah tersimpan, PDF terbuka otomatis; tombol di baris berganti **"Cetak Disposisi"** dan **"Ubah Disposisi"**.
+Dua tombol: **"Simpan & Cetak"** (utama) dan "Simpan saja". Setelah tersimpan, PDF terbuka otomatis; Admin dapat mengubah lembar. Admin dan User bisa mencetak lembar yang sudah dibuat.
 
 **Cetakan Lembar Disposisi (A4, satu halaman)** — kop (logo + nama + alamat + telepon), garis, judul **LEMBAR DISPOSISI**, tabel dua kolom: Asal Surat · Diterima Tgl. · No. Surat · No. Agenda · Tgl. Surat · Kode · Sifat · Perihal · Diteruskan Kepada · Isi Disposisi (kotak ☑ untuk yang dipilih) · Catatan; di kanan bawah: "{Kota}, {tanggal}", jabatan pimpinan, ruang tanda tangan, nama pimpinan (dari Data Instansi).
 

@@ -2,7 +2,7 @@
 
 ## Status saat ini
 
-- Milestone aktif berikutnya: **M3 — Lembar Disposisi sederhana** (setelah perubahan M2 di-commit pengguna)
+- Milestone aktif: **M3 — Lembar Disposisi sederhana** (implementasi selesai; menunggu migrasi dan UAT Laragon)
 - M0: **Selesai untuk kode dan smoke test**; tampilan admin juga sudah terlihat pada screenshot browser pengguna. Tidak ada klaim UAT dengan pegawai akhir.
 - Lingkup v2: aplikasi surat masuk/keluar sederhana; disposisi satu lembar cetak adalah M3.
 - Database lama tidak dihapus. Migration baru diatur agar instalasi baru tidak membuat tabel fitur lama yang dibatalkan.
@@ -14,12 +14,19 @@
 | M0 — Fondasi & Login | Selesai (kode + smoke test) | Login username, level admin/user, seeder awal, timeout 30 menit, font lokal; `composer ci` lulus pada 2026-10-21 (6 test/28 assertion). Screenshot pengguna menunjukkan admin berhasil membuka aplikasi lokal. |
 | M1 — Data Master, Pengguna, Profil | Selesai (implementasi + CI + migrasi Laragon) | Data Instansi tunggal dengan logo privat, 9 klasifikasi, kelola pengguna/reset kata sandi, profil, audit baca-saja, policy dan proteksi Admin aktif terakhir. `composer ci` lulus; pengguna mengonfirmasi langkah M1 sudah dijalankan. |
 | M2 — Surat Masuk | Selesai (implementasi + CI) | CRUD, agenda 4 digit/tahun, file privat, pencarian tiga kolom sesuai PRD, filter tahun/klasifikasi, duplikat dengan konfirmasi, soft delete Admin dan hak ubah pemilik. 6 tes M2 lulus. Perlu UAT browser oleh pengguna. |
-| M3 — Lembar Disposisi sederhana | Belum dimulai | Buat satu form + PDF satu halaman. Tidak ada alur status, penerima berakun, tenggat, atau notifikasi. |
+| M3 — Lembar Disposisi sederhana | Implementasi + CI selesai; migrasi/UAT Laragon menunggu | Satu lembar per surat masuk, satu form, PDF A4 satu halaman, filter/lencana, penghitung cetak. Tabel alur lama diarsipkan tanpa menghapus data. |
 | M4 — Surat Keluar | Belum dimulai | CRUD, agenda dan nomor otomatis, unggah privat. |
 | M5 — Laporan | Belum dimulai | Laporan surat masuk/keluar, cetak, PDF, Excel. |
 | M6 — Dashboard & Penyelesaian | Sebagian tersedia | Sapaan, kartu placeholder, pengaturan ukuran huruf, dan font lokal tersedia; grafik, ringkasan nyata, bantuan, hardening, backup, panduan, dan UAT tersisa. |
 
 ## Riwayat
+
+### 2026-10-21 — Verifikasi login pengguna
+
+- **Selesai:** menambahkan tes regresi yang memastikan akun level Pengguna dengan username dan kata sandi valid bukan hanya berhasil autentikasi, tetapi juga dapat membuka halaman utama aplikasi. Tes autentikasi M0 lulus (5 test/27 assertion).
+- **Hasil pemeriksaan:** implementasi reset kata sandi menyimpan hash melalui cast Laravel; kata sandi lama memang tidak bisa dibaca. Seeder demo hanya membuat akun baru dan tidak mengubah kata sandi akun yang sudah ada. Nama pengguna pada daftar adalah nilai yang harus dimasukkan di kolom login.
+- **Belum diverifikasi:** login aktual tiap akun di browser pengguna. Butuh UAT setelah Admin mengatur ulang kata sandi di Data Pengguna untuk satu akun yang diuji.
+- **Langkah UAT:** Admin pilih Data Pengguna → Atur Ulang Kata Sandi pada satu akun Pengguna aktif, simpan kata sandi baru (minimal 10 karakter, huruf besar/kecil dan angka), keluar, lalu masuk memakai username persis dari tabel dan kata sandi yang baru disetel. Jika akun kosong username (mis. Test User), Admin harus mengisi username unik terlebih dahulu.
 
 ### 2026-10-21 — Audit rombakan total dan M0
 
@@ -55,3 +62,13 @@
 - **Migrasi Laragon:** `php artisan migrate:status` menunjukkan semua migrasi sudah berjalan; tidak ada migrasi baru pada sesi M2.
 - **Belum diverifikasi:** pengguna perlu mencoba daftar/cari surat, catat/edit surat, pratinjau file, dan hapus sebagai Admin dari browser Laragon. Rendering tabel Livewire tidak dapat diuji di runtime ini karena ekstensi PHP `intl` tidak tersedia; `composer ci` tetap lulus.
 - **Berikutnya:** setelah pengguna menyimpan perubahan M2 pada Git, lanjutkan M3 — Lembar Disposisi sederhana.
+
+### 2026-10-21 — M3 Lembar Disposisi sederhana
+
+- **Selesai:** menambahkan satu form disposisi pada daftar Surat Masuk, termasuk Sifat, tujuan (satu nama/jabatan per baris), checklist instruksi, instruksi lainnya, catatan, dan tanggal. Admin dapat membuat/mengubah; Admin dan User dapat mencetak lembar yang telah dibuat.
+- **Selesai:** membuat PDF A4 satu halaman berisi kop Data Instansi, semua data surat, isi disposisi, blok tanda tangan pimpinan, serta penghitung dan audit setiap cetak. Daftar Surat Masuk menampilkan status dan filter Sudah/Belum didisposisi.
+- **Keamanan/data:** validasi dilakukan di action, satu lembar dijamin unik per surat, dan log tidak menyimpan tujuan/catatan. Tabel lama `dispositions` (skema berjenjang) akan diubah nama menjadi `legacy_dispositions`; semua datanya tetap disimpan.
+- **Validasi kode:** 4 tes M3 lulus (25 assertion), termasuk batas Admin/User, satu lembar per surat, isi PDF, satu halaman, penghitung cetak, dan audit.
+- **Perintah Laragon:** jalankan `php artisan migrate` lalu `composer ci`. Setelah migrasi, UAT sebagai Admin: buat disposisi, simpan saja, ubah, simpan & cetak; sebagai User: pastikan tombol buat/ubah tidak ada dan tombol cetak berfungsi. Jangan jalankan `migrate:fresh` atau `db:wipe`.
+- **Belum diverifikasi:** migrasi M3 dan tampilan tombol/modal di browser Laragon. Database saat ini memiliki tabel disposisi lama; migrasi M3 dirancang untuk mengarsipkannya sebelum membuat tabel baru.
+- **Berikutnya:** setelah pengguna menjalankan migrasi dan UAT, commit M3 lalu lanjutkan M4 — Surat Keluar.

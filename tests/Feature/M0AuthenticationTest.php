@@ -35,6 +35,22 @@ it('allows an active user to sign in with username', function (): void {
     $this->assertAuthenticatedAs($user);
 });
 
+it('allows a signed-in user to open the application panel', function (): void {
+    $user = User::factory()->create([
+        'username' => 'pegawaiaktif',
+        'level' => UserLevel::User,
+        'password' => 'KataSandiUji123',
+    ]);
+
+    Livewire::test(Login::class)
+        ->fillForm(['username' => 'pegawaiaktif', 'password' => 'KataSandiUji123'])
+        ->call('authenticate')
+        ->assertHasNoFormErrors();
+
+    $this->assertAuthenticatedAs($user);
+    $this->get('/')->assertOk();
+});
+
 it('rejects inactive users even when their password is correct', function (): void {
     User::factory()->create([
         'username' => 'nonaktif',

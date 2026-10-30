@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Actions\SaveDisposition;
 use App\Enums\DispositionInstruction;
 use App\Enums\DispositionNature;
+use App\Enums\DispositionRecipientStatus;
 use App\Filament\Resources\IncomingLetterResource\Pages\CreateIncomingLetter;
 use App\Filament\Resources\IncomingLetterResource\Pages\EditIncomingLetter;
 use App\Filament\Resources\IncomingLetterResource\Pages\ListIncomingLetters;
@@ -26,7 +27,7 @@ use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -41,6 +42,8 @@ class IncomingLetterResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-inbox-arrow-down';
 
     protected static ?string $navigationGroup = 'SURAT';
+
+    protected static ?int $navigationSort = 1;
 
     public static function getNavigationLabel(): string
     {
@@ -102,20 +105,32 @@ class IncomingLetterResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('disposition'))
-            ->description(__('incoming.table_help'))
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['disposition.recipients']))
             ->searchPlaceholder(__('incoming.search_hint'))
             ->columns([
-                TextColumn::make('agenda_number')->label(__('incoming.agenda_number'))->sortable(),
-                TextColumn::make('letter_number')->label(__('incoming.letter_number'))->searchable(),
-                TextColumn::make('sender_name')->label(__('incoming.sender_name'))->searchable(),
-                TextColumn::make('subject')->label(__('incoming.subject'))->searchable()->limit(45),
-                TextColumn::make('letter_date')->label(__('incoming.letter_date'))->date('d M Y')->sortable(),
-                TextColumn::make('disposition_status')
-                    ->label(__('disposition.filter'))
-                    ->state(fn (IncomingLetter $record): string => $record->disposition ? __('disposition.done') : __('disposition.not_done'))
-                    ->badge()
-                    ->color(fn (IncomingLetter $record): string => $record->disposition ? 'success' : 'gray'),
+                TextColumn::make('agenda_number')->label(__('incoming.agenda_number'))->width('7rem')->placeholder('—'),
+                TextColumn::make('letter_number')->label(__('incoming.letter_number'))->width('11rem')->searchable()->placeholder('—'),
+                TextColumn::make('sender_name')->label(__('incoming.sender_name'))->width('10rem')->searchable(),
+                TextColumn::make('subject')
+                    ->label(__('incoming.subject'))
+                    ->width('14rem')
+                    ->searchable()
+                    ->limit(45)
+                    ->description(function (IncomingLetter $record): ?string {
+                        $disp = $record->disposition;
+                        if (! $disp) {
+                            return null;
+                        }
+                        $recipients = $disp->recipients;
+                        if ($recipients->isNotEmpty()) {
+                            $done = $recipients->where('status', DispositionRecipientStatus::Done)->count();
+
+                            return "Disposisi: {$done}/{$recipients->count()} selesai";
+                        }
+
+                        return 'Disposisi dibuat';
+                    }),
+                TextColumn::make('letter_date')->label(__('incoming.letter_date'))->width('9rem')->date('d M Y')->sortable()->placeholder('—'),
             ])
             ->filters([
                 SelectFilter::make('agenda_year')
@@ -134,9 +149,12 @@ class IncomingLetterResource extends Resource
                         default => $query,
                     }),
             ])
+            ->filtersTriggerAction(fn (Action $action, Table $table): Action => $action->extraAttributes([
+                'data-active-filters' => $table->getActiveFiltersCount(),
+            ]))
             ->actions([
                 Action::make('disposition')
-                    ->label(fn (IncomingLetter $record): string => $record->disposition ? __('disposition.edit') : __('disposition.create'))
+                    ->label(__('disposition.create'))
                     ->icon('heroicon-o-document-text')
                     ->color('primary')
                     ->visible(fn (): bool => auth()->user()?->can('create', Disposition::class) ?? false)
@@ -149,13 +167,26 @@ class IncomingLetterResource extends Resource
                             ->options(DispositionNature::options())
                             ->columns(4)
                             ->required(),
-                        Textarea::make('forwarded_to_input')
-                            ->label(__('disposition.forwarded_to'))
-                            ->placeholder(__('disposition.forwarded_to_placeholder'))
-                            ->helperText(__('disposition.forwarded_to_help'))
+                        Select::make('recipient_user_ids')
+                            ->label(__('disposition.recipients'))
+                            ->helperText(__('disposition.recipients_help'))
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->options(fn (): array => User::query()
+                                ->where('is_active', true)
+                                ->orderBy('name')
+                                ->get()
+                                ->mapWithKeys(fn (User $u): array => [
+                                    $u->id => $u->name.($u->position_title ? ' ('.$u->position_title.')' : ''),
+                                ])
+                                ->all()),
+                        Textarea::make('other_recipients')
+                            ->label(__('disposition.other_recipients'))
+                            ->helperText(__('disposition.other_recipients_help'))
+                            ->placeholder('Contoh: Pihak Eksternal')
                             ->rows(2)
-                            ->required()
-                            ->maxLength(2000),
+                            ->maxLength(1000),
                         CheckboxList::make('instructions')
                             ->label(__('disposition.instructions_label'))
                             ->options(DispositionInstruction::options())
@@ -177,7 +208,8 @@ class IncomingLetterResource extends Resource
                         if (! $disposition) {
                             return [
                                 'nature' => DispositionNature::Biasa->value,
-                                'forwarded_to_input' => '',
+                                'recipient_user_ids' => [],
+                                'other_recipients' => '',
                                 'instructions' => [],
                                 'instruction_other' => null,
                                 'note' => null,
@@ -185,9 +217,15 @@ class IncomingLetterResource extends Resource
                             ];
                         }
 
+                        $recipientIds = $disposition->recipients()->pluck('user_id')->all();
+                        $other = empty($recipientIds) && ! empty($disposition->forwarded_to)
+                            ? implode("\n", $disposition->forwarded_to)
+                            : '';
+
                         return [
                             'nature' => $disposition->nature->value,
-                            'forwarded_to_input' => implode("\n", $disposition->forwarded_to ?? []),
+                            'recipient_user_ids' => $recipientIds,
+                            'other_recipients' => $other,
                             'instructions' => $disposition->instructions ?? [],
                             'instruction_other' => $disposition->instruction_other,
                             'note' => $disposition->note,
@@ -211,23 +249,17 @@ class IncomingLetterResource extends Resource
 
                         return redirect()->route('dispositions.print', $disposition);
                     }),
-                Action::make('print_disposition')
-                    ->label(__('disposition.print'))
-                    ->icon('heroicon-o-printer')
-                    ->url(fn (IncomingLetter $record): string => $record->disposition
-                        ? route('dispositions.print', $record->disposition)
-                        : '#')
-                    ->openUrlInNewTab()
-                    ->visible(fn (IncomingLetter $record): bool => $record->disposition !== null
-                        && (auth()->user()?->can('print', $record->disposition) ?? false)),
-                ViewAction::make()->label(__('incoming.detail')),
-                EditAction::make()->label(__('app.edit')),
-                DeleteAction::make()->label(__('app.delete'))->requiresConfirmation(),
+                ViewAction::make()->label(__('app.view'))->icon('heroicon-o-eye'),
+                EditAction::make()->label(__('app.edit'))->icon('heroicon-o-pencil-square'),
             ])
-            ->defaultSort('received_at', 'desc')
+            ->defaultSort('letter_date', 'desc')
             ->striped()
             ->paginated([10, 25])
-            ->emptyStateHeading(__('incoming.empty'));
+            ->defaultPaginationPageOption(10)
+            ->emptyStateActions([
+                CreateAction::make()->label(__('incoming.new'))->icon('heroicon-o-plus'),
+            ])
+            ->emptyStateHeading(__('app.no_data'));
     }
 
     public static function getPages(): array

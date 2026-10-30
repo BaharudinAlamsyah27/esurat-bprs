@@ -22,7 +22,8 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -39,6 +40,8 @@ class OutgoingLetterResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-paper-airplane';
 
     protected static ?string $navigationGroup = 'SURAT';
+
+    protected static ?int $navigationSort = 2;
 
     public static function getNavigationLabel(): string
     {
@@ -120,14 +123,13 @@ class OutgoingLetterResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('classification'))
-            ->description(__('outgoing.table_help'))
             ->searchPlaceholder(__('outgoing.search_hint'))
             ->columns([
-                TextColumn::make('agenda_number')->label(__('outgoing.agenda_number'))->sortable(),
-                TextColumn::make('letter_number')->label(__('outgoing.letter_number'))->searchable(),
-                TextColumn::make('recipient')->label(__('outgoing.recipient'))->searchable(),
-                TextColumn::make('subject')->label(__('outgoing.subject'))->searchable()->limit(45),
-                TextColumn::make('letter_date')->label(__('outgoing.letter_date'))->date('d M Y')->sortable(),
+                TextColumn::make('agenda_number')->label(__('outgoing.agenda_number'))->width('7rem')->placeholder('—'),
+                TextColumn::make('letter_number')->label(__('outgoing.letter_number'))->width('11rem')->searchable()->placeholder('—'),
+                TextColumn::make('recipient')->label(__('outgoing.recipient'))->width('10rem')->searchable()->placeholder('—'),
+                TextColumn::make('subject')->label(__('outgoing.subject'))->width('14rem')->searchable()->limit(45)->placeholder('—'),
+                TextColumn::make('letter_date')->label(__('outgoing.letter_date'))->width('9rem')->date('d M Y')->sortable()->placeholder('—'),
             ])
             ->filters([
                 SelectFilter::make('agenda_year')
@@ -135,15 +137,21 @@ class OutgoingLetterResource extends Resource
                     ->options(fn (): array => OutgoingLetter::query()->select('agenda_year')->distinct()->orderByDesc('agenda_year')->pluck('agenda_year', 'agenda_year')->all()),
                 SelectFilter::make('classification_id')->label(__('outgoing.classification'))->relationship('classification', 'name'),
             ])
+            ->filtersTriggerAction(fn (Action $action, Table $table): Action => $action->extraAttributes([
+                'data-active-filters' => $table->getActiveFiltersCount(),
+            ]))
             ->actions([
-                ViewAction::make()->label(__('outgoing.detail')),
-                EditAction::make()->label(__('app.edit')),
-                DeleteAction::make()->label(__('app.delete'))->requiresConfirmation(),
+                ViewAction::make()->label(__('app.view'))->icon('heroicon-o-eye'),
+                EditAction::make()->label(__('app.edit'))->icon('heroicon-o-pencil-square'),
             ])
             ->defaultSort('letter_date', 'desc')
             ->striped()
             ->paginated([10, 25])
-            ->emptyStateHeading(__('outgoing.empty'));
+            ->defaultPaginationPageOption(10)
+            ->emptyStateActions([
+                CreateAction::make()->label(__('outgoing.new'))->icon('heroicon-o-plus'),
+            ])
+            ->emptyStateHeading(__('app.no_data'));
     }
 
     /** @param array<string, mixed> $data */

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Support\ThemePalette;
 use App\Models\Institution;
 use App\Models\Setting;
 use Filament\Forms\Components\FileUpload;
@@ -26,6 +27,8 @@ class InstitutionSettings extends Page implements HasForms
     protected static string $view = 'filament.pages.institution-settings';
 
     protected static ?string $navigationGroup = 'DATA MASTER';
+
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
@@ -57,7 +60,7 @@ class InstitutionSettings extends Page implements HasForms
 
         $this->form->fill([
             ...$institution->attributesToArray(),
-            'theme_color' => Setting::query()->where('key', 'ui_theme_color')->first()?->value['color'] ?? 'green',
+            'theme_color' => ThemePalette::selected(),
         ]);
     }
 
@@ -94,11 +97,8 @@ class InstitutionSettings extends Page implements HasForms
                     ->schema([
                         Select::make('theme_color')
                             ->label(__('m1.theme_color'))
-                            ->options([
-                                'green' => __('m1.theme_green'),
-                                'blue' => __('m1.theme_blue'),
-                                'maroon' => __('m1.theme_maroon'),
-                            ])
+                            ->options(ThemePalette::options())
+                            ->in(array_keys(ThemePalette::options()))
                             ->required()
                             ->helperText(__('m1.theme_color_help')),
                     ]),
@@ -108,6 +108,8 @@ class InstitutionSettings extends Page implements HasForms
 
     public function save(): void
     {
+        abort_unless(static::canAccess(), 403);
+
         $state = $this->form->getState();
         $themeColor = $state['theme_color'];
         unset($state['theme_color']);

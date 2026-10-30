@@ -1,0 +1,32 @@
+﻿{
+    "appId":  "id.bprssragen.esurat",
+    "appName":  "E-Surat BPRS Sragen",
+    "webDir":  "www",
+    "server":  {
+                   "url":  "http://192.168.10.199:8080",
+                   "cleartext":  true,
+                   "allowNavigation":  [
+                                           "esurat.test",
+                                           "*.bprssragen.co.id",
+                                           "localhost",
+                                           "10.0.2.2",
+                                           "192.168.*"
+                                       ]
+               },
+    "plugins":  {
+                    "SplashScreen":  {
+                                         "launchShowDuration":  2000,
+                                         "backgroundColor":  "#0F5C46",
+                                         "androidSplashResourceName":  "splash",
+                                         "showSpinner":  false
+                                     },
+                    "PushNotifications":  {
+                                              "presentationOptions":  [
+                                                                          "badge",
+                                                                          "sound",
+                                                                          "alert"
+                                                                      ]
+                                          }
+                },
+    "appendUserAgent":  "ESuratApp/1.0.0"
+}

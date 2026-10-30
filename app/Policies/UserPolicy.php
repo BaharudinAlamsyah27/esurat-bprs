@@ -30,6 +30,7 @@ class UserPolicy
     public function delete(User $user, User $record): bool
     {
         return $user->isAdmin() && $user->isNot($record)
+            && ! $record->hasUsageHistory()
             && (! $record->isAdmin() || ! $record->is_active || User::query()->where('level', UserLevel::Admin->value)->where('is_active', true)->count() > 1);
     }
 

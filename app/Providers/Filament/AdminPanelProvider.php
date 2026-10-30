@@ -25,6 +25,7 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Vite;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\HtmlString;
@@ -46,7 +47,23 @@ class AdminPanelProvider extends PanelProvider
             ->defaultThemeMode(ThemeMode::Light)
             ->font('Plus Jakarta Sans', provider: LocalFontProvider::class)
             ->colors(fn (): array => ThemePalette::filamentColors())
-            ->renderHook(PanelsRenderHook::HEAD_END, fn (): HtmlString => new HtmlString(ThemePalette::styles()))
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): HtmlString => new HtmlString(
+                ThemePalette::styles().
+                '<meta name="apple-mobile-web-app-capable" content="yes">'.
+                '<meta name="mobile-web-app-capable" content="yes">'.
+                '<meta name="apple-mobile-web-app-status-bar-style" content="default">'.
+                '<meta name="apple-mobile-web-app-title" content="E-Surat">'.
+                '<link rel="apple-touch-icon" href="'.asset('images/bprs-sragen.png').'">'.
+                '<link rel="manifest" href="'.asset('manifest.json').'">'
+            ))
+            ->renderHook(PanelsRenderHook::BODY_END, function (): HtmlString {
+                /** @var Vite $vite */
+                $vite = app(Vite::class);
+
+                // Memuat mobile-bridge.js agar APK Android bisa mendaftarkan token
+                // notifikasi dan menangani tombol kembali.
+                return $vite(['resources/js/app.js']);
+            })
             ->userMenuItems([
                 MenuItem::make()
                     ->label(__('m1.profile'))
@@ -55,6 +72,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->sidebarFullyCollapsibleOnDesktop()
             ->sidebarWidth('17rem')
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->navigationGroups([
                 'DATA MASTER',

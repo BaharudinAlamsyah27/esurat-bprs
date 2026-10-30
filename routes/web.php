@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\DispositionPrintController;
 use App\Http\Controllers\InstitutionLogoController;
 use App\Http\Controllers\ReportPrintController;
@@ -22,4 +23,11 @@ Route::middleware(['auth', IdleSessionTimeout::class])->group(function (): void 
 
     Route::get('/instansi/logo', [InstitutionLogoController::class, 'show'])
         ->name('institution.logo');
+
+    Route::post('/device-tokens', [DeviceTokenController::class, 'store'])
+        ->middleware('throttle:30,1')
+        ->name('device-tokens.store');
+
+    Route::delete('/device-tokens', [DeviceTokenController::class, 'destroy'])
+        ->name('device-tokens.destroy');
 });

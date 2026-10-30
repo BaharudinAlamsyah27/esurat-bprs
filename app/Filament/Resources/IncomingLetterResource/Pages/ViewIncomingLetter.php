@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\IncomingLetterResource\Pages;
 
 use App\Filament\Resources\IncomingLetterResource;
+use App\Models\IncomingLetter;
+use Filament\Actions\Action;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -12,6 +14,16 @@ use Filament\Resources\Pages\ViewRecord;
 class ViewIncomingLetter extends ViewRecord
 {
     protected static string $resource = IncomingLetterResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        /** @var IncomingLetter $record */
+        $record = $this->getRecord();
+
+        return $record->disposition && (auth()->user()?->can('print', $record->disposition) ?? false)
+            ? [Action::make('printDisposition')->label(__('disposition.print'))->icon('heroicon-o-printer')->url(route('dispositions.print', $record->disposition))->openUrlInNewTab()]
+            : [];
+    }
 
     public function infolist(Infolist $infolist): Infolist
     {

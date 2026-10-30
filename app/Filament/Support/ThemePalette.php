@@ -7,12 +7,24 @@ use Filament\Support\Colors\Color;
 
 class ThemePalette
 {
-    /** @var array<string, array{primary: string, surface: string, active: string, dark_surface: string, dark_active: string}> */
+    /** @var array<string, array{primary: string, hover: string, active: string}> */
     private const PALETTES = [
-        'green' => ['primary' => '#0F5C46', 'surface' => '#EAF3EF', 'active' => '#DCEDE5', 'dark_surface' => '#213D35', 'dark_active' => '#315749'],
-        'blue' => ['primary' => '#2457A6', 'surface' => '#EDF3FC', 'active' => '#DCE8F8', 'dark_surface' => '#263B58', 'dark_active' => '#345579'],
-        'maroon' => ['primary' => '#963B4B', 'surface' => '#F8EEF0', 'active' => '#F0DDE1', 'dark_surface' => '#49313A', 'dark_active' => '#68404B'],
+        'green' => ['primary' => '#0F5C46', 'hover' => '#0B4938', 'active' => '#EAF3EF'],
+        'blue' => ['primary' => '#2457A6', 'hover' => '#1D4687', 'active' => '#EAF0FA'],
+        'maroon' => ['primary' => '#762D3A', 'hover' => '#5D202C', 'active' => '#F6EAEC'],
+        'teal' => ['primary' => '#0F766E', 'hover' => '#115E59', 'active' => '#E6F3F1'],
     ];
+
+    /** @return array<string, string> */
+    public static function options(): array
+    {
+        return [
+            'green' => __('m1.theme_green'),
+            'blue' => __('m1.theme_blue'),
+            'maroon' => __('m1.theme_maroon'),
+            'teal' => __('m1.theme_teal'),
+        ];
+    }
 
     public static function selected(): string
     {
@@ -32,6 +44,6 @@ class ThemePalette
     {
         $palette = self::PALETTES[self::selected()];
 
-        return '<style>:root{--esurat-green:'.$palette['primary'].';--esurat-green-hover:'.$palette['primary'].';--esurat-brand-surface:'.$palette['surface'].';--esurat-active:'.$palette['active'].';--esurat-dark-brand-surface:'.$palette['dark_surface'].';--esurat-dark-active:'.$palette['dark_active'].';}</style>';
+        return '<style>:root{--esurat-accent:'.$palette['primary'].';--esurat-accent-hover:'.$palette['hover'].';--esurat-active:'.$palette['active'].';--esurat-brand-surface:#ffffff;--esurat-dark-brand-surface:#243443}.fi-sidebar,.fi-sidebar-header{background-color:var(--esurat-brand-surface)!important}.dark .fi-sidebar,.dark .fi-sidebar-header{background-color:var(--esurat-dark-brand-surface)!important}</style>';
     }
 }

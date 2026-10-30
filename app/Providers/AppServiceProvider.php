@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Listeners\RemoveDeviceTokensOnLogout;
 use App\Models\Classification;
 use App\Models\Disposition;
+use App\Models\DispositionRecipient;
 use App\Models\IncomingLetter;
 use App\Models\Institution;
 use App\Models\OutgoingLetter;
@@ -11,6 +13,7 @@ use App\Models\User;
 use App\Policies\ActivityLogPolicy;
 use App\Policies\ClassificationPolicy;
 use App\Policies\DispositionPolicy;
+use App\Policies\DispositionRecipientPolicy;
 use App\Policies\IncomingLetterPolicy;
 use App\Policies\InstitutionPolicy;
 use App\Policies\OutgoingLetterPolicy;
@@ -48,6 +51,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Activity::class, ActivityLogPolicy::class);
         Gate::policy(IncomingLetter::class, IncomingLetterPolicy::class);
         Gate::policy(OutgoingLetter::class, OutgoingLetterPolicy::class);
+        Gate::policy(DispositionRecipient::class, DispositionRecipientPolicy::class);
 
         Event::listen(Login::class, function (Login $event): void {
             if (! $event->user instanceof User) {
@@ -64,12 +68,16 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Event::listen(Logout::class, function (Logout $event): void {
-            if (! $event->user instanceof User) {
+            $user = $event->user;
+
+            if (! $user instanceof User) {
                 return;
             }
 
+            app(RemoveDeviceTokensOnLogout::class)->handle($event);
+
             activity('authentication')
-                ->causedBy($event->user)
+                ->causedBy($user)
                 ->event('logout')
                 ->withProperties(['ip' => request()->ip()])
                 ->log(__('m1.audit_logout'));

@@ -27,6 +27,11 @@ abstract class LetterReportPage extends Page implements HasForms
 
     protected static ?string $navigationGroup = 'LAPORAN';
 
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
+
     /** @var array<string, mixed>|null */
     public ?array $data = [];
 

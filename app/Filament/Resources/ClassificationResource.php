@@ -15,6 +15,8 @@ class ClassificationResource extends MasterDataResource
 
     protected static ?string $navigationGroup = 'DATA MASTER';
 
+    protected static ?int $navigationSort = 1;
+
     public static function getNavigationLabel(): string
     {
         return __('m1.classifications');

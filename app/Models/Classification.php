@@ -30,4 +30,9 @@ class Classification extends Model
     {
         return $this->hasMany(OutgoingLetter::class);
     }
+
+    public function usageCount(): int
+    {
+        return $this->incomingLetters()->count() + $this->outgoingLetters()->count();
+    }
 }

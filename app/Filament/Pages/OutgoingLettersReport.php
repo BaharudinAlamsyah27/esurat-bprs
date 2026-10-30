@@ -6,6 +6,8 @@ use App\Filament\Support\LetterReportPage;
 
 class OutgoingLettersReport extends LetterReportPage
 {
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $navigationIcon = 'heroicon-o-document-arrow-up';
 
     public static function getNavigationLabel(): string

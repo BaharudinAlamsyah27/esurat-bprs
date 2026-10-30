@@ -1,0 +1,20 @@
+{
+  "name": "esurat-mobile",
+  "version": "1.0.0",
+  "description": "Aplikasi Android (APK) E-Surat BPRS Sragen pembungkus WebView",
+  "scripts": {
+    "build": "echo \"Web assets are served by Laravel server\"",
+    "cap:sync": "cap sync android",
+    "cap:open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.2",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/push-notifications": "^6.0.3",
+    "@capacitor/splash-screen": "^6.0.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0"
+  }
+}

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -17,6 +18,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $registered_by
  * @property int $agenda_year
  * @property int $agenda_seq
+ * @property Carbon|null $letter_date
+ * @property Carbon|null $received_at
  */
 class IncomingLetter extends Model
 {

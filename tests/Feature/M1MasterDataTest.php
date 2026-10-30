@@ -8,9 +8,11 @@ use App\Filament\Resources\ClassificationResource;
 use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\EditUser;
+use App\Filament\Support\ThemePalette;
 use App\Models\Classification;
 use App\Models\IncomingLetter;
 use App\Models\Institution;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\UserAdministrationService;
 use Database\Seeders\MasterDataSeeder;
@@ -53,6 +55,41 @@ it('allows admins to update the singleton institution and records the change', f
         'subject_type' => Institution::class,
         'subject_id' => 1,
     ]);
+});
+
+it('defaults to the BPRS green accent when no theme has been selected', function (): void {
+    expect(ThemePalette::selected())->toBe('green');
+});
+
+it('offers and saves each supported accent theme for all users', function (): void {
+    $admin = User::factory()->create(['level' => UserLevel::Admin]);
+    $this->actingAs($admin);
+
+    expect(ThemePalette::options())->toBe([
+        'green' => __('m1.theme_green'),
+        'blue' => __('m1.theme_blue'),
+        'maroon' => __('m1.theme_maroon'),
+        'teal' => __('m1.theme_teal'),
+    ]);
+
+    foreach (array_keys(ThemePalette::options()) as $theme) {
+        Livewire::test(InstitutionSettings::class)
+            ->set('data.theme_color', $theme)
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect(ThemePalette::selected())->toBe($theme)
+            ->and(Setting::query()->where('key', 'ui_theme_color')->first()?->value['color'])->toBe($theme);
+    }
+});
+
+it('denies non-admin users from changing the accent theme', function (): void {
+    $user = User::factory()->create(['level' => UserLevel::User]);
+    $this->actingAs($user);
+
+    $this->get(InstitutionSettings::getUrl())->assertForbidden();
+
+    expect(ThemePalette::selected())->toBe('green');
 });
 
 it('hides and denies master data pages to regular users', function (): void {
@@ -101,6 +138,22 @@ it('protects the last active admin and prevents self deletion', function (): voi
 
     expect($admin->can('delete', $admin))->toBeFalse()
         ->and($admin->can('delete', $otherAdmin))->toBeTrue();
+});
+
+it('does not treat account creation as user activity history', function (): void {
+    $admin = User::factory()->create(['level' => UserLevel::Admin, 'is_active' => true]);
+    $otherUser = User::factory()->create(['level' => UserLevel::User]);
+
+    expect($admin->can('delete', $otherUser))->toBeTrue();
+});
+
+it('prevents deleting a user who has performed an audited action', function (): void {
+    $admin = User::factory()->create(['level' => UserLevel::Admin, 'is_active' => true]);
+    $otherUser = User::factory()->create(['level' => UserLevel::User]);
+
+    activity('users')->causedBy($otherUser)->event('test_action')->log('Aksi uji');
+
+    expect($admin->can('delete', $otherUser))->toBeFalse();
 });
 
 it('prevents deactivating the last active admin', function (): void {

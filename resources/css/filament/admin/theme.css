@@ -1,16 +1,17 @@
 @import '../../../../vendor/filament/filament/dist/theme.css';
 
 :root {
-    --esurat-green: #0f5c46;
-    --esurat-green-hover: #0b4938;
+    --esurat-accent: #0f5c46;
+    --esurat-accent-hover: #0b4938;
     --esurat-gold: #b8912f;
-    --esurat-page: #f7f5f0;
+    --esurat-page: #f5f7f6;
     --esurat-ink: #1f2933;
     --esurat-muted: #52606d;
     --esurat-card: #ffffff;
     --esurat-border: #e5e7eb;
-    --esurat-surface: #fcfcfb;
-    --esurat-active: #e5f3ed;
+    --esurat-surface: #ffffff;
+    --esurat-brand-surface: #ffffff;
+    --esurat-active: #eaf3ef;
     --esurat-font-scale: 1;
 }
 
@@ -21,8 +22,9 @@
     --esurat-muted: #c0cad5;
     --esurat-card: #243443;
     --esurat-border: #405264;
-    --esurat-surface: #1d2a37;
-    --esurat-active: #164e3e;
+    --esurat-surface: #243443;
+    --esurat-brand-surface: #243443;
+    --esurat-active: color-mix(in srgb, var(--esurat-accent) 24%, #151d27);
 }
 
 @font-face {
@@ -36,12 +38,7 @@
 html { font-size: calc(18px * var(--esurat-font-scale)); }
 body, .fi-body { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }
 .fi-body { background-color: var(--esurat-page); color: var(--esurat-ink); }
-.fi-simple-layout {
-    background:
-        radial-gradient(ellipse at top left, rgb(15 92 70 / 10%), transparent 38rem),
-        var(--esurat-page);
-    padding: 1.5rem;
-}
+.fi-simple-layout { background: var(--esurat-page); padding: 1.5rem; }
 .fi-simple-main {
     width: min(100% - 2rem, 30rem);
     border: 1px solid #e6e9e5;
@@ -53,28 +50,41 @@ body, .fi-body { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, san
 .fi-simple-header-heading { color: var(--esurat-ink); }
 .fi-simple-main .fi-btn { width: 100%; min-height: 3.25rem; border-radius: .75rem; }
 .fi-simple-main .fi-input-wrp { border-radius: .75rem; }
-.fi-sidebar { background-color: var(--esurat-brand-surface); }
-.fi-sidebar-header { border-bottom: 1px solid var(--esurat-border); background-color: var(--esurat-brand-surface); }
+.fi-sidebar,
+.fi-sidebar-header { background-color: var(--esurat-brand-surface) !important; }
+.fi-sidebar-header { border-bottom: 1px solid var(--esurat-border); }
 .fi-sidebar-header .fi-logo { max-width: min(100%, 14rem); object-fit: contain; object-position: left center; }
 img.fi-logo { border-radius: .35rem; background: #fff; padding: .2rem .35rem; }
 .fi-sidebar-item-active > a,
-.fi-sidebar-item-active > button { border-radius: .75rem; background: var(--esurat-active); color: var(--esurat-green); }
+.fi-sidebar-item-active > button { border-radius: .75rem; background: var(--esurat-active); color: var(--esurat-accent); }
 .dark .fi-sidebar-item-active > a,
-.dark .fi-sidebar-item-active > button { background: var(--esurat-dark-active); color: #fff; }
-.dark .fi-sidebar-item-active > a { background: var(--esurat-dark-active); color: #fff; }
+.dark .fi-sidebar-item-active > button { background: var(--esurat-active); color: #fff; }
 .fi-sidebar-item:not(.fi-sidebar-item-active) > a:hover,
-.fi-sidebar-item:not(.fi-sidebar-item-active) > button:hover { background: color-mix(in srgb, var(--esurat-green) 7%, transparent); }
-.fi-sidebar-item:not(.fi-sidebar-item-active) > a:hover { background: color-mix(in srgb, var(--esurat-green) 7%, transparent); }
+.fi-sidebar-item:not(.fi-sidebar-item-active) > button:hover { background: var(--esurat-page); }
 .dark .fi-sidebar-item:not(.fi-sidebar-item-active) > a:hover,
 .dark .fi-sidebar-item:not(.fi-sidebar-item-active) > button:hover { background: rgb(255 255 255 / 6%); }
 .fi-btn { min-height: 3rem; border-radius: .75rem; }
+.fi-btn.fi-color-primary:hover { background-color: var(--esurat-accent-hover); }
+.fi-ta-header-toolbar > div:first-child { display: none; }
+.fi-ta-header-toolbar > div:last-of-type { width: 100%; margin-inline-start: 0; justify-content: flex-start; }
+.fi-ta-search-field { width: min(100%, 42rem); flex: 1 1 28rem; }
+.fi-ta-search-field .fi-input-wrp { width: 100%; }
+.fi-ta-filters-dropdown button[data-active-filters="0"] .fi-badge,
+.fi-ta-filters-modal button[data-active-filters="0"] .fi-badge { display: none; }
+.fi-ta-header-cell,
+.fi-ta-cell { font-size: .9rem; }
+.fi-ta-row > td { min-height: 3rem; padding-block: .45rem; }
+.fi-ta-actions .fi-link { min-height: 2.5rem; padding-inline: .45rem; white-space: nowrap; }
+.fi-ta-actions .fi-link:hover { border-radius: .5rem; background: color-mix(in srgb, var(--esurat-accent) 8%, transparent); }
+.fi-ta-row:hover { background-color: rgb(15 23 42 / 3%); }
 .fi-topbar { background: var(--esurat-brand-surface); }
 .fi-topbar nav { min-height: 4rem; border-bottom: 1px solid var(--esurat-border); background: var(--esurat-brand-surface); }
 .fi-header-heading { font-size: clamp(1.35rem, 1.5vw, 1.65rem); line-height: 1.2; letter-spacing: -.02em; }
 .esurat-summary-card { min-height: 5rem; border: 1px solid var(--esurat-border); border-radius: .75rem; background: var(--esurat-card); padding: .7rem .85rem; }
 .esurat-summary-card { display: flex; flex-direction: column; justify-content: center; color: var(--esurat-ink); text-decoration: none; transition: border-color .15s ease, box-shadow .15s ease; }
-.esurat-summary-card:hover, .esurat-summary-card:focus-visible { border-color: var(--esurat-green); box-shadow: 0 0 0 3px rgb(15 92 70 / 12%); outline: none; }
-.esurat-summary-card strong { display: block; color: var(--esurat-green); font-size: 1.35rem; line-height: 1.2; }
+.esurat-summary-card:hover { border-color: #cbd5d1; }
+.esurat-summary-card:focus-visible { border-color: var(--esurat-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--esurat-accent) 12%, transparent); outline: none; }
+.esurat-summary-card strong { display: block; color: var(--esurat-ink); font-size: 1.35rem; line-height: 1.2; }
 .esurat-summary-card span { line-height: 1.3; }
 .esurat-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: .4rem; }
 .esurat-font-control { display: flex; align-items: center; gap: .75rem; }
@@ -85,14 +95,14 @@ img.fi-logo { border-radius: .35rem; background: #fff; padding: .2rem .35rem; }
 .esurat-latest-letters h2 { margin: 0 0 .4rem; font-size: 1rem; font-weight: 700; }
 .esurat-latest-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
 .esurat-latest-panel { min-width: 0; border: 1px solid var(--esurat-border); border-radius: .6rem; background: var(--esurat-surface); padding: .5rem .65rem; }
-.esurat-latest-panel h3 { margin: 0 0 .35rem; color: var(--esurat-green); font-size: 1rem; font-weight: 700; }
+.esurat-latest-panel h3 { margin: 0 0 .35rem; color: var(--esurat-ink); font-size: 1rem; font-weight: 700; }
 .esurat-latest-row { display: grid; min-height: 2rem; grid-template-columns: 4.7rem minmax(0, 1fr) auto; align-items: center; gap: .4rem; border-top: 1px solid var(--esurat-border); padding: .25rem 0; color: var(--esurat-ink); text-decoration: none; }
-.esurat-latest-row:focus-visible { outline: 3px solid var(--esurat-green); outline-offset: 2px; }
+.esurat-latest-row:focus-visible { outline: 3px solid var(--esurat-accent); outline-offset: 2px; }
 .esurat-latest-date { color: var(--esurat-muted); font-size: .78rem; }
 .esurat-latest-main { display: flex; min-width: 0; flex: 1; flex-direction: column; }
 .esurat-latest-main strong, .esurat-latest-main small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .esurat-latest-main small { color: var(--esurat-muted); }
-.esurat-latest-link { color: var(--esurat-green); font-size: .9rem; font-weight: 700; }
+.esurat-latest-link { color: var(--esurat-accent); font-size: .9rem; font-weight: 700; }
 .esurat-empty { color: var(--esurat-muted); }
 
 .fi-wi-chart canvas { width: 100% !important; }
@@ -131,8 +141,8 @@ img.fi-logo { border-radius: .35rem; background: #fff; padding: .2rem .35rem; }
 .dark .esurat-latest-panel { background-color: var(--esurat-surface); }
 .dark .fi-header-heading { color: #f8fafc; }
 .dark .esurat-summary-card strong,
-.dark .esurat-latest-panel h3,
-.dark .esurat-latest-link { color: #6ee7b7; }
+.dark .esurat-latest-panel h3 { color: var(--esurat-ink); }
+.dark .esurat-latest-link { color: color-mix(in srgb, var(--esurat-accent) 70%, white); }
 
 @media (max-width: 640px) {
     .fi-simple-layout { padding: .75rem; }

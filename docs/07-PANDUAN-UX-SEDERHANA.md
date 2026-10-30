@@ -53,11 +53,16 @@ Dua tombol: **"Simpan & Cetak"** (utama) dan "Simpan saja". Setelah tersimpan, P
 ## 5. Gaya Visual (token — dapat disetel sesuai identitas resmi BPRS)
 | Token | Nilai awal |
 |---|---|
-| Primer (hijau tua) | `#0F5C46` · hover `#0B4938` |
-| Aksen (emas lembut) | `#B8912F` |
-| Latar halaman / kartu | `#F7F5F0` / `#FFFFFF` |
+| Aksen default Hijau BPRS | `#0F5C46` · hover `#0B4938` · aktif pudar `#EAF3EF` |
+| Aksen Biru | `#2457A6` · hover `#1D4687` · aktif pudar `#EAF0FA` |
+| Aksen Marun | `#762D3A` · hover `#5D202C` · aktif pudar `#F6EAEC` |
+| Aksen Teal | `#0F766E` · hover `#115E59` · aktif pudar `#E6F3F1` |
+| Latar halaman / kartu | `#F5F7F6` / `#FFFFFF` |
 | Teks utama / sekunder | `#1F2933` / `#52606D` |
 | Sukses / Peringatan / Bahaya / Info | `#2F855A` / `#C77700` / `#C53030` / `#2B6CB0` |
+- Header dan sidebar tetap putih pada mode terang; semua tema hanya mengganti aksen. Pada mode gelap, latar menggunakan warna netral gelap dan aksen tetap mengikuti tema.
+- Aksen hanya dipakai pada tombol utama, tautan, fokus, dan menu aktif. Semua pilihan memakai teks putih pada tombol dengan rasio kontras minimal 4,5:1.
+- Token netral dan token aksen berada pada variabel CSS `--esurat-page`, `--esurat-card`, `--esurat-brand-surface`, `--esurat-border`, `--esurat-ink`, `--esurat-muted`, `--esurat-accent`, `--esurat-accent-hover`, dan `--esurat-active`.
 - Font Plus Jakarta Sans atau Inter (OFL), **18px** dasar, judul 24px+, **dibundel lokal** (tanpa CDN). Tombol ≥ 48px, sudut membulat, jarak lega, tanpa animasi berlebihan.
 - Status = ikon + kata + warna. Ikon hanya Heroicons (bawaan Filament). Catat lisensi di `docs/LICENSES.md`.
 - Pilihan **Ukuran Huruf** (normal/besar/sangat besar) di menu pengguna, disimpan di `users.ui_font_scale`.
@@ -88,3 +93,12 @@ Tombol **"? Bantuan"** di tiap halaman utama (satu paragraf + 3 langkah), contoh
 
 ## 9. Kriteria Uji Kemudahan (UAT)
 Pengguna usia 50+ tanpa pelatihan harus bisa, **tanpa bantuan**: (1) menambah surat masuk; (2) membuat dan mencetak Lembar Disposisi dalam ≤ 4 klik dari daftar; (3) mencari sebuah surat; (4) mencetak laporan bulan ini; (5) memahami semua pesan error. Lolos bila ≥ 4 dari 5 berhasil pada ≥ 3 pengguna senior.
+
+## 10. Pola Tabel Standar
+- Halaman daftar menampilkan judul, satu kalimat penjelas yang singkat dan mudah dipahami, tanpa breadcrumb, serta satu tombol utama hijau dengan ikon tambah dan nama yang spesifik (mis. “Tambah klasifikasi” atau “Catat Surat Masuk”).
+- Kotak pencarian diletakkan di sisi kiri dan dibuat cukup lebar; jumlah data ditampilkan dengan jelas. Jangan tampilkan pengatur kolom atau ikon tanpa label bila tidak diperlukan.
+- Tabel maksimal enam kolom termasuk kolom aksi. Kolom data dimulai dari kiri; tombol aksi berada di kanan setelah data. Hanya kolom utama yang dapat diurutkan. Klasifikasi diurutkan menurut kode naik; surat menurut tanggal terbaru. Nomor/kode dibuat ringkas, nilai kosong ditampilkan sebagai “—”, tinggi baris minimal 52px, pemisah tipis, serta sorotan hover yang halus.
+- Tombol aksi berupa tombol berbingkai, berikon dan berteks. Daftar klasifikasi, pengguna, dan instansi hanya menyediakan “Ubah”; Surat Masuk menyediakan “Lihat”, “Disposisi”, “Ubah”; Surat Keluar menyediakan “Lihat”, “Ubah”. Jangan tampilkan “Hapus” pada baris daftar.
+- Penghapusan yang diizinkan tersedia pada bagian bawah halaman Ubah/Detail, berwarna bahaya, memakai konfirmasi yang jelas (“Hapus data ini?” dengan tombol “Ya, Hapus” dan “Batal”). Jika data telah dipakai, tombol dinonaktifkan dan alasan penggunaan ditampilkan.
+- Footer menampilkan rentang dan jumlah hasil, pilihan 10 atau 25 data per halaman, serta tombol navigasi halaman yang mudah ditekan. Saat kosong tampilkan “Belum ada data.” beserta tombol tambah yang berlabel jelas.
+- Urutan menu DATA MASTER wajib: Data Klasifikasi, Data Instansi, Data Pengguna, Riwayat Aktivitas. Tetapkan `navigationSort` pada semua item navigasi agar urutan tetap.

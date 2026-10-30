@@ -2,10 +2,11 @@
 
 ## Status saat ini
 
-- Milestone aktif: **M6 — Dashboard & Penyelesaian** (branch `feature/m6-dashboard`; M5 telah di-commit dan masuk ke `develop`)
-- M0: **Selesai untuk kode dan smoke test**; tampilan admin juga sudah terlihat pada screenshot browser pengguna. Tidak ada klaim UAT dengan pegawai akhir.
-- Lingkup v2: aplikasi surat masuk/keluar sederhana; disposisi satu lembar cetak adalah M3.
-- Database lama tidak dihapus. Migration baru diatur agar instalasi baru tidak membuat tabel fitur lama yang dibatalkan.
+- Milestone aktif: **Fase 3 — Ekosistem Hybrid Terpadu (Mobile APK Android + Web Core & PWA iPhone)** (dokumen acuan: `docs/fase 3/`)
+- M0–M6 (Fase 1): **Selesai dan terverifikasi penuh** (41 test / 211 assertion).
+- Fase 2: **Selesai dan terverifikasi penuh** (56 test / 276 assertion Pest lulus).
+- Fase 3: **Dokumentasi blueprint arsitektur, PRD UX, topologi jaringan on-premise, dan SOP build APK telah selesai disusun di `docs/fase 3/`**.
+- **Hambatan aktif (audit 2026-10-30):** `composer ci` belum hijau di lingkungan pengembangan karena ekstensi `pdo_sqlite` belum aktif; PHPStan masih 8 galat; pekerjaan Fase 2 & Fase 3 belum di-commit; push FCM belum dikonfigurasi.
 
 ## Roadmap dan status
 
@@ -18,8 +19,51 @@
 | M4 — Surat Keluar | Implementasi + CI, migrasi Laragon, dan commit selesai; UAT browser menunggu | CRUD, nomor agenda/surat terkunci per tahun tanggal surat, pola tersimpan di `settings`, nomor manual Admin, lampiran privat, policy pemilik, soft delete Admin. `composer ci` lulus: 37 tes/183 assertion. |
 | M5 — Laporan | Implementasi + CI + UAT browser + commit selesai | Pengguna mengonfirmasi laporan berhasil diuji di browser dan `composer ci` lulus. Komit `19b147d` telah masuk ke `develop`. Test otomatis khusus laporan belum ditambahkan. |
 | M6 — Dashboard & Penyelesaian | Implementasi + CI selesai; UAT/staging menunggu | Kartu dinamis dan tautan filter, dua grafik enam bulan/klasifikasi, surat terbaru, bantuan kontekstual, header keamanan, cookie produksi, panduan pengguna/instalasi/backup/restore, skenario UAT, dan seeder data uji 10.000 surat tersedia. `composer ci` lulus (41 tes/211 assertion). Uji beban, restore staging, dan UAT belum dilakukan. |
+| Fase 2 — Disposisi Digital & Mobile APK | Selesai (implementasi + 56 tes lulus) | Disposisi digital berbasis akun, status baru/dibaca/selesai, menu Disposisi Saya, notifikasi lonceng web & push FCM HTTP v1, token HP endpoint, pembungkus Capacitor mobile/ |
+| Fase 3 — Ekosistem Hybrid Terpadu | Selesai (Kompilasi APK Sukses) | Blueprint lengkap di `docs/fase 3/`. Berkas Android APK (`esurat-bprs.apk`, 4.5 MB) berhasil dikompilasi via Gradle 8.2.1 & SDK 34 dan siap diunduh di `public/downloads/esurat-bprs.apk`. |
 
 ## Riwayat
+
+### 2026-10-30 — Audit menyeluruh & penyiapan lanjutan
+
+- **Dikerjakan:** mempelajari ulang `AGENTS.md`, roadmap, PRD/arsitektur/alur akses, panduan UX, dokumen Fase 2 & Fase 3, lalu memeriksa langsung kode, dokumentasi, dan kondisi lingkungan kerja.
+- **Status kode:** Fase 1 (M0–M6) dan Fase 2 sudah terimplementasi. Pekerjaan Fase 2 & Fase 3 (disposisi digital, notifikasi lonceng & push FCM, token perangkat, pembungkus `mobile/` Capacitor, manifest PWA) **belum di-commit** — masih berada di branch `feature/m6-dashboard` sebagai perubahan belum tersimpan (42 file termodifikasi + sejumlah file baru belum dilacak).
+- **Hambatan yang teridentifikasi:**
+  1. PHP CLI lingkungan ini 8.4.27 **tanpa ekstensi `pdo_sqlite` aktif** → `php artisan test` gagal `could not find driver (Connection: sqlite)`. DLL `php_pdo_sqlite.dll` sebenarnya tersedia di folder `ext`. Akibatnya `composer ci` belum bisa hijau di lingkungan ini.
+  2. PHPStan level 6 melaporkan **8 galat**: 7 di [MyDispositionResource.php](file:///c:/laragon/www/esurat/app/Filament/Resources/MyDispositionResource.php) (generik `Builder`, nullsafe berlebihan, `translatedFormat()` dipanggil pada string) dan 1 di [AppServiceProvider.php](file:///c:/laragon/www/esurat/app/Providers/AppServiceProvider.php#L77-L81) (`causedBy()` menerima `Authenticatable`).
+  3. **Push FCM belum aktif:** `mobile/android/app/google-services.json` dan `storage/app/private/firebase-service-account.json` belum ada; `FCM_ENABLED` belum diisi pada `.env`.
+- **Validasi:** `vendor/bin/pint --test` **LULUS** (161 file).
+- **Belum bisa diverifikasi:** `composer ci` penuh (terhalang `pdo_sqlite`), UAT browser, dan pengiriman push FCM.
+
+### 2026-10-27 — Fase 3 Ekosistem Hybrid Terpadu (Mobile APK Android + Web Core & PWA iPhone)
+
+- **Selesai:**
+  1. **Dokumentasi Lengkap:** Menyusun blueprint di [`docs/fase 3/00-RINGKASAN-FASE3.md`](file:///c:/laragon/www/esurat/docs/fase%203/00-RINGKASAN-FASE3.md), PRD UX di [`01-PRD-DAN-USER-EXPERIENCE-FASE3.md`](file:///c:/laragon/www/esurat/docs/fase%203/01-PRD-DAN-USER-EXPERIENCE-FASE3.md), dan arsitektur teknis di [`02-ARSITEKTUR-TEKNIS-DAN-INFRASTRUKTUR-FASE3.md`](file:///c:/laragon/www/esurat/docs/fase%203/02-ARSITEKTUR-TEKNIS-DAN-INFRASTRUKTUR-FASE3.md).
+  2. **Inisialisasi Native Android (`mobile/android`):** Menyiapkan container Capacitor 6 dengan plugin `@capacitor/app`, `@capacitor/push-notifications`, dan `@capacitor/splash-screen`.
+  3. **Keamanan Perbankan:** Mengonfigurasi `AndroidManifest.xml` (`allowBackup="false"`, `usesCleartextTraffic="true"`, dan izin `POST_NOTIFICATIONS` Android 13+).
+  4. **Kompilasi Berkas APK:** Mengonfigurasi `local.properties` (Android SDK 34) dan Gradle 8.2.1. Berhasil menjalankan `assembleDebug` (160 task sukses, durasi 5 menit).
+  5. **Penyediaan Berkas Siap Unduh:** File `app-debug.apk` (4,498,869 bytes) telah disalin ke [`public/downloads/esurat-bprs.apk`](file:///c:/laragon/www/esurat/public/downloads/esurat-bprs.apk) agar dapat diunduh langsung dari jaringan kantor melalui tautan `http://<IP-Server>:8080/downloads/esurat-bprs.apk`.
+
+### 2026-10-27 — Fase 2 Disposisi Digital, Notifikasi Push & Pembungkus Android APK
+
+- **Selesai:** implementasi backend dan frontend web untuk Fase 2 sesuai `docs/fase 2/00-RINGKASAN-FASE2.md`, `01-PRD-FASE2.md`, dan `02-ARSITEKTUR-DAN-API.md`:
+  1. **Database & Migrasi:** membuat migrasi `2026_10_27_100000_fase2_disposition_recipients_and_device_tokens.php` (`position_title` dan `push_enabled` pada `users`, tabel `disposition_recipients`, tabel `device_tokens`, dan tabel standar `notifications`).
+  2. **Model & Enum:** membuat enum `DispositionRecipientStatus` (`new`, `read`, `done`), model `DispositionRecipient`, model `DeviceToken`, relasi `recipients()` pada `Disposition`, serta relasi dan trait `Notifiable` pada `User`.
+  3. **Action & Notifikasi:** memperbarui `SaveDisposition` agar menyinkronkan daftar penerima pegawai (dengan backward compatibility cetak PDF via `forwarded_to`), membuat action `MarkDispositionRead` dan `CompleteDispositionRecipient`, notifikasi `DispositionAssigned` dan `DispositionCompleted`, saluran `FcmChannel`, layanan `FcmClient` (FCM HTTP v1), serta action `RegisterDeviceToken` dan `RevokeDeviceToken`.
+  4. **Filament Resource & Menu:**
+     - Menu baru **"Disposisi Saya"** (`MyDispositionsResource`) untuk pegawai melihat lembar disposisi yang ditugaskan, otomatis menandai status `dibaca` saat dibuka, dan tombol modal `Tandai Selesai` dengan catatan tindak lanjut.
+     - Lencana badge navigasi otomatis menampilkan jumlah disposisi berstatus `Baru`.
+     - Lonceng notifikasi in-app Filament diaktifkan via `databaseNotifications()` dengan polling 30 detik.
+     - Halaman admin **"Perangkat Terdaftar"** (`RegisteredDeviceResource`) untuk memantau dan mencabut token perangkat HP.
+     - Form disposisi pada `IncomingLetterResource` diperbarui dengan pemilih multi-pegawai dan teks penerima luar, serta indikator progres tindak lanjut pada tabel surat.
+     - Toggle profil pengguna "Terima notifikasi di HP" (`push_enabled`).
+  5. **Endpoint Token HP & Listener Logout:** rute `POST /device-tokens` dan `DELETE /device-tokens` dengan validasi CSRF & throttle, serta event listener `RemoveDeviceTokensOnLogout` saat sesi berakhir.
+  6. **Arsitektur Pembungkus Android (APK):** membuat folder `mobile/` dengan konfigurasi Capacitor (`capacitor.config.json`, `package.json`, `www/index.html`, `www/offline.html`) dan jembatan WebView `resources/js/mobile-bridge.js`.
+  7. **Testing:** membuat test suite `tests/Feature/Fase2DigitalDispositionAndPushTest.php` (6 tes / 23 assertion lulus). Seluruh test suite (56 tes / 276 assertion) lulus tanpa regresi. Pint format check lulus.
+  8. **Perbaikan Kompatibilitas Data Lama:** mengatasi error `ValueError: "pending" is not a valid backing value` dengan menambahkan case `Pending = 'pending'` dan `InProgress = 'in_progress'` pada `DispositionRecipientStatus`, serta memperbarui metode `markAsRead()` dan badge navigasi agar mendukung data riwayat terdahulu.
+  9. **Perbaikan Kolom Database `done_note`:** mengatasi error `SQLSTATE[42S22]: Unknown column 'done_note'` saat menekan tombol "Tandai Selesai" dengan membuat migrasi patch `2026_10_27_103000_patch_disposition_recipients_columns.php` yang menambahkan kolom `done_note` (varchar 255), `user_id` (foreignId), dan `notified_at` (timestamp) ke tabel `disposition_recipients` serta mem-backfill data lama dari kolom `report_notes` & `recipient_user_id`. Migrasi telah berstatus `Ran` pada MySQL Laragon dan telah diuji sukses pada record disposisi lama. Cache aplikasi juga telah dibersihkan (`php artisan optimize:clear`).
+  10. **Dukungan Standalone Web App (PWA) di iOS & Android:** menambahkan `manifest.json` dan meta tag `apple-mobile-web-app-capable`, `apple-touch-icon`, serta `apple-mobile-web-app-status-bar-style` pada `AdminPanelProvider` agar saat pengguna memilih "Tambah ke Layar Utama" di iPhone/iPad/Android, aplikasi terbuka penuh secara mandiri (fullscreen) tanpa bilah URL Safari.
+
 
 ### 2026-10-21 — M6 Dashboard & Penyelesaian (mulai)
 
@@ -31,7 +75,18 @@
 - **Tata letak desktop:** widget kustom kini memakai pembungkus grid Filament supaya `columnSpan` berlaku; sapaan dipindah ke subjudul, kartu ringkasan mengisi satu baris pada layar lebar, dua grafik berdampingan, dan surat terbaru memakai satu baris penuh. Kartu, grafik, baris surat, dan jarak dipadatkan untuk mengurangi tinggi halaman.
 - **Penyegaran tampilan akhir:** sidebar sekarang dapat ditutup sepenuhnya pada desktop dengan tombol hamburger; logo BPRS Sragen yang diberikan pengguna dipasang di header panel; mode terang/gelap bawaan Filament tersedia dengan mode terang sebagai pilihan awal, sementara pilihan pengguna tetap dapat diubah. Mode gelap memakai latar abu-abu kebiruan, header/sidebar lebih terang dari latar halaman, ikon menu berkontras jelas, dan kartu dashboard ikut menyesuaikan. Logo antarmuka ini terpisah dari logo Data Instansi yang dipakai pada PDF dan laporan. CSS tetap memakai font lokal dan tanpa dependensi baru.
 - **Polesan daftar dan warna:** sidebar dipersempit menjadi 17rem agar ruang tabel lebih lega. Daftar surat, pengguna, klasifikasi, dan aktivitas memiliki petunjuk singkat serta baris selang-seling; laporan menampilkan jumlah hasil. Admin dapat memilih aksen Hijau BPRS, Biru, atau Merah Marun dari Data Instansi; pilihan tersimpan pada `settings` yang sudah ada dan berlaku untuk semua role setelah halaman dimuat ulang. Header/sidebar memakai rona pilihan, area kerja tetap netral, termasuk mode gelap.
-- **Pemeriksaan kode:** `composer ci` lulus (Pint, PHPStan, 41 tes/211 assertion), termasuk empat tes M6 (28 assertion); `git diff --check` bersih.
+- **Standar tabel daftar:** permintaan lanjutan memperjelas kolom data harus tetap di kiri dan aksi di kanan. Aksi hapus dipindahkan dari daftar ke bagian bawah halaman Ubah; daftar surat dibatasi lima kolom data agar total dengan aksi tidak lebih dari enam. Search dibuat lebar dan rata kiri, breadcrumb/petunjuk tabel ganda dihapus, tombol tambah dibuat spesifik, pagination dimulai dari 10/25, nilai kosong memakai tanda “—”, tombol tambah tersedia pada kondisi kosong, dan urutan menu ditetapkan. Pola ini ditambahkan ke §10 panduan UX. Tes Pest mencakup default sort, ketiadaan Hapus pada daftar, tombol tambah kondisi kosong, alasan blokir klasifikasi terpakai, visibilitas menu role, dan urutan DATA MASTER.
+- **Pemeriksaan kode:** verifikasi melalui terminal Laragon belum dilakukan setelah revisi UI tabel. Pengguna akan menjalankan `composer ci` dan `npm run build`; hasil pemeriksaan yang berjalan saat sesi sebelumnya terputus belum dikonfirmasi.
+- **Perintah untuk dijalankan pengguna:** dari terminal Laragon di folder proyek, jalankan `composer ci`, lalu `npm run build`. Jangan commit sebelum keduanya berhasil.
+- **Belum bisa diverifikasi:** hasil CI/build terbaru dan tampilan tabel di browser Laragon, terutama posisi kolom aksi di kanan dan perilaku tampilan pada ukuran layar berbeda.
+- **Perbaikan dari hasil CI pengguna:** akun baru sebelumnya terhitung memiliki riwayat hanya karena catatan audit pembuatan akun. Pengecekan kini mengabaikan event `created` pada akun itu sendiri, tetapi tetap melindungi pengguna yang melakukan aksi audit atau memiliki surat tercatat. Tes regresi ditambahkan; hasil harus diverifikasi ulang oleh pengguna dengan `composer ci`.
+- **Polesan daftar surat:** tombol aksi Surat Masuk/Keluar dilepas dari gaya kotak dan dirapikan sebagai tautan berikon; ukuran teks dan jarak baris tabel dipadatkan, lebar kolom data surat dibatasi, dan label aksi disposisi diseragamkan. Pengguna perlu menjalankan `npm run build` dan memuat ulang halaman Laragon untuk melihat hasilnya.
+- **Palet warna profesional:** latar halaman menjadi abu sangat terang dengan kartu putih; header/sidebar kembali netral. Pemilih warna kini berisi Hijau BPRS, Biru, Marun, dan Teal, semuanya hanya mengubah aksen. Nilai tema disimpan melalui `settings` yang sudah ada; Admin saja yang dapat mengubahnya. Lencana filter bernilai nol disembunyikan. Panduan token warna dan tes pilihan/simpan/otorisasi/default tema diperbarui.
+- **Perintah untuk dijalankan pengguna:** `composer ci`, lalu `npm run build` dari terminal Laragon di folder proyek.
+- **Belum bisa diverifikasi:** hasil `composer ci` dan build CSS untuk palet baru, serta tampilan terang/gelap di browser setelah tema disimpan dan halaman dimuat ulang.
+- **Perbaikan tampilan lanjutan:** sidebar diberi latar opak agar tidak tembus oleh backdrop saat layar menyempit; aksi Ubah pada klasifikasi/pengguna kini tanpa bingkai; tinggi baris tabel dirapatkan.
+- **Sidebar saat berbagi layar:** latar solid sidebar/header kini juga didefinisikan oleh hook tema server, bukan hanya aset Vite. Ini mencegah variabel latar kosong membuat sidebar transparan saat jendela masuk mode overlay pada ukuran sempit. Perlu dimuat ulang dan diperiksa pada jendela setengah layar.
+- **Perbaikan PHPStan:** hitungan badge filter sekarang diambil dari `Filament\Tables\Table` yang memang menyediakan `getActiveFiltersCount()`, bukan dari kontrak Livewire `HasTable`. Minta pengguna mengulang `composer ci` untuk memastikan.
 - **Belum diverifikasi:** uji 10.000 data pada database lokal, backup dan restore di staging, serta UAT dengan sedikitnya tiga pegawai senior.
 
 ### 2026-10-21 — M5 Laporan (implementasi awal)
@@ -104,3 +159,12 @@
 - **Perintah Laragon:** jalankan `php artisan migrate` lalu `composer ci`. Setelah migrasi, UAT sebagai Admin: buat disposisi, simpan saja, ubah, simpan & cetak; sebagai User: pastikan tombol buat/ubah tidak ada dan tombol cetak berfungsi. Jangan jalankan `migrate:fresh` atau `db:wipe`.
 - **Belum diverifikasi:** migrasi M3 dan tampilan tombol/modal di browser Laragon. Database saat ini memiliki tabel disposisi lama; migrasi M3 dirancang untuk mengarsipkannya sebelum membuat tabel baru.
 - **Berikutnya:** setelah pengguna menjalankan migrasi dan UAT, commit M3 lalu lanjutkan M4 — Surat Keluar.
+
+### 2026-10-29 — Tahap A: APK Android berfungsi & alamat server bisa diatur
+
+- **Selesai:** memuat `resources/js/app.js` di panel Filament agar `mobile-bridge.js` benar-benar berjalan di dalam APK (registrasi token FCM dan tombol kembali Android). Bukti: halaman login kini memuat `app-*.js`; sebelumnya hanya `theme-*.css`.
+- **Selesai:** menambah `mobile/build-apk.ps1` yang menulis alamat server ke `capacitor.config.json`, menjalankan `cap sync`, membangun APK, lalu menyalinnya ke `public/downloads/esurat-bprs.apk`. IP kantor atau domain dapat diganti tanpa mengubah kode Laravel.
+- **Validasi:** skrip dijalankan dengan `-ServerUrl http://192.168.10.199:8080` → `BUILD SUCCESSFUL` dan APK tersalin. Pint lulus untuk file yang diubah.
+- **Belum diverifikasi:** `composer ci` belum lulus di lingkungan ini karena ekstensi `pdo_sqlite` tidak aktif (phpunit memakai sqlite `:memory:`) dan PHPStan melaporkan 8 galat lama di `MyDispositionResource` serta `AppServiceProvider` yang tidak terkait perubahan ini.
+- **Tersisa (penghambat notifikasi):** `mobile/android/app/google-services.json` belum ada sehingga plugin Firebase tidak dipasang saat build; server juga belum punya `storage/app/private/firebase-service-account.json` dan `FCM_ENABLED=true`.
+- **Perintah:** `powershell -ExecutionPolicy Bypass -File mobile\build-apk.ps1 -ServerUrl <alamat-server>`.

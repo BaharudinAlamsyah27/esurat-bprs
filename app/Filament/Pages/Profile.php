@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -39,6 +40,7 @@ class Profile extends Page implements HasForms
         $this->form->fill([
             'name' => $user->name,
             'email' => $user->email,
+            'push_enabled' => (bool) ($user->push_enabled ?? true),
         ]);
     }
 
@@ -48,6 +50,10 @@ class Profile extends Page implements HasForms
             ->schema([
                 TextInput::make('name')->label(__('m1.name'))->required()->maxLength(120),
                 TextInput::make('email')->label(__('m1.email'))->email()->nullable()->unique(table: 'users', ignorable: auth()->user())->maxLength(190),
+                Toggle::make('push_enabled')
+                    ->label(__('m1.push_enabled'))
+                    ->helperText(__('m1.push_enabled_help'))
+                    ->default(true),
                 TextInput::make('current_password')->label(__('m1.current_password'))->password()->revealable()->nullable()->requiredWith('password')->currentPassword(),
                 TextInput::make('password')->label(__('m1.new_password'))->password()->revealable()->nullable()->rule(Password::defaults())->confirmed()->dehydrated(fn (?string $state): bool => filled($state)),
                 TextInput::make('password_confirmation')->label(__('m1.password_confirmation'))->password()->revealable()->nullable()->dehydrated(false),
@@ -68,7 +74,7 @@ class Profile extends Page implements HasForms
         $state = $this->form->getState();
         $passwordChanged = filled($state['password'] ?? null);
 
-        $user->fill(array_intersect_key($state, array_flip(['name', 'email', 'password'])))->save();
+        $user->fill(array_intersect_key($state, array_flip(['name', 'email', 'password', 'push_enabled'])))->save();
 
         if ($passwordChanged) {
             activity('users')

@@ -38,7 +38,10 @@ return [
     'font_large' => 'Besar',
     'font_largest' => 'Sangat besar',
     'edit' => 'Ubah',
+    'view' => 'Lihat',
     'delete' => 'Hapus',
+    'confirm_delete' => 'Ya, Hapus',
+    'cancel' => 'Batal',
     'create' => 'Tambah',
     'search' => 'Cari',
 ];

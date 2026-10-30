@@ -16,6 +16,8 @@ class ActivityLogResource extends Resource
 
     protected static ?string $navigationGroup = 'DATA MASTER';
 
+    protected static ?int $navigationSort = 4;
+
     public static function canViewAny(): bool
     {
         return auth()->user()?->isAdmin() ?? false;
@@ -39,11 +41,10 @@ class ActivityLogResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->description(__('m1.activity_table_help'))
             ->columns([
                 TextColumn::make('created_at')->label(__('m1.activity_time'))->dateTime('d M Y, H:i')->sortable(),
                 TextColumn::make('causer.name')->label(__('m1.activity_user'))->placeholder(__('m1.system_user')),
-                TextColumn::make('description')->label(__('m1.activity_description'))->searchable()->wrap(),
+                TextColumn::make('description')->label(__('m1.activity_description'))->searchable()->wrap()->placeholder('—'),
                 TextColumn::make('subject_type')
                     ->label(__('m1.activity_object'))
                     ->formatStateUsing(fn (?string $state): string => $state ? class_basename($state) : '—')
@@ -51,7 +52,10 @@ class ActivityLogResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
-            ->paginated([10, 25]);
+            ->paginated([10, 25])
+            ->defaultPaginationPageOption(10)
+            ->emptyStateHeading(__('app.no_data'))
+            ->searchPlaceholder(__('m1.activity_search_hint'));
     }
 
     public static function getPages(): array

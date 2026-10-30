@@ -6,6 +6,8 @@ use App\Filament\Support\LetterReportPage;
 
 class IncomingLettersReport extends LetterReportPage
 {
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $navigationIcon = 'heroicon-o-document-magnifying-glass';
 
     public static function getNavigationLabel(): string

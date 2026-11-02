@@ -64,6 +64,14 @@ test('admin can assign digital disposition recipients and recipient receives not
     Notification::assertSentTo($recipient1, DispositionAssigned::class);
     Notification::assertSentTo($recipient2, DispositionAssigned::class);
 
+    $pushPayload = (new DispositionAssigned($rec1))->toFcm($recipient1);
+    expect($pushPayload['notification']['body'])->toBe('Anda menerima disposisi baru')
+        ->and($pushPayload['data'])->toBe([
+            'type' => 'disposition',
+            'path' => '/disposisi-saya/'.$rec1->id,
+            'id' => (string) $rec1->id,
+        ]);
+
     // Verify forwarded_to has names for backward compatibility with PDF print
     expect($disposition->forwarded_to)->toContain('Budi Santoso (Staf Operasional)');
     expect($disposition->forwarded_to)->toContain('Siti Rahma (Kasir)');
@@ -168,6 +176,8 @@ test('user logout removes session device tokens', function () {
 });
 
 test('fcm client safely skips push when disabled or credentials missing', function () {
+    config()->set('services.fcm.enabled', false);
+
     $user = User::factory()->create();
     $device = DeviceToken::create([
         'user_id' => $user->id,

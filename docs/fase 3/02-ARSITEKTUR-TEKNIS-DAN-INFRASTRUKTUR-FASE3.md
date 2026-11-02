@@ -91,7 +91,7 @@ Sistem menggunakan **Capacitor 6** yang terletak di direktori [`mobile/`](file:/
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
-    "url": "http://192.168.10.199:8080",
+    "url": "http://192.168.10.197:8000",
     "cleartext": true,
     "androidScheme": "http"
   },

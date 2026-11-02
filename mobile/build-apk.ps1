@@ -11,7 +11,7 @@
     IP kantor berubah atau saat pindah ke domain produksi.
 
 .EXAMPLE
-    .\build-apk.ps1 -ServerUrl http://192.168.10.199:8080
+    .\build-apk.ps1 -ServerUrl http://192.168.10.197:8000
 
 .EXAMPLE
     .\build-apk.ps1 -ServerUrl https://esurat.bprssragen.co.id -Mode release
@@ -35,7 +35,7 @@ $projectRoot = Split-Path -Parent $mobileDir
 $configPath = Join-Path $mobileDir 'capacitor.config.json'
 
 if ($ServerUrl -notmatch '^https?://') {
-    throw "ServerUrl harus dimulai dengan http:// atau https:// (contoh: http://192.168.10.199:8080)"
+    throw "ServerUrl harus dimulai dengan http:// atau https:// (contoh: http://192.168.10.197:8000)"
 }
 
 # Android hanya mengizinkan HTTP polos bila cleartext diaktifkan.

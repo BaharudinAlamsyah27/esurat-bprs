@@ -11,9 +11,9 @@ Aplikasi web internal BPRS Sragen (bank pembiayaan rakyat syariah), dijalankan *
 - Admin: Data Klasifikasi · Data Instansi · Data Pengguna · Data Surat Masuk · Data Surat Keluar · Laporan Surat Masuk · Laporan Surat Keluar · Profil · Riwayat Aktivitas.
 - User: Data Surat Masuk · Data Surat Keluar · Laporan Surat Masuk · Laporan Surat Keluar · Profil.
 - Dashboard: kartu ringkasan + 2 grafik sederhana + surat terbaru.
-- **Disposisi = SEDERHANA:** pada surat masuk, satu form "Lembar Disposisi" → Simpan & Cetak PDF (satu klik). Tanpa pelacakan, berjenjang, batas waktu, atau notifikasi.
+- **Disposisi web = SEDERHANA:** pada surat masuk, satu form "Lembar Disposisi" → Simpan & Cetak PDF (satu klik). Tanpa pelacakan, berjenjang, atau batas waktu. Pengecualian yang disetujui pengguna pada 2026-11-02: notifikasi FCM sederhana ke APK Android untuk disposisi.
 
-**JANGAN dibuat (ditunda ke fase 2; arsip di `docs/future/`)**: persetujuan berjenjang, tanda tangan digital & QR, surat internal/nota dinas/edaran, delegasi, notifikasi/pengingat, tingkat kerahasiaan & pembatasan akses per surat, hierarki unit kerja, disposisi berjenjang/berpelacakan, OCR, enkripsi file. Jika ragu apakah sesuatu termasuk scope, **jangan dibuat** dan catat di `docs/OPEN_QUESTIONS.md`.
+**JANGAN dibuat (ditunda ke fase 2; arsip di `docs/future/`)**: persetujuan berjenjang, tanda tangan digital & QR, surat internal/nota dinas/edaran, delegasi, pengingat dan notifikasi selain FCM disposisi APK yang telah disetujui, tingkat kerahasiaan & pembatasan akses per surat, hierarki unit kerja, disposisi berjenjang/berpelacakan, OCR, enkripsi file. Jika ragu apakah sesuatu termasuk scope, **jangan dibuat** dan catat di `docs/OPEN_QUESTIONS.md`.
 
 ## 2. Stack (JANGAN diganti tanpa persetujuan di `docs/DECISIONS.md`)
 | Lapisan | Pilihan |
@@ -92,5 +92,7 @@ Tampilan bersih dan sederhana: menu di sisi kiri yang selalu terbuka, kartu ring
 | `docs/06-PANDUAN-KOLABORASI-DAN-DEPLOY.md` | (untuk manusia) skema kerja, QA, deploy on-premise |
 | `docs/07-PANDUAN-UX-SEDERHANA.md` | Desain orisinal: menu, layar, lembar disposisi, token warna/font, istilah |
 | `docs/08-PANDUAN-SETUP-LARAGON.md` | (untuk manusia) setup Windows + Laragon |
+| `docs/fase 3/03-SETUP-FIREBASE.md` | Setup Firebase Cloud Messaging untuk notifikasi disposisi di APK Android |
 | `docs/DECISIONS.md` · `OPEN_QUESTIONS.md` · `PROGRESS.md` | Keputusan, pertanyaan, log progres |
+| `docs/HANDOVER-CODEX.md` | Titik pindah agent (2026-11-02): ringkasan status mobile/API, langkah berikutnya, masalah diketahui — baca pertama bila melanjutkan dari sesi Qoder |
 | `docs/future/` | ARSIP fase 2 — JANGAN dikerjakan |

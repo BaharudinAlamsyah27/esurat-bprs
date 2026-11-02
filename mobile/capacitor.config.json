@@ -3,7 +3,7 @@
     "appName":  "E-Surat BPRS Sragen",
     "webDir":  "www",
     "server":  {
-                   "url":  "http://192.168.10.199:8080",
+                   "url":  "http://192.168.10.197:8000",
                    "cleartext":  true,
                    "allowNavigation":  [
                                            "esurat.test",

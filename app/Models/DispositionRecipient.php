@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\DispositionRecipientStatus;
+use Database\Factories\DispositionRecipientFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -23,6 +25,9 @@ use Illuminate\Support\Carbon;
  */
 class DispositionRecipient extends Model
 {
+    /** @use HasFactory<DispositionRecipientFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'disposition_id',
         'user_id',

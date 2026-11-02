@@ -3,6 +3,7 @@
 namespace App\Services\Push;
 
 use App\Models\DeviceToken;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -56,7 +57,7 @@ class FcmClient
         ];
 
         try {
-            $response = Http::withToken($accessToken)
+            $response = Http::connectTimeout(3)->timeout(8)->withToken($accessToken)
                 ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
 
             if ($response->successful()) {
@@ -73,7 +74,7 @@ class FcmClient
             } else {
                 Log::warning('FCM message send error', [
                     'status' => $response->status(),
-                    'error' => $response->body(),
+                    'error_status' => $error,
                 ]);
             }
 
@@ -90,6 +91,19 @@ class FcmClient
      */
     protected function getAccessToken(string $credentialsPath): ?string
     {
+        $cacheKey = 'firebase.messaging.access_token.'.hash(
+            'sha256',
+            (string) config('services.fcm.project_id')
+        );
+        try {
+            $cachedToken = Cache::get($cacheKey);
+        } catch (\Throwable) {
+            $cachedToken = null;
+        }
+        if (is_string($cachedToken) && $cachedToken !== '') {
+            return $cachedToken;
+        }
+
         try {
             $contents = file_get_contents($credentialsPath);
             if (! $contents) {
@@ -120,12 +134,28 @@ class FcmClient
             openssl_sign("{$header}.{$claim}", $signature, $privateKey, OPENSSL_ALGO_SHA256);
             $jwt = "{$header}.{$claim}.".rtrim(strtr(base64_encode($signature), '+/', '-_'), '=');
 
-            $res = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+            $res = Http::connectTimeout(3)->timeout(8)->asForm()->post('https://oauth2.googleapis.com/token', [
                 'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
                 'assertion' => $jwt,
             ]);
 
-            return $res->json('access_token');
+            $accessToken = $res->json('access_token');
+            if (! is_string($accessToken) || $accessToken === '') {
+                return null;
+            }
+
+            $expiresIn = (int) $res->json('expires_in', 3600);
+            try {
+                Cache::put(
+                    $cacheKey,
+                    $accessToken,
+                    now()->addSeconds(max(60, $expiresIn - 60))
+                );
+            } catch (\Throwable) {
+                // Cache is an optimization; the newly generated token is usable.
+            }
+
+            return $accessToken;
         } catch (\Throwable $e) {
             Log::error('Failed to generate Google access token: '.$e->getMessage());
 

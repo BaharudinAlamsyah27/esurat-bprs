@@ -5,6 +5,7 @@ namespace App\Notifications\Channels;
 use App\Models\User;
 use App\Services\Push\FcmClient;
 use Illuminate\Notifications\Notification;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class FcmChannel
 {
@@ -28,6 +29,18 @@ class FcmChannel
         $tokens = $notifiable->deviceTokens()->get();
 
         foreach ($tokens as $deviceToken) {
+            // Token milik aplikasi API hanya aktif selama sesi Bearer terkait
+            // masih ada. Ini mencegah push setelah sesi APK dicabut/nonaktif.
+            if (str_starts_with((string) $deviceToken->session_id, 'api:')) {
+                $apiTokenId = substr((string) $deviceToken->session_id, 4);
+
+                if (! PersonalAccessToken::query()->whereKey($apiTokenId)->exists()) {
+                    $deviceToken->delete();
+
+                    continue;
+                }
+            }
+
             $this->fcmClient->send(
                 $deviceToken,
                 $fcmData['notification'],

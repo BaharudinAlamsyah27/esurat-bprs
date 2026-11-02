@@ -1,12 +1,15 @@
 # Log Progres
 
+> **PER 2026-11-02:** proyek dilanjutkan ke Codex (ChatGPT). Bacalah `docs/HANDOVER-CODEX.md` lebih dulu — berisi ringkasan pekerjaan, langkah selanjutnya, dan masalah yang diketahui.
+
 ## Status saat ini
 
-- Milestone aktif: **Fase 3 — Ekosistem Hybrid Terpadu (Mobile APK Android + Web Core & PWA iPhone)** (dokumen acuan: `docs/fase 3/`)
+- Milestone aktif: **Fase 3 — Ekosistem Hybrid Terpadu (Mobile APK Android Flutter + Web Core & PWA iPhone)** (dokumen acuan: `docs/fase 3/`)
 - M0–M6 (Fase 1): **Selesai dan terverifikasi penuh** (41 test / 211 assertion).
 - Fase 2: **Selesai dan terverifikasi penuh** (56 test / 276 assertion Pest lulus).
-- Fase 3: **Dokumentasi blueprint arsitektur, PRD UX, topologi jaringan on-premise, dan SOP build APK telah selesai disusun di `docs/fase 3/`**.
-- **Hambatan aktif (audit 2026-10-30):** `composer ci` belum hijau di lingkungan pengembangan karena ekstensi `pdo_sqlite` belum aktif; PHPStan masih 8 galat; pekerjaan Fase 2 & Fase 3 belum di-commit; push FCM belum dikonfigurasi.
+- Fase 3: **API mobile berjalan dan pengguna mengonfirmasi pop-up FCM sudah muncul di HP** setelah `.env` lokal dikoreksi. Kode saat ini siap untuk UAT lanjutan; APK rilis yang dibagikan tetap perlu dibangun ulang dari kode terbaru.
+- **Status verifikasi terakhir yang tercatat (2026-10-30):** `composer ci` **LULUS** (Pint, PHPStan 0 galat, **67 tes / 317 assertion**); `flutter analyze` **tanpa masalah**; `flutter build apk --release` **berhasil**. Hasil ini mendahului migrasi/perbaikan tanggal 2026-11-02, jadi CI perlu dijalankan ulang.
+- **Tersisa sebelum serah terima:** pastikan migrasi FK tercatat `Ran`; jalankan ulang CI PHP dan pemeriksaan Flutter; bangun serta uji APK terbaru; ganti Firebase uji dengan proyek kantor; siapkan deployment HTTPS dan backup.
 
 ## Roadmap dan status
 
@@ -15,14 +18,111 @@
 | M0 — Fondasi & Login | Selesai (kode + smoke test) | Login username, level admin/user, seeder awal, timeout 30 menit, font lokal; `composer ci` lulus pada 2026-10-21 (6 test/28 assertion). Screenshot pengguna menunjukkan admin berhasil membuka aplikasi lokal. |
 | M1 — Data Master, Pengguna, Profil | Selesai (implementasi + CI + migrasi Laragon) | Data Instansi tunggal dengan logo privat, 9 klasifikasi, kelola pengguna/reset kata sandi, profil, audit baca-saja, policy dan proteksi Admin aktif terakhir. `composer ci` lulus; pengguna mengonfirmasi langkah M1 sudah dijalankan. |
 | M2 — Surat Masuk | Selesai (implementasi + CI) | CRUD, agenda 4 digit/tahun, file privat, pencarian tiga kolom sesuai PRD, filter tahun/klasifikasi, duplikat dengan konfirmasi, soft delete Admin dan hak ubah pemilik. 6 tes M2 lulus. Perlu UAT browser oleh pengguna. |
-| M3 — Lembar Disposisi sederhana | Implementasi + CI selesai; migrasi/UAT Laragon menunggu | Satu lembar per surat masuk, satu form, PDF A4 satu halaman, filter/lencana, penghitung cetak. Tabel alur lama diarsipkan tanpa menghapus data. |
+| M3 — Lembar Disposisi sederhana | Implementasi selesai; perbaikan FK ditambahkan dan pengguna melaporkan simpan disposisi kembali berjalan | Satu lembar per surat masuk, satu form, PDF A4 satu halaman, filter/lencana, penghitung cetak. Migrasi mengarsipkan tabel penerima lama dan mengarahkan FK aktif ke `dispositions`; status penerapan perlu dipastikan sebelum serah terima. |
 | M4 — Surat Keluar | Implementasi + CI, migrasi Laragon, dan commit selesai; UAT browser menunggu | CRUD, nomor agenda/surat terkunci per tahun tanggal surat, pola tersimpan di `settings`, nomor manual Admin, lampiran privat, policy pemilik, soft delete Admin. `composer ci` lulus: 37 tes/183 assertion. |
 | M5 — Laporan | Implementasi + CI + UAT browser + commit selesai | Pengguna mengonfirmasi laporan berhasil diuji di browser dan `composer ci` lulus. Komit `19b147d` telah masuk ke `develop`. Test otomatis khusus laporan belum ditambahkan. |
 | M6 — Dashboard & Penyelesaian | Implementasi + CI selesai; UAT/staging menunggu | Kartu dinamis dan tautan filter, dua grafik enam bulan/klasifikasi, surat terbaru, bantuan kontekstual, header keamanan, cookie produksi, panduan pengguna/instalasi/backup/restore, skenario UAT, dan seeder data uji 10.000 surat tersedia. `composer ci` lulus (41 tes/211 assertion). Uji beban, restore staging, dan UAT belum dilakukan. |
-| Fase 2 — Disposisi Digital & Mobile APK | Selesai (implementasi + 56 tes lulus) | Disposisi digital berbasis akun, status baru/dibaca/selesai, menu Disposisi Saya, notifikasi lonceng web & push FCM HTTP v1, token HP endpoint, pembungkus Capacitor mobile/ |
-| Fase 3 — Ekosistem Hybrid Terpadu | Selesai (Kompilasi APK Sukses) | Blueprint lengkap di `docs/fase 3/`. Berkas Android APK (`esurat-bprs.apk`, 4.5 MB) berhasil dikompilasi via Gradle 8.2.1 & SDK 34 dan siap diunduh di `public/downloads/esurat-bprs.apk`. |
+| Fase 2 — Disposisi Digital & Mobile APK | Implementasi selesai (56 tes lulus) | Disposisi digital berbasis akun, status baru/dibaca/selesai, menu Disposisi Saya, notifikasi lonceng web & push FCM HTTP v1, endpoint token HP. Pembungkus Capacitor lama diarsipkan; aplikasi mobile aktif memakai Flutter. |
+| Fase 3 — Ekosistem Hybrid Terpadu | Pengguna mengonfirmasi pop-up FCM muncul di HP; uji dan paket rilis akhir masih perlu dibereskan | APK Flutter memakai API Bearer token. Token perangkat didaftarkan/dicabut melalui API, notifikasi membuka rincian disposisi setelah autentikasi, dan payload FCM tetap umum. Konfigurasi lokal memakai Firebase uji; sebelum serah terima, pindahkan ke proyek Firebase milik kantor. |
 
 ## Riwayat
+
+### 2026-11-02 — Penyelarasan catatan serah terima
+
+- Memperbarui status M3/Fase 3 berdasarkan laporan pengguna: penyimpanan disposisi kembali berjalan dan pop-up FCM sudah diterima di HP. Menegaskan bahwa CI lama mendahului migrasi terakhir dan APK publik belum diperbarui.
+- Memperbarui `docs/HANDOVER-CODEX.md` dan panduan Firebase untuk membedakan konfigurasi lokal uji dari persiapan produksi. Menghapus kata sandi akun uji dari dokumen.
+- `.env`, konfigurasi `google-services.json`, dan kredensial privat memiliki aturan abaikan Git. Status Git/staging tidak diperiksa; pengguna perlu memastikan tidak ada rahasia yang sudah masuk daftar commit.
+- **Belum dilakukan:** penggantian proyek Firebase pribadi dengan proyek kantor, sesuai arahan pengguna untuk menundanya.
+
+### 2026-11-02 — Tindak lanjut pemeriksaan Composer CI
+
+- Pengguna melaporkan `composer ci` berhenti pada pemeriksaan format Pint untuk migrasi perbaikan foreign key disposisi dan urutan import di `routes/api.php` (182 file diperiksa). Ini adalah kegagalan format, bukan laporan kegagalan tes atau PHPStan; tahap-tahap itu belum berjalan pada eksekusi tersebut.
+- Perintah berikutnya untuk pengguna: jalankan `composer lint` untuk merapikan format otomatis, lalu `composer ci` kembali. Status akhir CI belum diketahui.
+- Setelah format lulus, PHPStan melaporkan pemeriksaan jenis token Sanctum dianggap selalu benar karena model `User` belum menyatakan tipe token sementara SPA. Anotasi generik Sanctum pada model kini menyebut token API dan token sementara secara akurat, sehingga pemeriksaan `PersonalAccessToken` di endpoint logout dan pendaftaran perangkat tetap aman serta dapat dibedakan oleh PHPStan. Hasil `composer ci` setelah perubahan ini belum diverifikasi.
+- Pengguna kemudian melaporkan Pint dan PHPStan lolos, tetapi satu tes FCM gagal karena konfigurasi Firebase lokal dapat aktif dan memiliki kredensial, sementara tes tersebut mengharapkan push dilewati. Tes kini secara eksplisit mematikan FCM agar tidak bergantung pada `.env` lokal dan tidak mencoba menghubungi Firebase. Hasil Pest/`composer ci` setelah perubahan tes belum diverifikasi.
+- Saat peninjauan pra-commit, seluruh placeholder `.gitignore` di bawah `storage/` ditemukan terhapus dan direktori `storage/` tidak tersedia di workspace. Placeholder Laravel dipulihkan agar direktori runtime tetap ada di checkout tanpa memasukkan isi storage ke Git. Pengguna perlu meninjau `git status --short --untracked-files=all` sebelum staging.
+- **Temuan CI terbaru:** pengguna melaporkan Pint menemukan masalah format pada migrasi FK dan urutan import API. Import API sudah dirapikan; jalankan `composer lint` untuk merapikan migrasi, lalu ulangi pemeriksaan.
+- **Perintah untuk dijalankan pengguna:** pastikan migrasi FK tercatat `Ran`; jalankan `composer lint`, `composer ci`, `flutter analyze`, dan `flutter test`; periksa `git status` sebelum commit.
+- **Belum bisa diverifikasi:** hasil pemeriksaan terminal dan status Git masih menunggu pengguna.
+
+### 2026-11-02 — Perbaikan konfigurasi Firebase push lokal
+
+- Penyebab pop-up tidak terkirim ditemukan di `.env`: `FCM_ENABLED=true` dan `QUEUE_CONNECTION=sync` sudah benar, tetapi `FIREBASE_PROJECT_ID` masih berupa placeholder dan `FIREBASE_CREDENTIALS` menunjuk ke nama berkas yang tidak ada.
+- ID proyek dicocokkan dengan metadata berkas service account lokal tanpa membaca/menampilkan private key. Nilai ID proyek dan path kredensial di `.env` lokal telah diselaraskan. Jangan commit `.env` atau berkas service account.
+- **Perintah untuk dijalankan pengguna:** jalankan `php artisan config:clear`, lalu restart server API (`Ctrl+C`, kemudian `php artisan serve --host=0.0.0.0 --port=8000`). Login ulang ke APK, minimalkan aplikasi, lalu uji disposisi baru ke akun tersebut.
+- **Verifikasi pengguna:** setelah memperbaiki `.env`, pengguna mengonfirmasi pop-up sudah diterima. Pop-up sistem diuji saat aplikasi di latar belakang; skenario logout, izin ditolak, dan pemulihan token belum diuji ulang.
+- **Belum bisa diverifikasi:** hasil `composer ci`/Flutter setelah rangkaian perubahan terbaru belum dilaporkan; build Codex tidak menghasilkan APK baru.
+
+### 2026-11-02 — Perbaikan FK penerima disposisi
+
+- Akar masalah: FK `disposition_recipients.disposition_id` pada database lama masih menunjuk `legacy_dispositions` setelah tabel workflow lama diganti nama, sehingga ID disposisi sederhana yang baru ditulis tidak ditemukan.
+- Menambahkan migrasi perbaikan yang mengarsipkan tabel penerima lama (tanpa menghapus isinya), membuat tabel aktif dengan FK ke `dispositions`, dan menyalin penerima lama hanya bila bisa dicocokkan secara aman lewat surat yang sama. Data yang tak dapat dicocokkan tetap utuh di tabel arsip.
+- **Perintah untuk dijalankan pengguna:** `php artisan migrate`, lalu coba simpan disposisi lagi. Jika hendak menjalankan pemeriksaan lengkap, jalankan `composer ci`.
+- **Verifikasi pengguna:** setelah perbaikan, pengguna menyatakan masalah disposisi selesai dan melanjutkan pengujian notifikasi. Tabel lama diarsipkan dengan nama `legacy_disposition_recipients_20261102`.
+- **Belum bisa diverifikasi:** status migrasi dan `composer ci` tidak dilihat langsung; pastikan migrasi berstatus `Ran` sebelum menyerahkan ke mentor.
+
+### 2026-11-02 — Perbaikan konfigurasi build Android untuk FCM
+
+- Menetapkan Android NDK `26.1.10909125` dan `minSdk` 23 sesuai kebutuhan plugin Firebase Messaging yang muncul pada build APK.
+- Panduan setup Firebase kini mencatat kebutuhan NDK dan batas minimum Android 6.0. Alamat LAN terbaru `192.168.10.197:8000` sudah dipasang sebagai bawaan Flutter dan diselaraskan di contoh konfigurasi/panduan; alamat lama `192.168.10.157` dan `192.168.10.199` sudah tidak tersisa di berkas sumber dan dokumentasi.
+- APK yang sudah terpasang/tersimpan tidak otomatis berubah; perlu dibangun ulang dan dipasang kembali. Untuk emulator, gunakan `10.0.2.2:8000`, sedangkan HP fisik memakai IP LAN `192.168.10.197:8000`.
+- **Perintah untuk dijalankan pengguna:** dari `mobile_flutter`, jalankan `flutter clean`, `flutter pub get`, lalu `flutter build apk --release --dart-define=API_BASE_URL=http://192.168.10.197:8000/api` untuk HP fisik. Untuk emulator, ganti alamat API menjadi `http://10.0.2.2:8000/api`.
+- **Percobaan build Codex:** perintah Flutter tidak mengeluarkan log dan berhenti; waktu berkas APK yang ada tidak berubah. APK lama tidak dihapus/ditimpa karena belum ada APK baru yang berhasil dibangun.
+- **Belum bisa diverifikasi:** build ulang dan pemasangan APK menunggu dijalankan pengguna melalui CMD/Laragon; peringatan SDK XML perlu ditinjau terpisah dengan memperbarui Android SDK Command-line Tools di SDK Manager jika masih muncul.
+
+### 2026-11-02 — Integrasi FCM APK Flutter (implementasi kode, konfigurasi menunggu)
+
+- **Backend API:** menambahkan endpoint terautentikasi untuk mendaftarkan dan mencabut token Android. Token terikat pada ID sesi Sanctum dan dicabut saat logout; token dari pengguna lain tidak dapat dicabut.
+- **Aplikasi Flutter:** menambahkan Firebase Core/Messaging, permintaan izin notifikasi setelah login, pendaftaran/penyegaran token, penanganan notifikasi saat aplikasi di latar atau ditutup, serta navigasi ke rincian disposisi yang dimuat ulang dari API. Lencana Beranda mengikuti jumlah disposisi belum dibaca yang sudah tersedia.
+- **Privasi dan keandalan:** payload hanya berisi pemberitahuan umum serta ID disposisi; FCM client memakai batas waktu dan menyimpan sementara token OAuth agar permintaan berulang lebih hemat.
+- **Dokumentasi:** menambahkan keputusan scope yang telah disetujui pengguna, langkah setup Firebase, alur UAT, dan peta dokumen di `AGENTS.md`.
+- **Perintah untuk dijalankan pengguna:** `composer ci` dari root proyek. Di `mobile_flutter`: `flutter pub get`, `flutter analyze`, `flutter test`, lalu build APK setelah `google-services.json` tersedia. Ikuti `docs/fase 3/03-SETUP-FIREBASE.md` untuk konfigurasi Firebase.
+- **Belum bisa diverifikasi:** CI PHP dan pemeriksaan Flutter tidak dijalankan sesuai arahan pengguna agar perintah Laragon dijalankan sendiri; pengiriman FCM juga menunggu file konfigurasi dan kredensial dari Admin/IT serta pengujian di HP.
+
+### 2026-10-30 — Rombak tampilan aplikasi mobile (bottom navigation)
+
+- **Latar:** tampilan lama hanya satu layar berisi 4 kartu menu berwarna-warni, tanpa bottom navigation. Tampilan dirombak mengikuti panduan UX: satu warna aksen hijau BPRS `#0F5C46` (ikon `#1D9E75`), latar `#F5F7F6`, kartu putih bergaris `#E3E8E5` sudut 16, font Plus Jakarta Sans dibundel lokal (`assets/fonts`, lisensi OFL).
+- **Struktur baru:** `main_shell.dart` dengan 4 tab (Beranda, Disposisi, Surat, Akun) memakai `NavigationBar`; tab dimuat saat pertama dibuka. Beranda: app bar logo + lonceng, sapaan per jam, kartu hijau "Disposisi untuk saya", dua kartu ringkasan, dan "Surat terbaru" (maksimal 5). Surat: sub-tab Masuk/Keluar dengan pencarian, tarik-ke-bawah, skeleton muat, pesan kosong, dan pesan jaringan kantor + tombol "Coba Lagi". Akun: nama, level, ukuran huruf (Normal/Besar/Sangat besar, disimpan lokal), menu Laporan, dan tombol Keluar dengan dialog "Keluar dari aplikasi?".
+- **Data ringkasan:** `HomeProvider` memakai endpoint yang sudah ada (`/incoming-letters`, `/outgoing-letters`, `/dispositions` dengan `per_page`) dan membaca `meta.total`. Tidak ada endpoint baru.
+- **Placeholder (TODO):** (1) angka lonceng notifikasi masih `0` karena belum ada endpoint notifikasi; (2) jumlah disposisi belum dibaca dihitung dari maksimal 50 disposisi terbaru (API belum punya filter/hitungan); (3) lencana "Baru" pada surat memakai tanggal terima ≤ 7 hari karena belum ada penanda sudah dibaca per surat; (4) menu Laporan di aplikasi hanya memberi keterangan untuk membuka versi web.
+- **Hak akses:** aplikasi menampilkan menu yang sama untuk semua pengguna aktif (level `admin` dan `user`), dan itu sesuai policy server (`viewAny` surat & disposisi hanya meminta akun aktif). Tidak ada menu khusus admin di aplikasi, jadi tidak ada tampilan yang melampaui hak akses.
+- **Verifikasi:** `flutter analyze` tanpa masalah; `flutter test` 11 tes lulus (tema, format tanggal/sapaan, penyimpanan ukuran huruf, Beranda, keadaan offline, layar masuk, tab Akun); APK release x86_64 (21,2 MB) dipasang di emulator 360x800 dan alur login, Beranda, Surat, Disposisi, Akun berjalan.
+- **Belum bisa diverifikasi:** tangkapan layar resmi 4 tab pada skala huruf 1.0 dan 1.3 belum tersimpan seluruhnya (pemeriksaan visual dilakukan langsung di emulator), serta uji di HP fisik.
+- **Firebase:** belum ada berkas `google-services.json`, `firebase_options.dart`, atau dependensi Firebase di proyek mobile. Untuk notifikasi nanti diperlukan `firebase_core` + `firebase_messaging`, berkas `android/app/google-services.json`, plugin `com.google.gms.google-services` di Gradle, dan endpoint pendaftaran token di API.
+
+### 2026-10-30 — Melanjutkan APK Flutter: perbaikan API + build APK berhasil
+
+- **Latar:** melanjutkan pekerjaan pembuatan APK Flutter yang sebelumnya dirintis memakai alat lain (kuota habis). Kondisi awal: `php artisan test` 56 tes lulus, tetapi `flutter analyze` masih 2 galat, dan API hasil rintisan memiliki beberapa bug yang membuat aplikasi HP tidak bisa memakai data.
+- **Perbaikan API:**
+  1. `DispositionController` memakai `$this->authorize()` padahal `Controller` dasar tidak memuat `AuthorizesRequests` → diganti `Gate::authorize()`.
+  2. `DispositionResource` membaca relasi `sender` yang tidak ada (relasi sebenarnya `creator`) → pengirim kini diambil dari nama pembuat lembar disposisi, ditambah `instructions`, `nature`, `forwarded_to`, dan `status`.
+  3. URL lampiran menunjuk route web berbasis sesi sehingga aplikasi HP selalu 401 → dibuat route API `GET /api/attachments/{attachment}` (nama route `api.attachments.show`) dengan Bearer token, wajib disk `private`, dan tercatat di audit.
+  4. Pencarian surat keluar memakai kolom `recipient_name` yang tidak ada → diganti `recipient`.
+  5. Login API diberi `throttle:5,1`; akun yang dinonaktifkan langsung kehilangan akses token lama melalui middleware `EnsureApiUserIsActive` (token database ikut dihapus).
+  6. `GET /api/me` hanya mengembalikan id, nama, username, level, dan jabatan. Pesan API dipindah ke `lang/id/api.php`.
+- **Perbaikan aplikasi Flutter:** `provider.hasMore` → `hasMoreIncoming`, `shape:` pada `ElevatedButton` diperbaiki, model surat keluar membaca `recipient`, menu "Disposisi Saya" tersambung, menu "Laporan" memberi keterangan, konfirmasi keluar, pesan galat login/jaringan lebih jelas, dan layar tunggu saat memulihkan sesi.
+- **Alamat server bisa diatur tanpa ubah kode:** `ApiService.baseUrl` memakai `String.fromEnvironment('API_BASE_URL')` dengan bawaan LAN lokal `http://192.168.10.197:8000/api`. Untuk emulator gunakan `http://10.0.2.2:8000/api`.
+- **Android:** manifest diberi izin `INTERNET` dan `usesCleartextTraffic="true"`, label aplikasi "E-Surat BPRS". Proyek dinaikkan ke AGP 8.6.0, Gradle 8.11.1, Kotlin 2.1.10, dan `compileSdk 35` karena `flutter_pdfview` menuntut SDK 35. Plugin yang memaksa AGP 8.11 disamakan lewat `resolutionStrategy` di `android/build.gradle` (Gradle 8.13 belum tersedia di laptop).
+- **Tes baru:** `tests/Feature/Api/AuthApiTest.php` (5 tes) dan `tests/Feature/Api/DispositionApiTest.php` (6 tes), ditambah `DispositionFactory` dan `DispositionRecipientFactory`.
+- **Validasi:** `composer ci` **LULUS** (Pint, PHPStan 0 galat, 67 tes/317 assertion); `flutter analyze` tanpa masalah; `flutter build apk --release` menghasilkan APK 34 MB dan disalin ke `public/downloads/esurat-bprs-flutter.apk`.
+- **Perintah untuk dijalankan pengguna:** jalankan Laragon (Apache + MySQL), lalu `php artisan migrate` (tabel `personal_access_tokens` perlu ada untuk token HP), `composer ci`, dan build APK dengan alamat server kantor:
+  ```powershell
+  cd C:\laragon\www\esurat\mobile_flutter
+  flutter build apk --release --dart-define=API_BASE_URL=http://IP-SERVER-KANTOR:8000/api
+  ```
+- **Belum bisa diverifikasi:** pemasangan APK di HP fisik dan login ke server kantor, tampilan PDF ber-token di HP, notifikasi FCM (kredensial Firebase belum dipasang), serta UAT pengguna. APK 34 MB sebaiknya tidak di-commit langsung ke Git.
+- **Uji di emulator Android (laptop dev):** sistem image `system-images/android-34/google_apis/x86_64` dipasang lewat CLI baru `android sdk install`, AVD `esurat_uji` (Pixel 5) dibuat dengan `hw.keyboard=yes` agar keyboard laptop bisa dipakai. APK yang dipasang adalah build khusus emulator (`flutter build apk --release --target-platform android-x64 --dart-define=API_BASE_URL=http://10.0.2.2:8000/api`, 21 MB) karena APK debug 103 MB gagal ditransfer ke emulator. Hasil: login, daftar surat masuk/keluar, pencarian, dan halaman "Disposisi Saya" berjalan dengan data asli dari `php artisan serve`. Akun uji sementara `mobile.uji` dibuat lewat tinker dan **harus dihapus** sebelum serah terima.
+
+### 2026-10-30 — Perbaikan hambatan CI (Pint, PHPStan, test) — hijau
+
+- **Selesai:** mengaktifkan ekstensi `pdo_sqlite` (dan `sqlite3`) pada `php.ini` Laragon (`C:\laragon\bin\php\php-8.4.27-Win32-vs17-x64\php.ini`) sehingga `php artisan test` yang memakai sqlite `:memory:` dapat berjalan.
+- **Selesai:** memperbaiki **8 galat PHPStan** (level 6):
+  1. [MyDispositionResource.php](file:///c:/laragon/www/esurat/app/Filament/Resources/MyDispositionResource.php) — menambah anotasi `@return Builder<DispositionRecipient>`, menghapus nullsafe berlebih di sisi kiri operator `??` (PHP sudah menangani null lewat `??`), dan memakai akses `->` yang disarankan.
+  2. [IncomingLetter.php](file:///c:/laragon/www/esurat/app/Models/IncomingLetter.php#L17-L23) — menambah anotasi `@property Carbon|null $letter_date` dan `@property Carbon|null $received_at` agar `translatedFormat()` dikenali sebagai pemanggilan pada `Carbon`, bukan `string`.
+  3. [AppServiceProvider.php](file:///c:/laragon/www/esurat/app/Providers/AppServiceProvider.php#L70-L84) — menyimpan `$event->user` ke variabel lokal sebelum `instanceof` agar penyempitan tipe tidak hilang setelah pemanggilan `handle($event)` pada listener logout.
+- **Validasi:** `composer ci` **LULUS** — Pint 161 file, PHPStan 0 galat, **56 tes / 276 assertion** hijau (durasi ~44 detik).
+- **Catatan lingkungan:** pengaktifan `pdo_sqlite` mengubah `php.ini` Laragon (di luar folder proyek). Jika Laragon diperbarui dan `php.ini` ditimpa, ekstensi perlu diaktifkan ulang.
+- **Belum bisa diverifikasi:** UAT browser dan pengiriman push FCM (tertunda karena akun Google/Firebase belum tersedia).
 
 ### 2026-10-30 — Audit menyeluruh & penyiapan lanjutan
 
@@ -164,7 +264,7 @@
 
 - **Selesai:** memuat `resources/js/app.js` di panel Filament agar `mobile-bridge.js` benar-benar berjalan di dalam APK (registrasi token FCM dan tombol kembali Android). Bukti: halaman login kini memuat `app-*.js`; sebelumnya hanya `theme-*.css`.
 - **Selesai:** menambah `mobile/build-apk.ps1` yang menulis alamat server ke `capacitor.config.json`, menjalankan `cap sync`, membangun APK, lalu menyalinnya ke `public/downloads/esurat-bprs.apk`. IP kantor atau domain dapat diganti tanpa mengubah kode Laravel.
-- **Validasi:** skrip dijalankan dengan `-ServerUrl http://192.168.10.199:8080` → `BUILD SUCCESSFUL` dan APK tersalin. Pint lulus untuk file yang diubah.
+- **Validasi:** skrip dijalankan dengan alamat LAN lokal terbaru `-ServerUrl http://192.168.10.197:8000` → `BUILD SUCCESSFUL` dan APK tersalin. Pint lulus untuk file yang diubah.
 - **Belum diverifikasi:** `composer ci` belum lulus di lingkungan ini karena ekstensi `pdo_sqlite` tidak aktif (phpunit memakai sqlite `:memory:`) dan PHPStan melaporkan 8 galat lama di `MyDispositionResource` serta `AppServiceProvider` yang tidak terkait perubahan ini.
 - **Tersisa (penghambat notifikasi):** `mobile/android/app/google-services.json` belum ada sehingga plugin Firebase tidak dipasang saat build; server juga belum punya `storage/app/private/firebase-service-account.json` dan `FCM_ENABLED=true`.
 - **Perintah:** `powershell -ExecutionPolicy Bypass -File mobile\build-apk.ps1 -ServerUrl <alamat-server>`.

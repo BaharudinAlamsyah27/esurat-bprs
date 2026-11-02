@@ -9,10 +9,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-/** @property int $created_by */
+/**
+ * @property int $created_by
+ * @property Carbon|null $letter_date
+ * @property Carbon|null $sent_date
+ */
 class OutgoingLetter extends Model
 {
     /** @use HasFactory<OutgoingLetterFactory> */

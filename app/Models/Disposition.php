@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\DispositionInstruction;
 use App\Enums\DispositionNature;
+use Database\Factories\DispositionFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +22,9 @@ use Illuminate\Support\Carbon;
  */
 class Disposition extends Model
 {
+    /** @use HasFactory<DispositionFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'incoming_letter_id', 'nature', 'forwarded_to', 'instructions', 'instruction_other', 'note',
         'disposition_date', 'print_count', 'printed_at', 'created_by', 'updated_by',

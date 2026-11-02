@@ -23,3 +23,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Berkas APK hasil build tidak di-commit (ukurannya besar).
+/public/downloads/*.apk

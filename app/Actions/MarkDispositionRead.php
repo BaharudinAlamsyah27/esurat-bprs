@@ -15,7 +15,7 @@ class MarkDispositionRead
             throw new AuthorizationException(__('disposition.unauthorized_recipient'));
         }
 
-        if ($recipient->status === DispositionRecipientStatus::New) {
+        if (in_array($recipient->status, [DispositionRecipientStatus::New, DispositionRecipientStatus::Pending], true)) {
             $recipient->markAsRead();
 
             activity('disposition')

@@ -15,6 +15,10 @@ class CompleteDispositionRecipient
             throw new AuthorizationException(__('disposition.unauthorized_recipient'));
         }
 
+        if ($recipient->status->isCompleted()) {
+            return;
+        }
+
         $recipient->markAsDone($note);
 
         activity('disposition')

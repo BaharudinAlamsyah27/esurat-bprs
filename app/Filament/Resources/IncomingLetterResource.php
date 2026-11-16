@@ -217,10 +217,18 @@ class IncomingLetterResource extends Resource
                             ];
                         }
 
-                        $recipientIds = $disposition->recipients()->pluck('user_id')->all();
-                        $other = empty($recipientIds) && ! empty($disposition->forwarded_to)
-                            ? implode("\n", $disposition->forwarded_to)
-                            : '';
+                        $recipientIds = $disposition->recipients()
+                            ->whereNotNull('user_id')
+                            ->pluck('user_id')
+                            ->all();
+                        $userLabels = $recipientIds === []
+                            ? []
+                            : User::query()
+                                ->whereIn('id', $recipientIds)
+                                ->get()
+                                ->map(fn (User $u): string => $u->name.(filled($u->position_title) ? ' ('.$u->position_title.')' : ''))
+                                ->all();
+                        $other = implode("\n", array_values(array_diff($disposition->forwarded_to ?? [], $userLabels)));
 
                         return [
                             'nature' => $disposition->nature->value,

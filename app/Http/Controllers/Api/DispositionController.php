@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\CompleteDispositionRecipient;
+use App\Actions\MarkDispositionRead;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\DispositionResource;
 use App\Models\DispositionRecipient;
@@ -26,26 +28,29 @@ class DispositionController extends Controller
         return DispositionResource::collection($recipients);
     }
 
-    public function show(Request $request, DispositionRecipient $disposition): DispositionResource
+    public function show(Request $request, DispositionRecipient $disposition, MarkDispositionRead $markDispositionRead): DispositionResource
     {
         Gate::authorize('view', $disposition);
 
-        // Membuka disposisi sekaligus menandainya sudah dibaca penerima.
-        $disposition->markAsRead();
+        // Membuka disposisi sekaligus menandainya sudah dibaca penerima + mencatat audit trail.
+        $markDispositionRead->execute($request->user(), $disposition);
         $disposition->load(['disposition.creator', 'disposition.incomingLetter.attachments']);
 
         return new DispositionResource($disposition);
     }
 
-    public function markAsDone(Request $request, DispositionRecipient $disposition): DispositionResource
-    {
+    public function markAsDone(
+        Request $request,
+        DispositionRecipient $disposition,
+        CompleteDispositionRecipient $completeDispositionRecipient
+    ): DispositionResource {
         Gate::authorize('update', $disposition);
 
         $validated = $request->validate([
-            'note' => ['required', 'string', 'max:1000'],
+            'note' => ['required', 'string', 'max:255'],
         ]);
 
-        $disposition->markAsDone($validated['note']);
+        $completeDispositionRecipient->execute($request->user(), $disposition, $validated['note']);
         $disposition->load(['disposition.creator', 'disposition.incomingLetter.attachments']);
 
         return new DispositionResource($disposition);

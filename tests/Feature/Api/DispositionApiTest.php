@@ -6,8 +6,11 @@ use App\Models\DispositionRecipient;
 use App\Models\IncomingLetter;
 use App\Models\OutgoingLetter;
 use App\Models\User;
+use App\Notifications\DispositionCompleted;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Activitylog\Models\Activity;
 
 function apiDispositionFor(User $recipient): DispositionRecipient
 {
@@ -68,9 +71,12 @@ it('blocks a user from opening a disposition addressed to someone else', functio
     expect($recipient->fresh()->read_at)->toBeNull();
 });
 
-it('lets the recipient mark a disposition as done with a note', function (): void {
+it('lets the recipient mark a disposition as done with a note, logs audit, and notifies creator', function (): void {
+    Notification::fake();
+
     $me = User::factory()->create();
     $recipient = apiDispositionFor($me);
+    $creator = $recipient->disposition->creator;
 
     Sanctum::actingAs($me);
 
@@ -79,10 +85,18 @@ it('lets the recipient mark a disposition as done with a note', function (): voi
         ->assertJsonValidationErrors('note');
 
     $this->postJson("/api/dispositions/{$recipient->getKey()}/done", [
+        'note' => str_repeat('a', 256),
+    ])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('note');
+
+    $this->postJson("/api/dispositions/{$recipient->getKey()}/done", [
         'note' => 'Sudah dikoordinasikan dengan bagian pembiayaan.',
     ])->assertOk()->assertJsonPath('data.status', 'done');
 
     expect($recipient->fresh()->done_note)->toBe('Sudah dikoordinasikan dengan bagian pembiayaan.');
+    Notification::assertSentTo($creator, DispositionCompleted::class);
+    expect(Activity::query()->where('log_name', 'disposition')->where('event', 'completed')->exists())->toBeTrue();
 });
 
 it('serves letter files through the api using a token instead of a session', function (): void {

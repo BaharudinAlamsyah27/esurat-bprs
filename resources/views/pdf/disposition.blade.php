@@ -66,7 +66,13 @@
 <div class="signature">
     <div>{{ $institution?->city ?: 'Sragen' }}, {{ $dispositionDate }}</div>
     <div>{{ $institution?->leader_position ?: __('disposition.pdf.signature') }}</div>
-    <div class="signature-space"></div>
+    @if(!empty($signatureData))
+        <div style="margin: 6px 0;">
+            <img src="{{ $signatureData }}" alt="Tanda Tangan" style="max-height: 60px; max-width: 180px;">
+        </div>
+    @else
+        <div class="signature-space"></div>
+    @endif
     <strong>{{ $institution?->leader_name ?: '................................' }}</strong>
 </div>
 </body>

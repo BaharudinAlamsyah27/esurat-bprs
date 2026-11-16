@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/incoming_letter.dart';
+import '../providers/auth_provider.dart';
 import '../providers/letter_provider.dart';
+import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/format.dart';
 import '../widgets/common_widgets.dart';
@@ -122,6 +125,7 @@ class _IncomingLetterViewState extends State<IncomingLetterView> {
 
                     return _IncomingLetterCard(
                       letter: provider.incomingLetters[index],
+                      onDispositionSaved: _reload,
                     );
                   },
                 ),
@@ -135,9 +139,13 @@ class _IncomingLetterViewState extends State<IncomingLetterView> {
 }
 
 class _IncomingLetterCard extends StatelessWidget {
-  const _IncomingLetterCard({required this.letter});
+  const _IncomingLetterCard({
+    required this.letter,
+    required this.onDispositionSaved,
+  });
 
   final IncomingLetter letter;
+  final Future<void> Function() onDispositionSaved;
 
   void _open(BuildContext context) {
     if (letter.attachmentUrl == null) {
@@ -159,9 +167,23 @@ class _IncomingLetterCard extends StatelessWidget {
     );
   }
 
+  void _openDispositionModal(BuildContext context) {
+    showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => _DispositionFormSheet(letter: letter),
+    ).then((saved) {
+      if (saved == true) {
+        onDispositionSaved();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final baru = isSuratBaru(letter.receivedAt);
+    final isAdmin = Provider.of<AuthProvider>(context).user?.isAdmin ?? false;
 
     return SectionCard(
       onTap: () => _open(context),
@@ -212,7 +234,232 @@ class _IncomingLetterCard extends StatelessWidget {
                 ? const StatusBadge(label: 'Disposisi')
                 : null,
           ),
+          if (isAdmin) ...[
+            const SizedBox(height: AppSpacing.gapSmall),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _openDispositionModal(context),
+                icon: const Icon(Icons.assignment_add),
+                label: Text(
+                  letter.hasDisposition
+                      ? 'Ubah Disposisi'
+                      : 'Buat Disposisi',
+                ),
+              ),
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _DispositionFormSheet extends StatefulWidget {
+  const _DispositionFormSheet({required this.letter});
+
+  final IncomingLetter letter;
+
+  @override
+  State<_DispositionFormSheet> createState() => _DispositionFormSheetState();
+}
+
+class _DispositionFormSheetState extends State<_DispositionFormSheet> {
+  final _noteController = TextEditingController();
+  bool _loadingOptions = true;
+  bool _submitting = false;
+  String? _error;
+
+  List<Map<String, dynamic>> _natures = [];
+  List<Map<String, dynamic>> _instructions = [];
+  List<Map<String, dynamic>> _recipients = [];
+
+  String? _selectedNature;
+  final Set<int> _selectedRecipientIds = {};
+  final Set<String> _selectedInstructions = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOptions();
+  }
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadOptions() async {
+    try {
+      final response = await ApiService().getDispositionOptions();
+      final data = response.data['data'] as Map<String, dynamic>;
+      setState(() {
+        _natures = List<Map<String, dynamic>>.from(data['natures'] ?? []);
+        _instructions =
+            List<Map<String, dynamic>>.from(data['instructions'] ?? []);
+        _recipients =
+            List<Map<String, dynamic>>.from(data['recipients'] ?? []);
+        if (_natures.isNotEmpty) {
+          _selectedNature = _natures.first['value'] as String?;
+        }
+        _loadingOptions = false;
+      });
+    } catch (_) {
+      setState(() {
+        _error = 'Gagal memuat pilihan disposisi.';
+        _loadingOptions = false;
+      });
+    }
+  }
+
+  Future<void> _submit() async {
+    if (_selectedNature == null ||
+        _selectedRecipientIds.isEmpty ||
+        _selectedInstructions.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pilih sifat surat, minimal 1 penerima, dan instruksi.'),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _submitting = true);
+    try {
+      await ApiService().saveDispositionForLetter(widget.letter.id, {
+        'nature': _selectedNature,
+        'recipient_user_ids': _selectedRecipientIds.toList(),
+        'instructions': _selectedInstructions.toList(),
+        'note': _noteController.text.trim(),
+        'disposition_date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+      });
+
+      if (!mounted) return;
+      Navigator.pop(context, true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Disposisi berhasil disimpan.')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal menyimpan disposisi.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.page,
+          0,
+          AppSpacing.page,
+          MediaQuery.of(context).viewInsets.bottom + AppSpacing.gapLarge,
+        ),
+        child: _loadingOptions
+            ? const SizedBox(
+                height: 180,
+                child: Center(child: CircularProgressIndicator()),
+              )
+            : _error != null
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Text(_error!),
+                  )
+                : SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Disposisi: ${widget.letter.subject}',
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.gap),
+                        const Text('Sifat Surat',
+                            style: TextStyle(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 8,
+                          children: _natures.map((item) {
+                            final val = item['value'] as String;
+                            return ChoiceChip(
+                              label: Text(item['label'] as String),
+                              selected: _selectedNature == val,
+                              onSelected: (_) =>
+                                  setState(() => _selectedNature = val),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: AppSpacing.gap),
+                        const Text('Penerima Pegawai',
+                            style: TextStyle(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 8,
+                          children: _recipients.map((user) {
+                            final id = (user['id'] as num).toInt();
+                            return FilterChip(
+                              label: Text(user['name'] as String),
+                              selected: _selectedRecipientIds.contains(id),
+                              onSelected: (selected) => setState(() {
+                                if (selected) {
+                                  _selectedRecipientIds.add(id);
+                                } else {
+                                  _selectedRecipientIds.remove(id);
+                                }
+                              }),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: AppSpacing.gap),
+                        const Text('Instruksi',
+                            style: TextStyle(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 8,
+                          children: _instructions.map((item) {
+                            final val = item['value'] as String;
+                            return FilterChip(
+                              label: Text(item['label'] as String),
+                              selected: _selectedInstructions.contains(val),
+                              onSelected: (selected) => setState(() {
+                                if (selected) {
+                                  _selectedInstructions.add(val);
+                                } else {
+                                  _selectedInstructions.remove(val);
+                                }
+                              }),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: AppSpacing.gap),
+                        TextField(
+                          controller: _noteController,
+                          maxLines: 3,
+                          decoration: const InputDecoration(
+                            labelText: 'Catatan Pimpinan (opsional)',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.gap),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton(
+                            onPressed: _submitting ? null : _submit,
+                            child: Text(
+                                _submitting ? 'Menyimpan...' : 'Simpan Disposisi'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
       ),
     );
   }

@@ -110,11 +110,36 @@ it('enforces owner edit and admin-only soft delete on cooperation agreements', f
     expect($agreement->fresh()->trashed())->toBeTrue();
 });
 
-it('renders the cooperation agreement page under SURAT navigation for signed-in users', function (): void {
+it('renders the cooperation agreement page under ARSIP navigation for signed-in users', function (): void {
     $user = User::factory()->create(['level' => UserLevel::User]);
 
     $this->actingAs($user)
         ->get(CooperationAgreementResource::getUrl('index'))
         ->assertOk()
         ->assertSee(__('cooperation.navigation'));
+});
+
+it('renders and exports the cooperation agreement report', function (): void {
+    $user = User::factory()->create(['level' => UserLevel::User]);
+    CooperationAgreement::factory()->create([
+        'agreement_date' => '2026-11-16',
+        'partner_name' => 'PT Laporan Uji',
+        'created_by' => $user->getKey(),
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('reports.cooperation.print', [
+            'start_date' => '2026-11-01',
+            'end_date' => '2026-11-30',
+        ]))
+        ->assertOk()
+        ->assertSee('PT Laporan Uji');
+
+    $this->actingAs($user)
+        ->get(route('reports.cooperation.pdf', [
+            'start_date' => '2026-11-01',
+            'end_date' => '2026-11-30',
+        ]))
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/pdf');
 });

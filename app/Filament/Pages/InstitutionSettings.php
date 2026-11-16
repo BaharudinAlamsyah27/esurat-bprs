@@ -92,6 +92,16 @@ class InstitutionSettings extends Page implements HasForms
                     ->schema([
                         TextInput::make('leader_name')->label(__('m1.leader_name'))->maxLength(120),
                         TextInput::make('leader_position')->label(__('m1.leader_position'))->maxLength(120),
+                        FileUpload::make('signature_path')
+                            ->label(__('m1.leader_signature'))
+                            ->image()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png'])
+                            ->maxSize(2048)
+                            ->disk('private')
+                            ->directory('institution/signatures')
+                            ->visibility('private')
+                            ->helperText(__('m1.leader_signature_help'))
+                            ->columnSpanFull(),
                     ]),
                 Section::make(__('m1.appearance'))
                     ->schema([
@@ -114,6 +124,7 @@ class InstitutionSettings extends Page implements HasForms
         $themeColor = $state['theme_color'];
         unset($state['theme_color']);
         $oldLogo = Institution::query()->whereKey(1)->value('logo_path');
+        $oldSignature = Institution::query()->whereKey(1)->value('signature_path');
 
         Institution::query()->updateOrCreate(['id' => 1], $state);
         Setting::query()->updateOrCreate(['key' => 'ui_theme_color'], ['value' => ['color' => $themeColor]]);
@@ -121,6 +132,11 @@ class InstitutionSettings extends Page implements HasForms
         $newLogo = $state['logo_path'] ?? null;
         if (is_string($oldLogo) && $oldLogo !== '' && $oldLogo !== $newLogo) {
             Storage::disk('private')->delete($oldLogo);
+        }
+
+        $newSignature = $state['signature_path'] ?? null;
+        if (is_string($oldSignature) && $oldSignature !== '' && $oldSignature !== $newSignature) {
+            Storage::disk('private')->delete($oldSignature);
         }
 
         Notification::make()->title(__('m1.institution_saved'))->success()->send();

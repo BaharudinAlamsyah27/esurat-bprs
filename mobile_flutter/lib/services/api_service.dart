@@ -149,4 +149,18 @@ class ApiService {
   Future<Response> markDispositionAsDone(int id, String note) async {
     return await _dio.post('/dispositions/$id/done', data: {'note': note});
   }
+
+  Future<Response> getDashboardSummary() async {
+    return await _dio.get('/dashboard/summary');
+  }
+
+  Future<Response> getDispositionOptions() async {
+    return await _dio.get('/disposition-options');
+  }
+
+  Future<Response> saveDispositionForLetter(
+      int incomingLetterId, Map<String, dynamic> data) async {
+    return await _dio.post('/incoming-letters/$incomingLetterId/disposition',
+        data: data);
+  }
 }

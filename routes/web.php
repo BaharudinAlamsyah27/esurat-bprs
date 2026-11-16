@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CooperationReportController;
 use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\DispositionPrintController;
 use App\Http\Controllers\InstitutionLogoController;
@@ -9,6 +10,9 @@ use App\Http\Middleware\IdleSessionTimeout;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', IdleSessionTimeout::class])->group(function (): void {
+    Route::get('/laporan/perjanjian-kerjasama/cetak', CooperationReportController::class)->name('reports.cooperation.print');
+    Route::get('/laporan/perjanjian-kerjasama/pdf', CooperationReportController::class)->name('reports.cooperation.pdf');
+    Route::get('/laporan/perjanjian-kerjasama/excel', CooperationReportController::class)->name('reports.cooperation.excel');
     Route::get('/laporan/{type}/cetak', ReportPrintController::class)->name('reports.print');
     Route::get('/laporan/{type}/pdf', ReportPrintController::class)->name('reports.pdf');
     Route::get('/laporan/{type}/excel', ReportPrintController::class)->name('reports.excel');

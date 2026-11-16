@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\DispositionInstruction;
 use App\Enums\DispositionNature;
+use App\Enums\UserLevel;
 use App\Models\Disposition;
 use App\Models\DispositionRecipient;
 use App\Models\IncomingLetter;
@@ -138,4 +140,49 @@ it('filters letters by the real recipient column', function (): void {
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.recipient', 'PT Mitra Sejahtera');
+});
+
+it('returns exact dashboard summary counts for the mobile home screen', function (): void {
+    $me = User::factory()->create();
+    apiDispositionFor($me);
+
+    Sanctum::actingAs($me);
+
+    $this->getJson('/api/dashboard/summary')
+        ->assertOk()
+        ->assertJsonPath('data.unread_dispositions', 1)
+        ->assertJsonPath('data.dispositions_total', 1)
+        ->assertJsonPath('data.incoming_total', 1);
+});
+
+it('lets admins create a disposition for an incoming letter via api and blocks regular users', function (): void {
+    Notification::fake();
+
+    $admin = User::factory()->create(['level' => UserLevel::Admin]);
+    $user = User::factory()->create(['level' => UserLevel::User]);
+    $letter = IncomingLetter::factory()->create(['registered_by' => $admin->getKey()]);
+
+    Sanctum::actingAs($user);
+    $this->getJson('/api/disposition-options')->assertForbidden();
+    $this->postJson("/api/incoming-letters/{$letter->getKey()}/disposition", [
+        'nature' => DispositionNature::Penting->value,
+        'recipient_user_ids' => [$user->getKey()],
+        'instructions' => [DispositionInstruction::SegeraTindakLanjuti->value],
+        'disposition_date' => '2026-11-16',
+    ])->assertForbidden();
+
+    Sanctum::actingAs($admin);
+    $this->getJson('/api/disposition-options')
+        ->assertOk()
+        ->assertJsonStructure(['data' => ['natures', 'instructions', 'recipients']]);
+
+    $this->postJson("/api/incoming-letters/{$letter->getKey()}/disposition", [
+        'nature' => DispositionNature::Penting->value,
+        'recipient_user_ids' => [$user->getKey()],
+        'instructions' => [DispositionInstruction::SegeraTindakLanjuti->value],
+        'note' => 'Proses segera dari HP',
+        'disposition_date' => '2026-11-16',
+    ])->assertOk()->assertJsonPath('data.recipient_count', 1);
+
+    expect($letter->fresh()->disposition)->not->toBeNull();
 });

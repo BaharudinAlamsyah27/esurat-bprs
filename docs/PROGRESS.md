@@ -4,11 +4,27 @@
 
 ## Status saat ini
 
-- **2026-11-16 — Penambahan modul Perjanjian Kerjasama (PKS) di bawah menu `SURAT`:**
+- **2026-11-16 — Penyelesaian 5 celah fungsional Web & Mobile (poin 2):**
+  - **Disposisi Saya (`MyDispositionResource`):** filter `user_id` kini berlaku untuk semua role termasuk Admin/Superadmin, sehingga lencana dan daftar hanya menampilkan disposisi milik akun yang sedang login.
+  - **PKS di Beranda & Laporan:** ditambahkan kartu ringkasan **Perjanjian Kerjasama** di `SummaryCardsWidget` serta halaman **Laporan Kerjasama (PKS)** lengkap dengan cetak, unduh PDF, dan ekspor Excel (`CooperationAgreementsReport`, `CooperationReportController`, `CooperationAgreementsExport`).
+  - **Konsistensi label di Flutter (`mobile_flutter/`):** tab **Surat** disamakan menjadi **Arsip** pada `MainShell` dan `LettersTab`.
+  - **Buat/Ubah Disposisi dari HP:** ditambahkan `GET /api/disposition-options` & `POST /api/incoming-letters/{incomingLetter}/disposition` beserta tombol/sheet disposisi di `IncomingLetterView` khusus Admin/Superadmin.
+  - **Ringkasan Beranda APK Akurat:** ditambahkan `GET /api/dashboard/summary` (`DashboardController`) dan `HomeProvider` kini memakai angka langsung dari server (tanpa batas proksi 50 data).
+  - Verifikasi: `composer ci` **LULUS** (Pint, PHPStan 0 galat, **79 tes / 386 assertion**); `flutter analyze` **0 isu**; `flutter test` **14/14 lulus**.
+- **2026-11-16 — Penyesuaian menu `ARSIP`, tabel & filter `Surat Masuk`, serta tanda tangan digital instansi:**
+  - Grup menu sidebar `SURAT` diganti menjadi **`ARSIP`** (mencakup *Disposisi Saya*, *Surat Masuk*, *Surat Keluar*, *Perjanjian Kerjasama*).
+  - Tabel **Surat Masuk** (`IncomingLetterResource`): kolom *No. Agenda* dan *Nomor surat* digabung menjadi 1 kolom (**Nomor Surat & Agenda**), dan ditambahkan kolom **Tanggal diterima** (`received_at`) di samping **Tanggal surat** (`letter_date`).
+  - Filter **Surat Masuk** ditingkatkan sesuai praktik terbaik arsip kantor: filter **Klasifikasi** (`kode — nama`, searchable & preload), **Tahun agenda**, **Status disposisi**, dan **Rentang tanggal diterima** (`received_date_range`).
+  - `MasterDataSeeder` diperkaya dengan keterangan kantor/perbankan pada 9 klasifikasi standar (`100`–`900`).
+  - **Data Instansi** (`InstitutionSettings` + migrasi `signature_path`): ditambah upload **Tanda tangan digital pimpinan** (disimpan di disk `private`), yang otomatis ditampilkan di PDF **Lembar Disposisi** (`DispositionPdfService` + `pdf/disposition.blade.php`).
+  - Verifikasi: `composer ci` **LULUS** (Pint, PHPStan 0 galat, **76 tes / 366 assertion**).
+- **2026-11-16 — Penambahan modul Perjanjian Kerjasama (PKS) di Web, API Mobile, dan APK Flutter:**
   - Tabel baru `cooperation_agreements` (`bss_pks_number`, `partner_pks_number`, `partner_npwp`, `agreement_date`, `partner_name`, `subject`, `pic_name`, `note`, `SoftDeletes`).
-  - Penyimpanan privat untuk **Berkas PKS** (`kind=pks_file`) dan **Legalitas Mitra** seperti KTP/NIB/Akta (`kind=partner_legality`) dengan validasi MIME (`pdf, jpg, jpeg, png`, maks 10 MB), hash SHA-256, dan rute terautentikasi `/perjanjian-kerjasama/berkas/{attachment}`.
+  - Penyimpanan privat untuk **Berkas PKS** (`kind=pks_file`) dan **Legalitas Mitra** seperti KTP/NIB/Akta (`kind=partner_legality`) dengan validasi MIME (`pdf, jpg, jpeg, png`, maks 10 MB), hash SHA-256, dan rute terautentikasi web & API.
   - Policy `CooperationAgreementPolicy` (semua user aktif dapat melihat & mencatat; ubah oleh pemilik/Admin; soft delete hanya Admin) dan tercatat di Audit Trail.
-  - Verifikasi: `composer ci` **LULUS** (Pint, PHPStan 0 galat, **75 tes / 353 assertion**). Pengguna perlu menjalankan `php artisan migrate` di Laragon agar tabel baru aktif di MySQL lokal.
+  - API `/api/cooperation-agreements` (`index`, `show`) & `AttachmentController` diperluas untuk melayani berkas PKS/legalitas ke mobile.
+  - Aplikasi Flutter (`mobile_flutter/`): ditambah tab **Kerjasama** pada menu **Surat** beserta pencarian, rincian 9 field PKS, serta tombol buka **Berkas PKS** dan **Legalitas**.
+  - Verifikasi: `composer ci` **LULUS** (Pint, PHPStan 0 galat, **76 tes / 365 assertion**); `flutter analyze` **0 isu**; `flutter test` **14/14 lulus**. Pengguna perlu menjalankan `php artisan migrate` di Laragon serta build ulang APK jika ingin menguji di HP.
 - **2026-11-16 — Perbaikan inti logika disposisi (Web & API Mobile):**
   - `DispositionController` (API mobile) kini memakai action resmi `MarkDispositionRead` dan `CompleteDispositionRecipient`, sehingga baca/selesai lewat HP tercatat di Audit Trail dan mengirim notifikasi selesai ke pembuat disposisi.
   - Batas panjang `note` di API diselaraskan menjadi `max:255` agar cocok dengan kolom `disposition_recipients.done_note` (`varchar(255)`).

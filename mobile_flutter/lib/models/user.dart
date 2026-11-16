@@ -6,6 +6,8 @@ class User {
   final String? positionTitle;
   final bool pushEnabled;
 
+  bool get isAdmin => level == 'admin' || level == 'superadmin';
+
   User({
     required this.id,
     required this.name,

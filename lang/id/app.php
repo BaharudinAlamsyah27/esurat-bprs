@@ -19,6 +19,7 @@ return [
     'outgoing_this_month' => 'Surat Keluar Bulan Ini',
     'incoming_total' => 'Surat Masuk',
     'outgoing_total' => 'Surat Keluar',
+    'cooperation_total' => 'Perjanjian Kerjasama',
     'dispositions_done' => 'Sudah Didisposisi',
     'dispositions_pending' => 'Belum Didisposisi',
     'classifications_total' => 'Data Klasifikasi',

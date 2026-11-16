@@ -28,19 +28,19 @@ class MasterDataSeeder extends Seeder
         }
 
         foreach ([
-            ['code' => '100', 'name' => 'Umum'],
-            ['code' => '200', 'name' => 'Politik'],
-            ['code' => '300', 'name' => 'Pemerintahan'],
-            ['code' => '400', 'name' => 'Kesejahteraan Rakyat'],
-            ['code' => '500', 'name' => 'Perekonomian'],
-            ['code' => '600', 'name' => 'Pekerjaan Umum & Ketenagakerjaan'],
-            ['code' => '700', 'name' => 'Pengawasan'],
-            ['code' => '800', 'name' => 'Kepegawaian'],
-            ['code' => '900', 'name' => 'Keuangan'],
+            ['code' => '100', 'name' => 'Umum', 'description' => 'Surat umum, kesekretariatan, undangan, dan pemberitahuan'],
+            ['code' => '200', 'name' => 'Politik', 'description' => 'Hubungan antarlembaga, asosiasi perbankan, dan organisasi'],
+            ['code' => '300', 'name' => 'Pemerintahan', 'description' => 'Surat dari pemerintah daerah, kementerian, atau instansi publik'],
+            ['code' => '400', 'name' => 'Kesejahteraan Rakyat', 'description' => 'CSR, kegiatan sosial, pendidikan, dan kemasyarakatan'],
+            ['code' => '500', 'name' => 'Perekonomian', 'description' => 'Pembiayaan, nasabah, kemitraan usaha, dan perjanjian kerjasama'],
+            ['code' => '600', 'name' => 'Pekerjaan Umum & Ketenagakerjaan', 'description' => 'Sarana prasarana, aset gedung, pengadaan, dan ketenagakerjaan'],
+            ['code' => '700', 'name' => 'Pengawasan', 'description' => 'Audit internal, kepatuhan, regulasi OJK/BI, dan pemeriksaan'],
+            ['code' => '800', 'name' => 'Kepegawaian', 'description' => 'SDM, pengangkatan, mutasi, cuti, dan pembinaan pegawai'],
+            ['code' => '900', 'name' => 'Keuangan', 'description' => 'Akuntansi, kas, perpajakan, anggaran, dan laporan keuangan'],
         ] as $classification) {
-            Classification::query()->firstOrCreate(
+            Classification::query()->updateOrCreate(
                 ['code' => $classification['code']],
-                ['name' => $classification['name']],
+                ['name' => $classification['name'], 'description' => $classification['description']],
             );
         }
 

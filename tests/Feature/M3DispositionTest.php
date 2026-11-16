@@ -114,6 +114,7 @@ it('renders the required letter fields and institution signature in the PDF view
         'letter' => $letter->load('classification'),
         'institution' => $institution,
         'logoData' => null,
+        'signatureData' => 'data:image/png;base64,iVBORw0KGgo=',
         'instructionLabels' => $disposition->instructionLabels(),
         'dispositionDate' => '21 Oktober 2026',
     ])->render();
@@ -123,6 +124,7 @@ it('renders the required letter fields and institution signature in the PDF view
         ->and($html)->toContain($letter->agenda_number)
         ->and($html)->toContain($letter->subject)
         ->and($html)->toContain('Pimpinan Contoh')
+        ->and($html)->toContain('data:image/png;base64,iVBORw0KGgo=')
         ->and($html)->toContain('Segera tindak lanjuti')
         ->and($html)->toContain('Siapkan ringkasan');
 });

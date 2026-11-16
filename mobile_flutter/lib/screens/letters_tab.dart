@@ -5,7 +5,7 @@ import 'cooperation_agreement_list_screen.dart';
 import 'incoming_letter_list_screen.dart';
 import 'outgoing_letter_list_screen.dart';
 
-/// Tab "Surat": sub-tab Surat Masuk, Surat Keluar, dan Perjanjian Kerjasama.
+/// Tab "Arsip": sub-tab Surat Masuk, Surat Keluar, dan Perjanjian Kerjasama.
 class LettersTab extends StatelessWidget {
   const LettersTab({super.key, this.initialIndex = 0});
 
@@ -19,7 +19,7 @@ class LettersTab extends StatelessWidget {
       initialIndex: initialIndex,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Surat'),
+          title: const Text('Arsip'),
           titleSpacing: AppSpacing.page,
           bottom: const TabBar(
             tabs: [

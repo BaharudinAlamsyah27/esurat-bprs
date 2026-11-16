@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../models/incoming_letter.dart';
-import '../models/my_disposition.dart';
 import '../services/api_messages.dart';
 import '../services/api_service.dart';
 
@@ -66,36 +65,22 @@ class HomeProvider extends ChangeNotifier {
     }
 
     try {
-      final responses = await Future.wait<Response<dynamic>>([
-        _apiService.getIncomingLetters(page: 1, perPage: 5),
-        _apiService.getOutgoingLetters(page: 1, perPage: 1),
-        _apiService.getMyDispositions(page: 1, perPage: 50),
-      ]);
+      final response = await _apiService.getDashboardSummary();
+      final payload = response.data['data'] as Map<String, dynamic>;
 
-      final incomingData = responses[0].data as Map<String, dynamic>;
-      final outgoingData = responses[1].data as Map<String, dynamic>;
-      final dispositionData = responses[2].data as Map<String, dynamic>;
-
-      final recent = (incomingData['data'] as List<dynamic>)
+      final recent = (payload['recent_incoming'] as List<dynamic>? ?? [])
           .map((json) => IncomingLetter.fromJson(json as Map<String, dynamic>))
           .take(5)
           .toList();
 
-      final dispositions = (dispositionData['data'] as List<dynamic>)
-          .map((json) => MyDisposition.fromJson(json as Map<String, dynamic>))
-          .toList();
-
-      final unread = dispositions.where((item) => !item.isRead).length;
-      final dispositionsTotal =
-          _totalFrom(dispositionData, dispositions.length);
-
       _summary = HomeSummary(
-        incomingTotal: _totalFrom(incomingData, recent.length),
-        outgoingTotal: _totalFrom(outgoingData, 0),
-        unreadDispositions: unread,
-        dispositionsTotal: dispositionsTotal,
+        incomingTotal: (payload['incoming_total'] as num?)?.toInt() ?? 0,
+        outgoingTotal: (payload['outgoing_total'] as num?)?.toInt() ?? 0,
+        unreadDispositions:
+            (payload['unread_dispositions'] as num?)?.toInt() ?? 0,
+        dispositionsTotal: (payload['dispositions_total'] as num?)?.toInt() ?? 0,
         recentIncoming: recent,
-        countsArePartial: dispositionsTotal > dispositions.length,
+        countsArePartial: false,
       );
       _isLoading = false;
       notifyListeners();
@@ -110,16 +95,5 @@ class HomeProvider extends ChangeNotifier {
       _error = kServerErrorMessage('ringkasan beranda');
       notifyListeners();
     }
-  }
-
-  /// Membaca `meta.total` dari respons paginasi Laravel.
-  int _totalFrom(Map<String, dynamic> payload, int fallback) {
-    final meta = payload['meta'];
-
-    if (meta is Map && meta['total'] is int) {
-      return meta['total'] as int;
-    }
-
-    return fallback;
   }
 }

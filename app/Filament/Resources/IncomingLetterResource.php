@@ -10,6 +10,7 @@ use App\Filament\Resources\IncomingLetterResource\Pages\CreateIncomingLetter;
 use App\Filament\Resources\IncomingLetterResource\Pages\EditIncomingLetter;
 use App\Filament\Resources\IncomingLetterResource\Pages\ListIncomingLetters;
 use App\Filament\Resources\IncomingLetterResource\Pages\ViewIncomingLetter;
+use App\Models\Classification;
 use App\Models\Disposition;
 use App\Models\IncomingLetter;
 use App\Models\User;
@@ -31,6 +32,7 @@ use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -41,7 +43,7 @@ class IncomingLetterResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox-arrow-down';
 
-    protected static ?string $navigationGroup = 'SURAT';
+    protected static ?string $navigationGroup = 'ARSIP';
 
     protected static ?int $navigationSort = 1;
 
@@ -108,8 +110,12 @@ class IncomingLetterResource extends Resource
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['disposition.recipients']))
             ->searchPlaceholder(__('incoming.search_hint'))
             ->columns([
-                TextColumn::make('agenda_number')->label(__('incoming.agenda_number'))->width('7rem')->placeholder('—'),
-                TextColumn::make('letter_number')->label(__('incoming.letter_number'))->width('11rem')->searchable()->placeholder('—'),
+                TextColumn::make('letter_number')
+                    ->label(__('incoming.letter_and_agenda'))
+                    ->width('12rem')
+                    ->searchable(['letter_number', 'agenda_number'])
+                    ->description(fn (IncomingLetter $record): string => __('incoming.agenda_prefix').': '.$record->agenda_number)
+                    ->placeholder('—'),
                 TextColumn::make('sender_name')->label(__('incoming.sender_name'))->width('10rem')->searchable(),
                 TextColumn::make('subject')
                     ->label(__('incoming.subject'))
@@ -130,13 +136,22 @@ class IncomingLetterResource extends Resource
 
                         return 'Disposisi dibuat';
                     }),
-                TextColumn::make('letter_date')->label(__('incoming.letter_date'))->width('9rem')->date('d M Y')->sortable()->placeholder('—'),
+                TextColumn::make('letter_date')->label(__('incoming.letter_date'))->width('8.5rem')->date('d M Y')->sortable()->placeholder('—'),
+                TextColumn::make('received_at')->label(__('incoming.received_at'))->width('8.5rem')->date('d M Y')->sortable()->placeholder('—'),
             ])
             ->filters([
                 SelectFilter::make('agenda_year')
                     ->label(__('incoming.year'))
                     ->options(fn (): array => IncomingLetter::query()->select('agenda_year')->distinct()->orderByDesc('agenda_year')->pluck('agenda_year', 'agenda_year')->all()),
-                SelectFilter::make('classification_id')->label(__('incoming.classification'))->relationship('classification', 'name'),
+                SelectFilter::make('classification_id')
+                    ->label(__('incoming.classification'))
+                    ->options(fn (): array => Classification::query()
+                        ->orderBy('code')
+                        ->get()
+                        ->mapWithKeys(fn (Classification $c): array => [$c->id => "{$c->code} — {$c->name}"])
+                        ->all())
+                    ->searchable()
+                    ->preload(),
                 SelectFilter::make('has_disposition')
                     ->label(__('disposition.filter'))
                     ->options([
@@ -147,6 +162,22 @@ class IncomingLetterResource extends Resource
                         'yes' => $query->has('disposition'),
                         'no' => $query->doesntHave('disposition'),
                         default => $query,
+                    }),
+                Filter::make('received_date_range')
+                    ->form([
+                        DatePicker::make('received_from')->label(__('incoming.received_from')),
+                        DatePicker::make('received_until')->label(__('incoming.received_until')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                filled($data['received_from'] ?? null),
+                                fn (Builder $q): Builder => $q->whereDate('received_at', '>=', $data['received_from'])
+                            )
+                            ->when(
+                                filled($data['received_until'] ?? null),
+                                fn (Builder $q): Builder => $q->whereDate('received_at', '<=', $data['received_until'])
+                            );
                     }),
             ])
             ->filtersTriggerAction(fn (Action $action, Table $table): Action => $action->extraAttributes([

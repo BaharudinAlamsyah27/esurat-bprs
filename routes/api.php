@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AttachmentController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CooperationAgreementController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\DispositionController;
 use App\Http\Controllers\Api\IncomingLetterController;
@@ -19,9 +21,14 @@ Route::middleware(['auth:sanctum', EnsureApiUserIsActive::class])->group(functio
     Route::post('/device-tokens', [DeviceTokenController::class, 'store'])->middleware('throttle:30,1');
     Route::delete('/device-tokens', [DeviceTokenController::class, 'destroy'])->middleware('throttle:30,1');
 
-    Route::apiResource('incoming-letters', IncomingLetterController::class)->only(['index', 'show']);
-    Route::apiResource('outgoing-letters', OutgoingLetterController::class)->only(['index', 'show']);
+    Route::get('/dashboard/summary', [DashboardController::class, 'summary']);
 
+    Route::apiResource('incoming-letters', IncomingLetterController::class)->only(['index', 'show']);
+    Route::post('/incoming-letters/{incomingLetter}/disposition', [DispositionController::class, 'upsertForLetter']);
+    Route::apiResource('outgoing-letters', OutgoingLetterController::class)->only(['index', 'show']);
+    Route::apiResource('cooperation-agreements', CooperationAgreementController::class)->only(['index', 'show']);
+
+    Route::get('/disposition-options', [DispositionController::class, 'options']);
     Route::get('/dispositions', [DispositionController::class, 'index']);
     Route::get('/dispositions/{disposition}', [DispositionController::class, 'show']);
     Route::post('/dispositions/{disposition}/done', [DispositionController::class, 'markAsDone']);

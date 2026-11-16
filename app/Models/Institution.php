@@ -17,6 +17,7 @@ class Institution extends Model
         'email',
         'city',
         'logo_path',
+        'signature_path',
         'leader_name',
         'leader_position',
     ];

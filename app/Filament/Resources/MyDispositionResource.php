@@ -30,7 +30,7 @@ class MyDispositionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox-arrow-down';
 
-    protected static ?string $navigationGroup = 'SURAT';
+    protected static ?string $navigationGroup = 'ARSIP';
 
     protected static ?int $navigationSort = 0;
 
@@ -74,7 +74,7 @@ class MyDispositionResource extends Resource
             ->with(['disposition.incomingLetter.attachments', 'disposition.creator', 'user'])
             ->latest('id');
 
-        if ($user && ! $user->isAdmin()) {
+        if ($user) {
             $query->where('user_id', $user->getKey());
         }
 

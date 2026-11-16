@@ -77,7 +77,7 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->navigationGroups([
                 'DATA MASTER',
-                'SURAT',
+                'ARSIP',
                 'LAPORAN',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

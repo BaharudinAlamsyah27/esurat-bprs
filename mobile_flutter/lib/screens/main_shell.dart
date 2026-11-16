@@ -257,7 +257,7 @@ class _MainShellState extends State<MainShell> {
           const NavigationDestination(
             icon: Icon(Icons.mail_outline),
             selectedIcon: Icon(Icons.mail),
-            label: 'Surat',
+            label: 'Arsip',
           ),
           const NavigationDestination(
             icon: Icon(Icons.person_outline),

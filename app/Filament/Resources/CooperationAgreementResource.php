@@ -38,7 +38,7 @@ class CooperationAgreementResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-check';
 
-    protected static ?string $navigationGroup = 'SURAT';
+    protected static ?string $navigationGroup = 'ARSIP';
 
     protected static ?int $navigationSort = 3;
 

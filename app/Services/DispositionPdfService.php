@@ -15,19 +15,15 @@ class DispositionPdfService
     {
         $disposition->loadMissing(['incomingLetter.classification', 'incomingLetter.registrar']);
         $institution = Institution::query()->first();
-        $logoData = null;
-
-        if ($institution?->logo_path && Storage::disk('private')->exists($institution->logo_path)) {
-            $contents = Storage::disk('private')->get($institution->logo_path);
-            $mime = Storage::disk('private')->mimeType($institution->logo_path) ?: 'image/png';
-            $logoData = 'data:'.$mime.';base64,'.base64_encode($contents);
-        }
+        $logoData = $this->encodePrivateImage($institution?->logo_path);
+        $signatureData = $this->encodePrivateImage($institution?->signature_path);
 
         $pdf = Pdf::loadView('pdf.disposition', [
             'disposition' => $disposition,
             'letter' => $disposition->incomingLetter,
             'institution' => $institution,
             'logoData' => $logoData,
+            'signatureData' => $signatureData,
             'instructionLabels' => $disposition->instructionLabels(),
             'dispositionDate' => $this->indonesianDate($disposition->disposition_date),
         ])->setPaper('a4');
@@ -55,6 +51,22 @@ class DispositionPdfService
             'Content-Disposition' => 'inline; filename="lembar-disposisi-'.str_replace('/', '-', $disposition->incomingLetter->agenda_number).'.pdf"',
             'Cache-Control' => 'private, no-store',
         ]);
+    }
+
+    private function encodePrivateImage(?string $path): ?string
+    {
+        if (! is_string($path) || $path === '' || ! Storage::disk('private')->exists($path)) {
+            return null;
+        }
+
+        $contents = Storage::disk('private')->get($path);
+        if (! is_string($contents)) {
+            return null;
+        }
+
+        $mime = Storage::disk('private')->mimeType($path) ?: 'image/png';
+
+        return 'data:'.$mime.';base64,'.base64_encode($contents);
     }
 
     private function indonesianDate(\DateTimeInterface $date): string

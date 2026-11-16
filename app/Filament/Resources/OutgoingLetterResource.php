@@ -39,7 +39,7 @@ class OutgoingLetterResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-paper-airplane';
 
-    protected static ?string $navigationGroup = 'SURAT';
+    protected static ?string $navigationGroup = 'ARSIP';
 
     protected static ?int $navigationSort = 2;
 

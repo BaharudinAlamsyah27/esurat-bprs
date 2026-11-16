@@ -43,9 +43,10 @@ it('shows accurate dashboard cards and keeps admin cards from users', function (
     $adminCards = Livewire::test(SummaryCardsWidget::class)->instance()->getCards();
     $adminCards = collect($adminCards)->keyBy('label');
 
-    expect($adminCards)->toHaveCount(6)
+    expect($adminCards)->toHaveCount(7)
         ->and($adminCards[__('app.incoming_total')]['value'])->toBe(1)
         ->and($adminCards[__('app.outgoing_total')]['value'])->toBe(1)
+        ->and($adminCards[__('app.cooperation_total')]['value'])->toBe(0)
         ->and($adminCards[__('app.dispositions_done')]['value'])->toBe(1)
         ->and($adminCards[__('app.dispositions_pending')]['value'])->toBe(0)
         ->and($adminCards[__('app.classifications_total')]['value'])->toBe(1)
@@ -55,7 +56,7 @@ it('shows accurate dashboard cards and keeps admin cards from users', function (
     $this->actingAs($user);
     $userCards = Livewire::test(SummaryCardsWidget::class)->instance()->getCards();
 
-    expect($userCards)->toHaveCount(4)
+    expect($userCards)->toHaveCount(5)
         ->and(collect($userCards)->pluck('label')->all())->not->toContain(__('app.classifications_total'))
         ->and(collect($userCards)->pluck('label')->all())->not->toContain(__('app.users_total'));
 });

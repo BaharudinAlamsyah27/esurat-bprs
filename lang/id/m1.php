@@ -32,6 +32,8 @@ return [
     'logo_help' => 'Pilih gambar PNG atau JPG, maksimal 2 MB. File disimpan secara privat.',
     'leader_name' => 'Nama pimpinan',
     'leader_position' => 'Jabatan pimpinan',
+    'leader_signature' => 'Tanda tangan digital pimpinan',
+    'leader_signature_help' => 'Unggah gambar tanda tangan PNG/JPG (disarankan PNG latar transparan, maks. 2 MB). Akan tampil otomatis pada Lembar Disposisi PDF.',
     'institution_saved' => 'Data instansi berhasil disimpan.',
     'appearance' => 'Tampilan aplikasi',
     'theme_color' => 'Tema warna aksen',

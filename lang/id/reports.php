@@ -3,8 +3,11 @@
 return [
     'incoming_navigation' => 'Laporan Surat Masuk',
     'outgoing_navigation' => 'Laporan Surat Keluar',
+    'cooperation_navigation' => 'Laporan Kerjasama (PKS)',
     'incoming_title' => 'Laporan Surat Masuk',
     'outgoing_title' => 'Laporan Surat Keluar',
+    'cooperation_title' => 'Laporan Perjanjian Kerjasama (PKS)',
+    'cooperation_no_results' => 'Tidak ada perjanjian kerjasama pada rentang tanggal ini.',
     'choose_dates' => 'Pilih tanggal laporan',
     'start_date' => 'Tanggal awal',
     'end_date' => 'Tanggal akhir',

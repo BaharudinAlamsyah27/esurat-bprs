@@ -9,7 +9,7 @@
         android:usesCleartextTraffic="true">
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="disposisi" />
+            android:value="disposisi_high_priority" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

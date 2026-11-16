@@ -1,0 +1,51 @@
+<?php
+
+return [
+    'navigation' => 'Perjanjian Kerjasama',
+    'singular' => 'Perjanjian Kerjasama',
+    'plural' => 'Perjanjian Kerjasama',
+    'new' => '+ Tambah Perjanjian Kerjasama',
+    'list_intro' => 'Daftar perjanjian kerjasama (PKS) antara BPRS Sragen dan mitra beserta berkas legalitasnya.',
+    'detail' => 'Rincian Perjanjian Kerjasama',
+    'created_by' => 'Dicatat Oleh',
+    'delete_confirmation_title' => 'Hapus Perjanjian Kerjasama?',
+    'delete_confirmation_body' => 'Data perjanjian kerjasama akan diarsipkan (soft delete) dan tetap tercatat di riwayat aktivitas. Lanjutkan?',
+    'section_main' => 'Data Perjanjian Kerjasama (PKS)',
+    'section_files' => 'Berkas Kerjasama & Legalitas Mitra',
+    'additional_info' => 'Catatan Tambahan',
+
+    'bss_pks_number' => 'Nomor PKS BSS',
+    'bss_pks_number_placeholder' => 'Contoh: 001/PKS/BPRS-SRG/XI/2026',
+    'partner_pks_number' => 'Nomor PKS Mitra',
+    'partner_pks_number_placeholder' => 'Contoh: 015/PKS-MITRA/2026 (opsional jika belum ada)',
+    'partner_npwp' => 'Nomor NPWP Mitra',
+    'partner_npwp_placeholder' => 'Contoh: 01.234.567.8-901.000 (opsional untuk individu)',
+    'agreement_date' => 'Tanggal Perjanjian',
+    'partner_name' => 'Nama Mitra',
+    'partner_name_placeholder' => 'Nama perusahaan / instansi / perorangan mitra',
+    'subject' => 'Perihal Kerjasama',
+    'subject_placeholder' => 'Contoh: Kerjasama Pembayaran Payroll / Pembiayaan',
+    'pic_name' => 'PIC (Person in Charge)',
+    'pic_name_placeholder' => 'Nama penanggung jawab dari pihak mitra / internal',
+    'note' => 'Catatan',
+
+    'pks_file' => 'Berkas PKS',
+    'pks_file_help' => 'Unggah scan dokumen PKS (PDF, JPG, atau PNG, maksimal 10 MB).',
+    'pks_file_current' => 'Berkas PKS Saat Ini',
+    'partner_legality' => 'Legalitas Mitra',
+    'partner_legality_help' => 'Unggah berkas legalitas mitra, misalnya KTP untuk individu atau NIB/Akta untuk badan usaha (PDF, JPG, PNG, maks. 10 MB).',
+    'partner_legality_current' => 'Berkas Legalitas Mitra Saat Ini',
+    'open_file' => 'Buka / Unduh Berkas',
+    'no_file' => 'Belum ada berkas diunggah',
+
+    'year' => 'Tahun',
+    'search_hint' => 'Cari nomor PKS, nama mitra, NPWP, perihal, atau PIC...',
+
+    'invalid_upload' => 'Berkas harus berformat PDF, JPG, atau PNG dengan ukuran maksimal 10 MB.',
+    'upload_failed' => 'Gagal menyimpan berkas ke penyimpanan privat.',
+
+    'audit_created' => 'Menambahkan perjanjian kerjasama baru',
+    'audit_updated' => 'Mengubah data perjanjian kerjasama',
+    'audit_file_replaced' => 'Mengganti berkas perjanjian kerjasama',
+    'audit_download' => 'Mengunduh berkas perjanjian kerjasama',
+];

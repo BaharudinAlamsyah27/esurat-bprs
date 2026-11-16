@@ -18,6 +18,9 @@ Route::middleware(['auth', IdleSessionTimeout::class])->group(function (): void 
     Route::get('/surat-keluar/berkas/{attachment}', [SecureFileController::class, 'show'])
         ->name('outgoing-letters.attachments.show');
 
+    Route::get('/perjanjian-kerjasama/berkas/{attachment}', [SecureFileController::class, 'show'])
+        ->name('cooperation-agreements.attachments.show');
+
     Route::get('/disposisi/{disposition}/cetak', DispositionPrintController::class)
         ->name('dispositions.print');
 

@@ -21,13 +21,22 @@ class FcmClient
         $projectId = (string) config('services.fcm.project_id');
         $credentialsPath = base_path((string) config('services.fcm.credentials'));
 
-        if (! $enabled || empty($projectId) || ! file_exists($credentialsPath)) {
-            Log::info('FCM push skipped (FCM disabled or credentials not configured)', [
-                'device_id' => $deviceToken->id,
-                'title' => $notification['title'],
-            ]);
+        if (! $enabled) {
+            Log::warning('FCM push skipped (FCM is disabled)');
 
             return true;
+        }
+
+        if ($projectId === '') {
+            Log::error('FCM push skipped (Firebase project ID is missing)');
+
+            return false;
+        }
+
+        if (! is_file($credentialsPath) || ! is_readable($credentialsPath)) {
+            Log::error('FCM push skipped (server credential file is missing or unreadable)');
+
+            return false;
         }
 
         $accessToken = $this->getAccessToken($credentialsPath);
@@ -50,7 +59,7 @@ class FcmClient
                     'priority' => 'high',
                     'ttl' => '86400s',
                     'notification' => [
-                        'channel_id' => 'disposisi',
+                        'channel_id' => 'disposisi_high_priority',
                     ],
                 ],
             ],
@@ -62,6 +71,7 @@ class FcmClient
 
             if ($response->successful()) {
                 $deviceToken->update(['last_used_at' => now()]);
+                Log::info('FCM push accepted by Firebase', ['device_id' => $deviceToken->id]);
 
                 return true;
             }

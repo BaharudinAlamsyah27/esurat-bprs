@@ -23,7 +23,7 @@ class RegisteredDeviceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->isAdmin() ?? false;
+        return auth()->user()?->isSuperAdmin() ?? false;
     }
 
     public static function getNavigationLabel(): string

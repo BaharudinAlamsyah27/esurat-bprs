@@ -6,6 +6,7 @@ use Filament\Support\Contracts\HasLabel;
 
 enum UserLevel: string implements HasLabel
 {
+    case SuperAdmin = 'superadmin';
     case Admin = 'admin';
     case User = 'user';
 

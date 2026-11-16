@@ -8,7 +8,9 @@ use App\Models\DeviceToken;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -89,6 +91,37 @@ class AuthController extends Controller
             'level' => $user->level,
             'position_title' => $user->position_title,
             'push_enabled' => $user->push_enabled,
+        ]);
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', Password::defaults(), 'confirmed'],
+        ]);
+
+        if (! Hash::check($validated['current_password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => [__('api.current_password_incorrect')],
+            ]);
+        }
+
+        DB::transaction(function () use ($user, $validated): void {
+            $user->forceFill(['password' => $validated['password']])->save();
+
+            activity('users')
+                ->causedBy($user)
+                ->performedOn($user)
+                ->event('profile_password_changed')
+                ->log(__('m1.audit_profile_password_changed'));
+        });
+
+        return response()->json([
+            'message' => __('api.password_changed'),
         ]);
     }
 }

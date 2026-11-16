@@ -11,9 +11,9 @@ class InitialUsersSeeder extends Seeder
 {
     public function run(): void
     {
-        if (! User::query()->where('level', UserLevel::Admin->value)->exists()) {
-            $username = trim((string) env('INITIAL_ADMIN_USERNAME', 'admin'));
-            $name = trim((string) env('INITIAL_ADMIN_NAME', 'Admin E-Surat'));
+        if (! User::query()->whereIn('level', [UserLevel::SuperAdmin->value, UserLevel::Admin->value])->exists()) {
+            $username = trim((string) env('INITIAL_ADMIN_USERNAME', 'superadmin'));
+            $name = trim((string) env('INITIAL_ADMIN_NAME', 'Superadmin E-Surat'));
             $password = (string) env('INITIAL_ADMIN_PASSWORD', '');
 
             if ($username === '' || $name === '' || ! Password::min(10)->mixedCase()->numbers()->passes('password', $password)) {
@@ -24,7 +24,7 @@ class InitialUsersSeeder extends Seeder
                 ['username' => $username],
                 [
                     'name' => $name,
-                    'level' => UserLevel::Admin,
+                    'level' => UserLevel::SuperAdmin,
                     'is_active' => true,
                     'password' => $password,
                 ],

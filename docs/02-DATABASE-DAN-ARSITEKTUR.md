@@ -4,7 +4,7 @@
 Monolit Laravel + satu panel Filament di root (`/`). Tidak ada route publik selain login.
 ```
 app/
-├── Enums/        # UserLevel (admin,user), Urgency (biasa,penting,segera,sangat_segera), DispositionInstruction
+├── Enums/        # UserLevel (superadmin,admin,user), Urgency (biasa,penting,segera,sangat_segera), DispositionInstruction
 ├── Models/       # User, Institution, Classification, IncomingLetter, OutgoingLetter, Disposition, LetterSequence
 ├── Policies/     # satu per model (berdasarkan users.level)
 ├── Services/     # DispositionPdfService, ReportService, FileStorageService
@@ -19,7 +19,7 @@ lang/id/  database/{migrations,factories,seeders}  tests/
 ## 2. Skema Tabel
 `*` wajib · `SD` = soft delete · semua tabel punya `created_at/updated_at`.
 
-**users** (SD): username* unik, name*, email null unik, password* (hashed), level* (`admin`/`user`), is_active* default true, last_login_at.
+**users** (SD): username* unik, name*, email null unik, password* (hashed), level* (`superadmin`/`admin`/`user`), is_active* default true, last_login_at. Superadmin mewarisi hak Admin Persuratan; Perangkat Terdaftar dan penetapan Superadmin khusus level Superadmin.
 **institutions** (hanya 1 baris): name*, address, phone, email, city, logo_path, leader_name, leader_position.
 **classifications** (SD): code* unik, name*, description.
 **incoming_letters** (SD): agenda_year*, agenda_seq* (unik bersama agenda_year), agenda_number* (teks `0001/2026`), letter_number*, sender*, subject*, note, classification_id* FK, letter_date*, received_date*, file_path, file_name, file_mime, file_size, file_sha256, created_by* FK.
@@ -37,4 +37,4 @@ Relasi: Classification 1—N IncomingLetter/OutgoingLetter · IncomingLetter 1�
 - Migrasi M3 mengarsipkan tabel disposisi berjenjang lama menjadi `legacy_dispositions` tanpa menghapus datanya, lalu membuat tabel `dispositions` sederhana satu lembar per surat.
 - Isi penerima dan catatan disposisi tidak disimpan di riwayat aktivitas. Riwayat hanya mencatat ID surat, nama kolom yang berubah, dan jumlah cetak.
 - Format nomor surat keluar: token `{seq:N}`, `{kode_klasifikasi}`, `{bulan_romawi}`, `{tahun}`; seq reset tahunan (scope tahun) memakai `LetterSequence`.
-- Seeder: 1 admin (`admin`, password diminta saat pertama setup / dari `.env`, **bukan** password lemah tetap), 1 user demo (hanya env local), 9 klasifikasi awal, 1 data instansi, pola nomor default. Data demo besar (`LargeDatasetSeeder`, 10.000 surat) terpisah dan tidak jalan di produksi.
+- Seeder: 1 Superadmin awal (nama pengguna ditentukan di `.env`, kata sandi diminta saat pertama setup, **bukan** password lemah tetap), 1 user demo (hanya env local), 9 klasifikasi awal, 1 data instansi, pola nomor default. Data demo besar (`LargeDatasetSeeder`, 10.000 surat) terpisah dan tidak jalan di produksi.

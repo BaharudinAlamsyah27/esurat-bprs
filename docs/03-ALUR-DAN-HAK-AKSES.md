@@ -20,20 +20,22 @@ Satu file per surat. Disimpan di disk private; nama disimpan acak, nama asli di 
 
 ## 5. Matriks Hak Akses
 Legenda: ✔ penuh · ◐ terbatas · — tidak.
-| Kemampuan | admin | user |
-|---|:-:|:-:|
-| Lihat & cari surat masuk/keluar | ✔ | ✔ |
-| Tambah surat masuk/keluar | ✔ | ✔ |
-| Ubah surat | ✔ semua | ◐ hanya yang ia buat |
-| Hapus surat (soft delete) | ✔ | — |
-| Buat/ubah Lembar Disposisi | ✔ | — |
-| Cetak Lembar Disposisi | ✔ | ✔ (jika sudah dibuat Admin) |
-| Laporan (tampil, cetak, PDF, Excel) | ✔ | ✔ |
-| Data Klasifikasi, Data Instansi, Data Pengguna | ✔ | — |
-| Riwayat Aktivitas | ✔ | — |
-| Dashboard | ✔ (6 kartu) | ✔ (4 kartu) |
-| Profil sendiri (ubah nama/email/password) | ✔ | ✔ |
-Catatan: ini ASUMSI default; konfirmasi di `OPEN_QUESTIONS.md`. Semua pengguna aktif dapat melihat semua surat (belum ada pembatasan rahasia).
+| Kemampuan | superadmin | admin | user |
+|---|:-:|:-:|:-:|
+| Lihat & cari surat masuk/keluar | ✔ | ✔ | ✔ |
+| Tambah surat masuk/keluar | ✔ | ✔ | ✔ |
+| Ubah surat | ✔ semua | ✔ semua | ◐ hanya yang ia buat |
+| Hapus surat (soft delete) | ✔ | ✔ | — |
+| Buat/ubah Lembar Disposisi | ✔ | ✔ | — |
+| Cetak Lembar Disposisi | ✔ | ✔ | ✔ (jika sudah dibuat Admin) |
+| Laporan (tampil, cetak, PDF, Excel) | ✔ | ✔ | ✔ |
+| Data Klasifikasi, Data Instansi, Data Pengguna | ✔ | ✔ (tanpa akun Superadmin) | — |
+| Riwayat Aktivitas | ✔ | ✔ | — |
+| Perangkat Terdaftar | ✔ | — | — |
+| Menetapkan akun Superadmin | ✔ | — | — |
+| Dashboard | ✔ (6 kartu) | ✔ (6 kartu) | ✔ (4 kartu) |
+| Profil sendiri (ubah nama/email/password) | ✔ | ✔ | ✔ |
+Catatan: Superadmin mewarisi semua kemampuan Admin. Admin tidak melihat akun Superadmin di daftar pengguna dan tidak dapat membuka atau mengubahnya lewat URL langsung. Semua pengguna aktif dapat melihat semua surat (belum ada pembatasan rahasia).
 
 ## 6. Audit (activitylog)
 Login/logout/gagal login; tambah/ubah/hapus surat; ganti file; buat/ubah/cetak disposisi; perubahan pengguna & atur ulang password; perubahan data instansi/klasifikasi.

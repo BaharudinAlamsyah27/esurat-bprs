@@ -22,14 +22,14 @@ class UserAdministrationService
             $lockedTarget = User::query()->lockForUpdate()->findOrFail($target->getKey());
             $activating = ! $lockedTarget->is_active;
 
-            if (! $activating && $lockedTarget->isAdmin()) {
-                $activeAdminIds = User::query()
-                    ->where('level', UserLevel::Admin->value)
+            if (! $activating && $lockedTarget->isSuperAdmin()) {
+                $activeSuperAdminIds = User::query()
+                    ->where('level', UserLevel::SuperAdmin->value)
                     ->where('is_active', true)
                     ->lockForUpdate()
                     ->pluck('id');
 
-                if ($activeAdminIds->count() <= 1) {
+                if ($activeSuperAdminIds->count() <= 1) {
                     throw ValidationException::withMessages(['record' => __('m1.last_active_admin')]);
                 }
             }

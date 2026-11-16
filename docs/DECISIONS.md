@@ -1,5 +1,13 @@
 # Keputusan Proyek
 
+## 2026-11-02 — Pemisahan tiga level akses
+
+- Sesuai keputusan pengguna, level akses adalah `superadmin`, `admin`, dan `user` (label UI: Superadmin, Admin Persuratan, Pegawai).
+- Superadmin mewarisi semua kemampuan Admin Persuratan dan menjadi satu-satunya level yang dapat melihat/mencabut perangkat terdaftar serta menetapkan akun Superadmin.
+- Admin Persuratan tetap dapat mengelola surat, data master, akun Admin/Pegawai, laporan, dan riwayat; tidak dapat melihat atau mengubah akun Superadmin.
+- Migrasi mempertahankan semua akun admin lama dan mempromosikan satu akun admin aktif: username `superadmin` jika ada, selain itu akun admin aktif tertua. Pada instalasi baru, seeder membuat akun awal sebagai Superadmin.
+- Akun Superadmin aktif terakhir dilindungi dari penonaktifan, penurunan level, dan penghapusan.
+
 ## 2026-11-02 — Notifikasi FCM terbatas untuk disposisi APK
 
 - Pengguna menyetujui penambahan Firebase Cloud Messaging (FCM) sebagai tambahan terbatas Fase 3.

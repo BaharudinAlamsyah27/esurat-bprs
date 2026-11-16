@@ -6,7 +6,7 @@ return [
     'email' => 'Alamat email',
     'username' => 'Nama pengguna',
     'password' => 'Kata sandi',
-    'user_levels' => ['admin' => 'Admin', 'user' => 'Pengguna'],
+    'user_levels' => ['superadmin' => 'Superadmin', 'admin' => 'Admin Persuratan', 'user' => 'Pegawai'],
     'initial_admin_password_required' => 'Isi INITIAL_ADMIN_PASSWORD pada berkas .env dengan kata sandi minimal 10 karakter, huruf besar dan kecil, serta angka sebelum membuat admin awal.',
     'welcome' => 'Selamat datang di E-Surat BPRS Sragen',
     'dashboard' => 'Beranda',

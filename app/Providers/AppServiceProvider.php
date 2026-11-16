@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Listeners\RemoveDeviceTokensOnLogout;
 use App\Models\Classification;
+use App\Models\CooperationAgreement;
 use App\Models\Disposition;
 use App\Models\DispositionRecipient;
 use App\Models\IncomingLetter;
@@ -12,6 +13,7 @@ use App\Models\OutgoingLetter;
 use App\Models\User;
 use App\Policies\ActivityLogPolicy;
 use App\Policies\ClassificationPolicy;
+use App\Policies\CooperationAgreementPolicy;
 use App\Policies\DispositionPolicy;
 use App\Policies\DispositionRecipientPolicy;
 use App\Policies\IncomingLetterPolicy;
@@ -52,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(IncomingLetter::class, IncomingLetterPolicy::class);
         Gate::policy(OutgoingLetter::class, OutgoingLetterPolicy::class);
         Gate::policy(DispositionRecipient::class, DispositionRecipientPolicy::class);
+        Gate::policy(CooperationAgreement::class, CooperationAgreementPolicy::class);
 
         Event::listen(Login::class, function (Login $event): void {
             if (! $event->user instanceof User) {

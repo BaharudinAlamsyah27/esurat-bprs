@@ -4,6 +4,11 @@
 
 ## Status saat ini
 
+- **2026-11-16 — Penambahan modul Perjanjian Kerjasama (PKS) di bawah menu `SURAT`:**
+  - Tabel baru `cooperation_agreements` (`bss_pks_number`, `partner_pks_number`, `partner_npwp`, `agreement_date`, `partner_name`, `subject`, `pic_name`, `note`, `SoftDeletes`).
+  - Penyimpanan privat untuk **Berkas PKS** (`kind=pks_file`) dan **Legalitas Mitra** seperti KTP/NIB/Akta (`kind=partner_legality`) dengan validasi MIME (`pdf, jpg, jpeg, png`, maks 10 MB), hash SHA-256, dan rute terautentikasi `/perjanjian-kerjasama/berkas/{attachment}`.
+  - Policy `CooperationAgreementPolicy` (semua user aktif dapat melihat & mencatat; ubah oleh pemilik/Admin; soft delete hanya Admin) dan tercatat di Audit Trail.
+  - Verifikasi: `composer ci` **LULUS** (Pint, PHPStan 0 galat, **75 tes / 353 assertion**). Pengguna perlu menjalankan `php artisan migrate` di Laragon agar tabel baru aktif di MySQL lokal.
 - **2026-11-16 — Perbaikan inti logika disposisi (Web & API Mobile):**
   - `DispositionController` (API mobile) kini memakai action resmi `MarkDispositionRead` dan `CompleteDispositionRecipient`, sehingga baca/selesai lewat HP tercatat di Audit Trail dan mengirim notifikasi selesai ke pembuat disposisi.
   - Batas panjang `note` di API diselaraskan menjadi `max:255` agar cocok dengan kolom `disposition_recipients.done_note` (`varchar(255)`).

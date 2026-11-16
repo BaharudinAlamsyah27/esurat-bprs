@@ -11,9 +11,9 @@ class MainActivity : FlutterActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "disposisi",
+                "disposisi_high_priority",
                 getString(R.string.disposition_notification_channel),
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = getString(R.string.disposition_notification_description)
             }

@@ -10,10 +10,11 @@ Memindahkan pencatatan surat BPRS Sragen dari buku/spreadsheet ke satu aplikasi 
 ## 2. Ruang Lingkup
 **Termasuk:** 9 modul di bawah. **Tidak termasuk (ditunda fase 2, arsip di `docs/future/`):** persetujuan berjenjang, tanda tangan digital & QR, surat internal/nota dinas/edaran, delegasi, notifikasi/pengingat, kerahasiaan per surat, hierarki unit, disposisi berpelacakan/berjenjang, OCR, enkripsi file, integrasi core banking.
 
-## 3. Peran Pengguna (hanya dua level)
+## 3. Peran Pengguna (tiga level)
 | Level | Siapa | Kemampuan utama |
 |---|---|---|
-| `admin` | Sekretariat/IT | Semua modul, termasuk data master, pengguna, hapus surat, buat disposisi |
+| `superadmin` | IT/pengelola sistem | Semua kemampuan Admin Persuratan, ditambah mengelola perangkat terdaftar dan menetapkan Superadmin |
+| `admin` | Sekretariat/admin persuratan | Semua modul operasional, termasuk data master, pengguna (tanpa menetapkan Superadmin), hapus surat, dan buat disposisi; tidak dapat melihat/mencabut perangkat terdaftar |
 | `user` | Pegawai/pimpinan | Melihat & mencari surat, menambah surat, mencetak laporan & disposisi, mengubah profil sendiri |
 Matriks lengkap di `03-ALUR-DAN-HAK-AKSES.md`.
 
@@ -26,7 +27,7 @@ Kode* (unik, mis. `500`), Judul/Nama*, Keterangan. Seeder awal: klasifikasi arsi
 Nama instansi*, alamat, telepon, email, kota (untuk tanggal cetak), logo (PNG/JPG), **nama pimpinan** dan **jabatan pimpinan** (dipakai pada tanda tangan Lembar Disposisi). Dipakai sebagai kop pada laporan dan lembar disposisi. Isi awal: "BPRS Sragen" (placeholder).
 
 ### C. Data Pengguna (Admin)
-Username* (unik), Nama*, Email (opsional), Level* (`admin`/`user`), Status aktif. Password diisi saat membuat; **tidak pernah ditampilkan**; tersedia tombol "Atur Ulang Password". Pengguna tidak bisa menghapus dirinya sendiri atau admin terakhir.
+Username* (unik), Nama*, Email (opsional), Level* (`superadmin`/`admin`/`user`), Status aktif. Admin hanya dapat menetapkan `admin` atau `user`; hanya Superadmin yang dapat menetapkan `superadmin`. Password diisi saat membuat; **tidak pernah ditampilkan**; tersedia tombol "Atur Ulang Password". Akun Superadmin aktif terakhir tidak bisa dinonaktifkan, diturunkan levelnya, atau dihapus.
 
 ### D. Data Surat Masuk (Admin & User)
 | Field | Keterangan |
@@ -73,7 +74,7 @@ Pilih **Tanggal Awal** dan **Tanggal Akhir** → tombol **"Tampilkan"** → tabe
 ### H. Profil (semua pengguna)
 Ubah nama, email, dan **ganti password** (wajib password lama). Tidak ada pengaturan lain.
 
-### I. Riwayat Aktivitas (Admin, menu kecil)
+### I. Riwayat Aktivitas (Admin Persuratan dan Superadmin, menu kecil)
 Tabel baca-saja: waktu, pengguna, aksi, objek (login, tambah/ubah/hapus surat, buat/cetak disposisi, perubahan pengguna).
 
 ### J. Dashboard

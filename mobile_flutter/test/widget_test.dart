@@ -5,6 +5,7 @@ import 'package:esurat_mobile/screens/account_tab.dart';
 import 'package:esurat_mobile/screens/home_tab.dart';
 import 'package:esurat_mobile/models/user.dart';
 import 'package:esurat_mobile/screens/login_screen.dart';
+import 'package:esurat_mobile/services/api_server_settings.dart';
 import 'package:esurat_mobile/providers/auth_provider.dart';
 import 'package:esurat_mobile/theme/app_theme.dart';
 import 'package:esurat_mobile/utils/format.dart';
@@ -62,8 +63,9 @@ Widget _bingkai(Widget child, {double textScale = 1.0}) {
 }
 
 void main() {
-  setUp(() {
+  setUp(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
+    await ApiServerSettings.reset();
   });
 
   group('Tema', () {
@@ -247,7 +249,27 @@ void main() {
       expect(find.text('Nama Pengguna'), findsOneWidget);
       expect(find.text('Kata Sandi'), findsOneWidget);
       expect(find.text('Masuk'), findsOneWidget);
+      expect(find.text('Ubah alamat server'), findsOneWidget);
       expect(tester.takeException(), isNull);
+    });
+
+    test('alamat server tersimpan dan otomatis memakai path API', () async {
+      final berhasil = await ApiServerSettings.save(
+        'http://10.226.242.115:8000',
+      );
+
+      expect(berhasil, isTrue);
+      expect(ApiServerSettings.serverUrl, 'http://10.226.242.115:8000/api');
+
+      await ApiServerSettings.load();
+      expect(ApiServerSettings.serverUrl, 'http://10.226.242.115:8000/api');
+    });
+
+    test('menolak alamat yang bukan URL server http atau https', () async {
+      final berhasil = await ApiServerSettings.save('10.226.242.115:8000');
+
+      expect(berhasil, isFalse);
+      expect(ApiServerSettings.serverUrl, ApiServerSettings.defaultServerUrl);
     });
   });
 
@@ -272,20 +294,37 @@ void main() {
             fontScale: AppFontScale.normal,
             onFontScaleChanged: (value) => dipilih = value,
             onOpenLaporan: () {},
+            onChangePassword: ({
+              required String currentPassword,
+              required String password,
+              required String passwordConfirmation,
+            }) async => null,
             onLogout: () => keluar = true,
           ),
         ),
       );
 
       expect(find.text('Auditor Demo'), findsOneWidget);
-      expect(find.text('Pengguna · auditor'), findsOneWidget);
+      expect(find.text('Pegawai · auditor'), findsOneWidget);
       expect(find.text('Normal'), findsOneWidget);
       expect(find.text('Sangat besar'), findsOneWidget);
 
       await tester.tap(find.text('Sangat besar'));
       expect(dipilih, AppFontScale.extraLarge);
 
-      await tester.tap(find.text('Keluar'));
+      final tombolKeluar = find.text('Keluar');
+      await tester.scrollUntilVisible(
+        tombolKeluar,
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byType(AccountTab),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(tombolKeluar);
       expect(keluar, isTrue);
     });
   });

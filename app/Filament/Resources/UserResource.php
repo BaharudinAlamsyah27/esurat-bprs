@@ -19,6 +19,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rules\Password;
 
 class UserResource extends Resource
@@ -34,6 +35,18 @@ class UserResource extends Resource
     public static function canViewAny(): bool
     {
         return auth()->user()?->isAdmin() ?? false;
+    }
+
+    /** @return Builder<User> */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (! (auth()->user()?->isSuperAdmin() ?? false)) {
+            $query->where('level', '!=', UserLevel::SuperAdmin->value);
+        }
+
+        return $query;
     }
 
     public static function getNavigationLabel(): string
@@ -60,7 +73,10 @@ class UserResource extends Resource
             TextInput::make('email')->label(__('m1.email'))->email()->nullable()->unique(ignoreRecord: true)->maxLength(190),
             Select::make('level')
                 ->label(__('m1.level'))
-                ->options(collect(UserLevel::cases())->mapWithKeys(fn (UserLevel $level): array => [$level->value => $level->getLabel()])->all())
+                ->options(fn (): array => collect(UserLevel::cases())
+                    ->reject(fn (UserLevel $level): bool => $level === UserLevel::SuperAdmin && ! (auth()->user()?->isSuperAdmin() ?? false))
+                    ->mapWithKeys(fn (UserLevel $level): array => [$level->value => $level->getLabel()])
+                    ->all())
                 ->disabled(fn (?User $record): bool => $record?->is(auth()->user()) ?? false)
                 ->required(),
             TextInput::make('password')

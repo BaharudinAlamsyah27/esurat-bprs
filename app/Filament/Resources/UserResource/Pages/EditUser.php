@@ -106,15 +106,21 @@ class EditUser extends EditRecord
             ]);
         }
 
-        $removesLastActiveAdmin = $record->isAdmin()
+        if ($newLevel === UserLevel::SuperAdmin->value && ! (auth()->user()?->isSuperAdmin() ?? false)) {
+            throw ValidationException::withMessages([
+                'data.level' => __('m1.superadmin_assignment_forbidden'),
+            ]);
+        }
+
+        $removesLastActiveSuperAdmin = $record->isSuperAdmin()
             && $record->is_active
-            && ((string) $newLevel !== UserLevel::Admin->value || ! (bool) ($data['is_active'] ?? $record->is_active))
+            && ((string) $newLevel !== UserLevel::SuperAdmin->value || ! (bool) ($data['is_active'] ?? $record->is_active))
             && User::query()
-                ->where('level', UserLevel::Admin->value)
+                ->where('level', UserLevel::SuperAdmin->value)
                 ->where('is_active', true)
                 ->count() <= 1;
 
-        if ($removesLastActiveAdmin) {
+        if ($removesLastActiveSuperAdmin) {
             throw ValidationException::withMessages([
                 'data.level' => __('m1.last_active_admin'),
             ]);

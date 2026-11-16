@@ -4,12 +4,13 @@
 > Proyek: **E-Surat BPRS Sragen** — aplikasi **surat masuk & surat keluar yang sederhana**, dengan Lembar Disposisi cetak, laporan, dan dashboard.
 
 ## 1. Ringkasan Proyek
-Aplikasi web internal BPRS Sragen (bank pembiayaan rakyat syariah), dijalankan **on-premise**. Pengguna: **Admin** (sekretariat/IT) dan **User** (pegawai). Sebagian pengguna berusia lanjut, jadi **kemudahan pakai adalah prioritas utama**. Konteks perbankan: keamanan dan jejak audit tetap penting.
+Aplikasi web internal BPRS Sragen (bank pembiayaan rakyat syariah), dijalankan **on-premise**. Pengguna: **Superadmin** (IT/pengelola sistem), **Admin Persuratan** (sekretariat), dan **Pegawai**. Superadmin mewarisi seluruh hak Admin Persuratan; Admin Persuratan tidak dapat membuka pengelolaan perangkat atau mengangkat Superadmin. Sebagian pengguna berusia lanjut, jadi **kemudahan pakai adalah prioritas utama**. Konteks perbankan: keamanan dan jejak audit tetap penting.
 
 ### SCOPE v2 — rombakan total, FINAL (jangan diperluas)
 **Modul yang DIBUAT**
-- Admin: Data Klasifikasi · Data Instansi · Data Pengguna · Data Surat Masuk · Data Surat Keluar · Laporan Surat Masuk · Laporan Surat Keluar · Profil · Riwayat Aktivitas.
-- User: Data Surat Masuk · Data Surat Keluar · Laporan Surat Masuk · Laporan Surat Keluar · Profil.
+- Superadmin: seluruh fitur Admin Persuratan, ditambah Perangkat Terdaftar dan kewenangan mengangkat Superadmin.
+- Admin Persuratan: Data Klasifikasi · Data Instansi · Data Pengguna (tanpa akses/penetapan Superadmin) · Data Surat Masuk · Data Surat Keluar · Laporan Surat Masuk · Laporan Surat Keluar · Profil · Riwayat Aktivitas.
+- Pegawai: Data Surat Masuk · Data Surat Keluar · Laporan Surat Masuk · Laporan Surat Keluar · Profil.
 - Dashboard: kartu ringkasan + 2 grafik sederhana + surat terbaru.
 - **Disposisi web = SEDERHANA:** pada surat masuk, satu form "Lembar Disposisi" → Simpan & Cetak PDF (satu klik). Tanpa pelacakan, berjenjang, atau batas waktu. Pengecualian yang disetujui pengguna pada 2026-11-02: notifikasi FCM sederhana ke APK Android untuk disposisi.
 
@@ -22,7 +23,7 @@ Aplikasi web internal BPRS Sragen (bank pembiayaan rakyat syariah), dijalankan *
 | Framework | Laravel **12.x** (`^12.0`), kunci di composer.lock |
 | Admin UI | Filament (versi stabil terbaru yang mendukung PHP 8.2 + Laravel 12; catat versinya di DECISIONS.md) |
 | Database | MySQL 8 (MariaDB 10.11+ kompatibel) |
-| Hak akses | Kolom `users.level` (`admin`/`user`) + Laravel Policy. **Tanpa** spatie/laravel-permission |
+| Hak akses | Kolom `users.level` (`superadmin`/`admin`/`user`) + Laravel Policy. **Tanpa** spatie/laravel-permission |
 | PDF | barryvdh/laravel-dompdf (lembar disposisi, laporan) |
 | Excel | maatwebsite/excel (ekspor laporan) |
 | Audit | spatie/laravel-activitylog |
@@ -34,7 +35,7 @@ Aplikasi web internal BPRS Sragen (bank pembiayaan rakyat syariah), dijalankan *
 ```bash
 composer install
 cp .env.example .env && php artisan key:generate
-php artisan migrate --seed          # admin, klasifikasi, data instansi contoh
+php artisan migrate --seed          # Superadmin awal, klasifikasi, data instansi contoh
 php artisan serve                   # dev
 composer ci                         # test + format check + static analysis (Windows & Linux)
 php artisan test                    # hanya test
@@ -46,7 +47,7 @@ Tugas SELESAI hanya jika `composer ci` lulus. Script `ci` dan `lint` dibuat di M
 - Identifier kode & database: **bahasa Inggris**, `snake_case` kolom/tabel, `PascalCase` class. Teks antarmuka: **bahasa Indonesia** di `lang/id/*.php` (jangan hardcode). Locale `id`, timezone `Asia/Jakarta`.
 - Glosarium: `incoming_letters` = surat masuk · `outgoing_letters` = surat keluar · `dispositions` = lembar disposisi · `classifications` = klasifikasi · `institutions` = data instansi.
 - Logika bisnis di `app/Services` / `app/Actions`; Filament Resource hanya tampilan/form/tabel. Status/pilihan memakai PHP Backed Enum.
-- Otorisasi dengan **Policy** (berdasarkan `users.level`); jangan cek peran dengan string di banyak tempat — buat helper `isAdmin()`.
+- Otorisasi dengan **Policy** (berdasarkan `users.level`); `isAdmin()` mencakup Admin Persuratan dan Superadmin, sedangkan area sistem khusus wajib memakai `isSuperAdmin()`.
 - Operasi multi-tabel dalam `DB::transaction`. Penomoran (agenda & nomor surat keluar) WAJIB `lockForUpdate()` agar tidak ganda.
 - Tanpa hard delete pada surat: `SoftDeletes`, hanya Admin yang boleh menghapus, dengan konfirmasi dan tercatat di audit.
 - Setiap fitur: migration + factory + seeder (bila perlu) + policy + test + terjemahan.

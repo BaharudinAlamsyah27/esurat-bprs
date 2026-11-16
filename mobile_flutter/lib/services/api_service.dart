@@ -1,16 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'api_server_settings.dart';
 
 class ApiService {
   final Dio _dio = Dio();
   final _storage = const FlutterSecureStorage();
 
-  // Alamat API bisa diatur saat build tanpa mengubah kode:
-  // flutter build apk --dart-define=API_BASE_URL=http://192.168.10.197:8000/api
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://192.168.10.197:8000/api',
-  );
+  static String get baseUrl => ApiServerSettings.serverUrl;
 
   ApiService() {
     _dio.options.baseUrl = baseUrl;
@@ -23,6 +19,9 @@ class ApiService {
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
+        // Alamat dapat diubah sebelum login; semua instance ApiService
+        // memakai alamat terakhir yang tersimpan.
+        options.baseUrl = baseUrl;
         String? token = await _storage.read(key: 'auth_token');
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
@@ -66,6 +65,18 @@ class ApiService {
 
   Future<Response> getMe() async {
     return await _dio.get('/me');
+  }
+
+  Future<Response> changePassword({
+    required String currentPassword,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    return _dio.post('/profile/password', data: {
+      'current_password': currentPassword,
+      'password': password,
+      'password_confirmation': passwordConfirmation,
+    });
   }
 
   Future<Response> getIncomingLetters(

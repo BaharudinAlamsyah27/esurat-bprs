@@ -222,6 +222,7 @@ class _MainShellState extends State<MainShell> {
               fontScale: settings.fontScale,
               onFontScaleChanged: settings.setFontScale,
               onOpenLaporan: _showLaporanInfo,
+              onChangePassword: auth.changePassword,
               onLogout: _confirmLogout,
             ),
           ),

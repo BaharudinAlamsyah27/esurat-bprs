@@ -11,7 +11,7 @@
 | API `/api/*` untuk mobile | Selesai; `composer ci` **hijau — 67 test lulus** |
 | APK Flutter v1 (tampilan lama, grid menu) | Terbangun, ada di `public/downloads/esurat-bprs-flutter.apk` (~34 MB) |
 | Rombakan UI Flutter (bottom navigation, Material 3) | **Selesai, lulus `flutter analyze` + 11 widget test, terverifikasi di emulator dengan data nyata — TAPI belum di-commit dan APK untuk HP belum dibangun ulang** |
-| Notifikasi push (Firebase FCM) | Pengguna mengonfirmasi pop-up sudah diterima di HP saat APK berada di latar belakang; konfigurasi lokal telah diselaraskan |
+| Notifikasi push (Firebase FCM) | Pengguna sebelumnya mengonfirmasi pop-up diterima. File kredensial server ditemukan dengan nama `.json.json`; nama lokal sudah dikoreksi agar cocok dengan path `.env`. Bersihkan cache konfigurasi dan uji ulang. |
 
 Repo: `C:\laragon\www\esurat` — proyek mobile di subfolder `mobile_flutter/` (satu repo dengan web; shared DB & API; jangan di-split tanpa alasan kuat).
 
@@ -20,7 +20,7 @@ Repo: `C:\laragon\www\esurat` — proyek mobile di subfolder `mobile_flutter/` (
 ### Backend (jaga agar tetap sederhana)
 - Endpoint API aktif ada di `routes/api.php`: `POST /api/login`, `/api/logout`, `GET /api/me`, daftar/detail surat masuk dan keluar, daftar/detail disposisi penerima, penyelesaian disposisi, lampiran privat, serta endpoint token FCM yang baru ditambahkan (`POST/DELETE /api/device-tokens`).
 - Auth: Bearer token Sanctum, ekspiry 12 jam; **harus lewat guard `api`** (guard `web` membuat file `storage/app/.gitignore` ikut ter-merge config dan `storage:link` rusak — pernah kejadian, sudah diperbaiki).
-- Policy: `viewAny` cukup user aktif (level `admin`/`user` sama-sama melihat daftar surat) — ini sesuai keputusan desain, bukan bug.
+- Policy surat: semua pengguna aktif (Superadmin/Admin Persuratan/Pegawai) dapat melihat daftar surat sesuai keputusan desain. Hierarki tiga level yang ditambahkan 2026-11-02: Superadmin mewarisi semua hak Admin Persuratan; hanya Superadmin dapat mengelola perangkat terdaftar dan menetapkan Superadmin.
 - Unduh lampiran: **route streaming sendiri** (bukan `filesystem.download` milik Filament yang butuh sesi web); tercatat di audit trail sebagai "Unduh Lampiran (API Mobile)".
 - Semua index menerima `page` dan `per_page` (1..50); respons paginasi punya `meta.total`.
 
@@ -63,7 +63,7 @@ Repo: `C:\laragon\www\esurat` — proyek mobile di subfolder `mobile_flutter/` (
 
 1. **CI belum diulang setelah perubahan terakhir:** `composer ci`, `flutter analyze`, dan `flutter test` harus dijalankan sebelum serah terima.
 2. **APK publik belum diperbarui:** `public/downloads/esurat-bprs-flutter.apk` adalah keluaran lama; build Codex terbaru tidak berhasil. Uji dan ganti dengan APK dari sumber terakhir sebelum dibagikan.
-3. **Firebase lokal masih proyek uji pribadi:** pop-up sudah dikonfirmasi, tetapi sebelum kantor memakai sistem, mentor perlu memakai proyek Firebase/akun kantor dan menempatkan kunci server dengan aman. `.env` dan service-account berada di jalur privat/diabaikan Git; periksa `git status` agar tidak ada rahasia yang terlanjur di-stage.
+3. **Firebase lokal masih proyek uji pribadi:** file kredensial server telah ditemukan dengan ekstensi `.json.json`, lalu namanya dikoreksi agar sesuai dengan path `.env`. Bersihkan cache konfigurasi dan uji kembali. Sebelum kantor memakai sistem, mentor perlu memakai proyek Firebase/akun kantor dan menempatkan kunci server dengan aman. Jangan kirim atau commit `.env`, `google-services.json`, atau kunci service account.
 4. **Server lokal bukan deployment kantor:** dua proses `php artisan serve`/alamat Laragon hanya untuk pengembangan. Produksi memerlukan HTTPS, konfigurasi server permanen, backup dan pemulihan yang diuji.
 5. **Data Beranda mobile masih proksi:** badge "Baru" memakai aturan ≤7 hari (`lib/utils/format.dart`); jumlah disposisi belum dibaca dibatasi 50 data (`lib/providers/home_provider.dart`). Tidak menghalangi notifikasi push, tetapi perlu diketahui saat UAT.
 6. **API status surat mobile sederhana:** `IncomingLetterStatus` baru memiliki nilai `registered`; label `baru` yang diperkirakan aplikasi belum disediakan API.

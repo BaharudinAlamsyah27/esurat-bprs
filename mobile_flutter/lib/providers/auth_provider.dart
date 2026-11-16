@@ -53,6 +53,54 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<String?> changePassword({
+    required String currentPassword,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    try {
+      await _apiService.changePassword(
+        currentPassword: currentPassword,
+        password: password,
+        passwordConfirmation: passwordConfirmation,
+      );
+
+      return null;
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      if (data is Map) {
+        final errors = data['errors'];
+        if (errors is Map) {
+          for (final field in [
+            'current_password',
+            'password',
+            'password_confirmation',
+          ]) {
+            final messages = errors[field];
+            if (messages is List && messages.isNotEmpty) {
+              return messages.first.toString();
+            }
+          }
+        }
+
+        if (data['message'] is String &&
+            data['message'] != 'The given data was invalid.') {
+          return data['message'] as String;
+        }
+      }
+
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        return 'Tidak dapat menghubungi server. Periksa jaringan kantor Anda.';
+      }
+
+      return 'Kata sandi belum berhasil diubah. Coba lagi.';
+    } catch (_) {
+      return 'Kata sandi belum berhasil diubah. Coba lagi.';
+    }
+  }
+
   /// Mengambil pesan dari server (bahasa Indonesia) atau memberi pesan
   /// yang mudah dipahami kalau jaringannya yang bermasalah.
   String _messageFrom(DioException e) {

@@ -1,4 +1,4 @@
 <resources>
-    <string name="disposition_notification_channel">Disposisi</string>
-    <string name="disposition_notification_description">Pemberitahuan disposisi surat</string>
+    <string name="disposition_notification_channel">Notifikasi disposisi</string>
+    <string name="disposition_notification_description">Pemberitahuan baru saat ada disposisi untuk Anda</string>
 </resources>

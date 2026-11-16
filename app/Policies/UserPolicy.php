@@ -14,7 +14,7 @@ class UserPolicy
 
     public function view(User $user, User $record): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() && ($user->isSuperAdmin() || ! $record->isSuperAdmin());
     }
 
     public function create(User $user): bool
@@ -24,19 +24,21 @@ class UserPolicy
 
     public function update(User $user, User $record): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() && ($user->isSuperAdmin() || ! $record->isSuperAdmin());
     }
 
     public function delete(User $user, User $record): bool
     {
-        return $user->isAdmin() && $user->isNot($record)
+        return $user->isAdmin()
+            && ($user->isSuperAdmin() || ! $record->isSuperAdmin())
+            && $user->isNot($record)
             && ! $record->hasUsageHistory()
-            && (! $record->isAdmin() || ! $record->is_active || User::query()->where('level', UserLevel::Admin->value)->where('is_active', true)->count() > 1);
+            && (! $record->isSuperAdmin() || ! $record->is_active || User::query()->where('level', UserLevel::SuperAdmin->value)->where('is_active', true)->count() > 1);
     }
 
     public function restore(User $user, User $record): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() && ($user->isSuperAdmin() || ! $record->isSuperAdmin());
     }
 
     public function forceDelete(User $user, User $record): bool

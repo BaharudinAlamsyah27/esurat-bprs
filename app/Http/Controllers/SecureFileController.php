@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attachment;
+use App\Models\CooperationAgreement;
 use App\Models\IncomingLetter;
 use App\Models\OutgoingLetter;
 use Illuminate\Support\Facades\Gate;
@@ -14,7 +15,12 @@ class SecureFileController
     public function show(Attachment $attachment): Response
     {
         $attachable = $attachment->attachable;
-        abort_unless($attachable instanceof IncomingLetter || $attachable instanceof OutgoingLetter, 404);
+        abort_unless(
+            $attachable instanceof IncomingLetter
+            || $attachable instanceof OutgoingLetter
+            || $attachable instanceof CooperationAgreement,
+            404
+        );
         Gate::authorize('viewAttachments', $attachable);
 
         abort_unless($attachment->disk === 'private', 404);
@@ -22,15 +28,21 @@ class SecureFileController
         $disk = Storage::disk('private');
         abort_unless($disk->exists($attachment->path), 404);
 
-        activity($attachable instanceof IncomingLetter ? 'incoming_letter' : 'outgoing_letter')
+        [$logName, $foreignKey, $logMessage] = match (true) {
+            $attachable instanceof IncomingLetter => ['incoming_letter', 'incoming_letter_id', 'incoming.audit_download'],
+            $attachable instanceof OutgoingLetter => ['outgoing_letter', 'outgoing_letter_id', 'outgoing.audit_download'],
+            default => ['cooperation_agreement', 'cooperation_agreement_id', 'cooperation.audit_download'],
+        };
+
+        activity($logName)
             ->causedBy(auth()->user())
             ->event('download_attachment')
             ->withProperties([
-                $attachable instanceof IncomingLetter ? 'incoming_letter_id' : 'outgoing_letter_id' => $attachable->getKey(),
+                $foreignKey => $attachable->getKey(),
                 'attachment_id' => $attachment->getKey(),
                 'ip' => request()->ip(),
             ])
-            ->log(__($attachable instanceof IncomingLetter ? 'incoming.audit_download' : 'outgoing.audit_download'));
+            ->log(__($logMessage));
 
         return response()->file($disk->path($attachment->path), [
             'Content-Type' => $attachment->mime,

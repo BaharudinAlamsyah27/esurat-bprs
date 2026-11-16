@@ -3,12 +3,12 @@
 Satu milestone = satu branch = satu sesi Codex. Selesai bila kriteria terpenuhi + `composer ci` hijau + `docs/PROGRESS.md` diperbarui.
 
 ## M0 — Fondasi & Login
-Laravel 12 + Filament panel di `/`, tema kustom orisinal (docs/07), login memakai **username**, kolom `users.username/level/is_active`, helper `isAdmin()`, seeder admin, script `composer ci`/`lint`, test smoke, `docs/LICENSES.md`.
-**Selesai bila:** admin dan user dapat login; pengguna nonaktif ditolak; tampilan awal sesuai docs/07; `composer ci` hijau.
+Laravel 12 + Filament panel di `/`, tema kustom orisinal (docs/07), login memakai **username**, kolom `users.username/level/is_active`, level `superadmin`/`admin`/`user`, helper `isAdmin()` dan `isSuperAdmin()`, seeder Superadmin awal, script `composer ci`/`lint`, test smoke, `docs/LICENSES.md`.
+**Selesai bila:** Superadmin, Admin Persuratan, dan Pegawai dapat login; pengguna nonaktif ditolak; tampilan awal sesuai docs/07; `composer ci` hijau.
 
 ## M1 — Data Master, Pengguna, Profil
 Data Klasifikasi (+seeder), Data Instansi (satu data), Data Pengguna (password hash, atur ulang password), Profil, Riwayat Aktivitas, Policy per level, menu per level.
-**Selesai bila:** Admin mengelola ketiganya; user tidak melihat menu admin dan ditolak jika membuka URL-nya; password tidak tampil di mana pun; perubahan tercatat.
+**Selesai bila:** Superadmin/Admin Persuratan mengelola data master; hanya Superadmin mengelola perangkat dan menetapkan Superadmin; Pegawai tidak melihat menu admin dan ditolak jika membuka URL-nya; password tidak tampil di mana pun; perubahan tercatat.
 
 ## M2 — Data Surat Masuk
 CRUD, nomor agenda otomatis, upload file privat, detail + pratinjau, pencarian/filter, peringatan duplikat, soft delete (Admin).

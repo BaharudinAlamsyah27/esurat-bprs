@@ -15,6 +15,7 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,
 Route::middleware(['auth:sanctum', EnsureApiUserIsActive::class])->group(function (): void {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/profile/password', [AuthController::class, 'changePassword'])->middleware('throttle:5,1');
     Route::post('/device-tokens', [DeviceTokenController::class, 'store'])->middleware('throttle:30,1');
     Route::delete('/device-tokens', [DeviceTokenController::class, 'destroy'])->middleware('throttle:30,1');
 

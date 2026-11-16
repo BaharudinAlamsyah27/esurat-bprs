@@ -58,7 +58,12 @@ class User extends Authenticatable implements FilamentUser
 
     public function isAdmin(): bool
     {
-        return $this->getRawOriginal('level') === UserLevel::Admin->value;
+        return in_array($this->getRawOriginal('level'), [UserLevel::SuperAdmin->value, UserLevel::Admin->value], true);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->getRawOriginal('level') === UserLevel::SuperAdmin->value;
     }
 
     public function hasUsageHistory(): bool

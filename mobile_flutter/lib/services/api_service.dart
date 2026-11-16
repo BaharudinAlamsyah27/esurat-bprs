@@ -119,6 +119,20 @@ class ApiService {
     return await _dio.get('/outgoing-letters/$id');
   }
 
+  Future<Response> getCooperationAgreements(
+      {String? search, int page = 1, int? perPage}) async {
+    Map<String, dynamic> queryParams = {'page': page};
+    if (search != null && search.isNotEmpty) {
+      queryParams['search'] = search;
+    }
+    if (perPage != null) {
+      queryParams['per_page'] = perPage;
+    }
+
+    return await _dio.get('/cooperation-agreements',
+        queryParameters: queryParams);
+  }
+
   Future<Response> getMyDispositions({int page = 1, int? perPage}) async {
     Map<String, dynamic> queryParams = {'page': page};
     if (perPage != null) {

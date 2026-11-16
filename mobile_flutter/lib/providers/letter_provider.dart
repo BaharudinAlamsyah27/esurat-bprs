@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+import '../models/cooperation_agreement.dart';
 import '../models/incoming_letter.dart';
 import '../models/my_disposition.dart';
 import '../models/outgoing_letter.dart';
@@ -19,40 +20,50 @@ class LetterProvider with ChangeNotifier {
 
   final List<IncomingLetter> _incomingLetters = [];
   final List<OutgoingLetter> _outgoingLetters = [];
+  final List<CooperationAgreement> _cooperationAgreements = [];
   final List<MyDisposition> _dispositions = [];
 
   bool _isLoadingIncoming = false;
   bool _isLoadingOutgoing = false;
+  bool _isLoadingCooperation = false;
   bool _isLoadingDispositions = false;
 
   String? _incomingError;
   String? _outgoingError;
+  String? _cooperationError;
   String? _dispositionsError;
 
   int _incomingPage = 1;
   int _outgoingPage = 1;
+  int _cooperationPage = 1;
   int _dispositionPage = 1;
 
   bool _hasMoreIncoming = true;
   bool _hasMoreOutgoing = true;
+  bool _hasMoreCooperation = true;
   bool _hasMoreDisposition = true;
 
   List<IncomingLetter> get incomingLetters =>
       List.unmodifiable(_incomingLetters);
   List<OutgoingLetter> get outgoingLetters =>
       List.unmodifiable(_outgoingLetters);
+  List<CooperationAgreement> get cooperationAgreements =>
+      List.unmodifiable(_cooperationAgreements);
   List<MyDisposition> get dispositions => List.unmodifiable(_dispositions);
 
   bool get isLoadingIncoming => _isLoadingIncoming;
   bool get isLoadingOutgoing => _isLoadingOutgoing;
+  bool get isLoadingCooperation => _isLoadingCooperation;
   bool get isLoadingDispositions => _isLoadingDispositions;
 
   String? get incomingError => _incomingError;
   String? get outgoingError => _outgoingError;
+  String? get cooperationError => _cooperationError;
   String? get dispositionsError => _dispositionsError;
 
   bool get hasMoreIncoming => _hasMoreIncoming;
   bool get hasMoreOutgoing => _hasMoreOutgoing;
+  bool get hasMoreCooperation => _hasMoreCooperation;
   bool get hasMoreDisposition => _hasMoreDisposition;
 
   // ---------------------------------------------------------------- surat masuk
@@ -146,6 +157,54 @@ class LetterProvider with ChangeNotifier {
     }
 
     _isLoadingOutgoing = false;
+    notifyListeners();
+  }
+
+  // ------------------------------------------------------ perjanjian kerjasama
+
+  Future<void> fetchCooperationAgreements(
+      {String? search, bool refresh = false}) async {
+    if (refresh) {
+      _cooperationPage = 1;
+      _cooperationAgreements.clear();
+      _hasMoreCooperation = true;
+    }
+
+    if (!_hasMoreCooperation || _isLoadingCooperation) {
+      return;
+    }
+
+    _isLoadingCooperation = true;
+    _cooperationError = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiService.getCooperationAgreements(
+        search: search,
+        page: _cooperationPage,
+      );
+
+      final data = response.data['data'] as List<dynamic>;
+      final fetched = data
+          .map((json) =>
+              CooperationAgreement.fromJson(json as Map<String, dynamic>))
+          .toList();
+
+      if (fetched.isEmpty) {
+        _hasMoreCooperation = false;
+      } else {
+        _cooperationAgreements.addAll(fetched);
+        _cooperationPage++;
+      }
+    } on DioException catch (error) {
+      _cooperationError = isConnectionProblem(error)
+          ? kOfflineMessage
+          : kServerErrorMessage('perjanjian kerjasama');
+    } catch (_) {
+      _cooperationError = kServerErrorMessage('perjanjian kerjasama');
+    }
+
+    _isLoadingCooperation = false;
     notifyListeners();
   }
 

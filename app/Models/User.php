@@ -77,7 +77,9 @@ class User extends Authenticatable implements FilamentUser
                     ->where('event', '!=', 'created')))
             ->exists()
             || DB::table('incoming_letters')->where('registered_by', $this->getKey())->exists()
-            || DB::table('outgoing_letters')->where('created_by', $this->getKey())->exists();
+            || DB::table('outgoing_letters')->where('created_by', $this->getKey())->exists()
+            || DB::table('cooperation_agreements')->where('created_by', $this->getKey())->exists()
+            || DB::table('dispositions')->where('created_by', $this->getKey())->exists();
     }
 
     protected function casts(): array

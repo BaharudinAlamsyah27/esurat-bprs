@@ -16,7 +16,7 @@ class IncomingLetterController extends Controller
         Gate::authorize('viewAny', IncomingLetter::class);
 
         $query = IncomingLetter::query()
-            ->with(['classification', 'attachments', 'disposition'])
+            ->with(['classification', 'attachments', 'disposition.recipients'])
             ->latest('received_at')
             ->latest('id');
 

@@ -84,7 +84,7 @@ class MyDispositionResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Section::make('Informasi Surat Masuk')
+            Section::make(__('disposition.section_incoming_letter'))
                 ->schema([
                     Placeholder::make('letter_number')
                         ->label(__('incoming.letter_number'))
@@ -99,22 +99,22 @@ class MyDispositionResource extends Resource
                         ->label(__('incoming.letter_date'))
                         ->content(fn (?DispositionRecipient $record): string => $record?->disposition?->incomingLetter?->letter_date?->translatedFormat('d F Y') ?? '—'),
                     Placeholder::make('attachment')
-                        ->label('Berkas Surat')
+                        ->label(__('disposition.letter_attachment'))
                         ->content(function (?DispositionRecipient $record): HtmlString {
                             $letter = $record?->disposition?->incomingLetter;
                             $att = $letter?->attachments?->first();
 
                             if (! $att) {
-                                return new HtmlString('<span class="text-gray-400">Tidak ada berkas</span>');
+                                return new HtmlString('<span class="text-gray-400">'.e(__('disposition.no_attachment')).'</span>');
                             }
 
                             $url = route('incoming-letters.attachments.show', $att);
 
-                            return new HtmlString('<a href="'.$url.'" target="_blank" class="inline-flex items-center gap-1 text-primary-600 underline font-medium hover:text-primary-800">Buka Berkas Surat</a>');
+                            return new HtmlString('<a href="'.e($url).'" target="_blank" class="inline-flex items-center gap-1 text-primary-600 underline font-medium hover:text-primary-800">'.e(__('disposition.open_attachment')).'</a>');
                         }),
                 ])->columns(2),
 
-            Section::make('Lembar Disposisi Pimpinan')
+            Section::make(__('disposition.section_leader_disposition'))
                 ->schema([
                     Placeholder::make('nature')
                         ->label(__('disposition.nature'))
@@ -138,16 +138,16 @@ class MyDispositionResource extends Resource
                         ->content(fn (?DispositionRecipient $record): string => $record?->disposition->note ?? '—'),
                 ])->columns(2),
 
-            Section::make('Status Tindak Lanjut Anda')
+            Section::make(__('disposition.section_recipient_status'))
                 ->schema([
                     Placeholder::make('recipient_status')
-                        ->label('Status')
+                        ->label(__('disposition.status_label'))
                         ->content(fn (?DispositionRecipient $record): string => $record?->status?->label() ?? '—'),
                     Placeholder::make('done_at')
-                        ->label('Waktu Selesai')
+                        ->label(__('disposition.done_at_label'))
                         ->content(fn (?DispositionRecipient $record): string => $record?->done_at?->translatedFormat('d F Y H:i') ?? '—'),
                     Placeholder::make('done_note')
-                        ->label('Catatan Tindak Lanjut')
+                        ->label(__('disposition.done_note_view_label'))
                         ->content(fn (?DispositionRecipient $record): string => $record->done_note ?? '—')
                         ->columnSpanFull(),
                 ])->columns(2),
@@ -177,19 +177,19 @@ class MyDispositionResource extends Resource
                     ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('status')
-                    ->label('Status')
+                    ->label(__('disposition.status_label'))
                     ->badge()
                     ->color(fn (DispositionRecipientStatus $state): string => $state->color())
                     ->formatStateUsing(fn (DispositionRecipientStatus $state): string => $state->label()),
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label('Status')
+                    ->label(__('disposition.status_label'))
                     ->options(DispositionRecipientStatus::options()),
             ])
             ->actions([
                 ViewAction::make()
-                    ->label('Lihat')
+                    ->label(__('app.view'))
                     ->before(function (DispositionRecipient $record): void {
                         $user = auth()->user();
                         if ($user) {
@@ -202,7 +202,7 @@ class MyDispositionResource extends Resource
                     ->color('success')
                     ->visible(fn (DispositionRecipient $record): bool => ! $record->status->isCompleted())
                     ->modalHeading(__('disposition.mark_done_heading'))
-                    ->modalSubmitActionLabel('Simpan')
+                    ->modalSubmitActionLabel(__('m1.save'))
                     ->form([
                         Textarea::make('done_note')
                             ->label(__('disposition.done_note_label'))
@@ -215,7 +215,7 @@ class MyDispositionResource extends Resource
                         if ($user) {
                             app(CompleteDispositionRecipient::class)->execute($user, $record, $data['done_note'] ?? null);
                             Notification::make()
-                                ->title('Disposisi ditandai selesai')
+                                ->title(__('disposition.marked_done_notification'))
                                 ->success()
                                 ->send();
                         }
@@ -225,7 +225,11 @@ class MyDispositionResource extends Resource
                     ->icon('heroicon-o-printer')
                     ->url(fn (DispositionRecipient $record): string => route('dispositions.print', $record->disposition_id))
                     ->openUrlInNewTab(),
-            ]);
+            ])
+            ->striped()
+            ->paginated([10, 25])
+            ->defaultPaginationPageOption(10)
+            ->emptyStateHeading(__('app.no_data'));
     }
 
     public static function getPages(): array

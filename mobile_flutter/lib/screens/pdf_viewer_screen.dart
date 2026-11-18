@@ -17,6 +17,7 @@ class PdfViewerScreen extends StatefulWidget {
 
 class _PdfViewerScreenState extends State<PdfViewerScreen> {
   String? localPath;
+  bool isImage = false;
   bool isLoading = true;
   String? error;
 
@@ -26,6 +27,15 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
     _downloadFile();
   }
 
+  @override
+  void dispose() {
+    final path = localPath;
+    if (path != null) {
+      File(path).delete().ignore();
+    }
+    super.dispose();
+  }
+
   Future<void> _downloadFile() async {
     try {
       const storage = FlutterSecureStorage();
@@ -33,30 +43,34 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
 
       final dir = await getTemporaryDirectory();
       final file = File(
-          '${dir.path}/temp_pdf_${DateTime.now().millisecondsSinceEpoch}.pdf');
+          '${dir.path}/temp_attachment_${DateTime.now().millisecondsSinceEpoch}');
 
       final dio = Dio();
-      await dio.download(
+      final response = await dio.download(
         widget.url,
         file.path,
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
-            'Accept': 'application/pdf',
+            'Accept': 'application/pdf, image/jpeg, image/png',
           },
         ),
       );
 
+      final contentType =
+          (response.headers.value('content-type') ?? '').toLowerCase();
+
       if (mounted) {
         setState(() {
           localPath = file.path;
+          isImage = contentType.startsWith('image/');
           isLoading = false;
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          error = 'Gagal mengunduh berkas PDF';
+          error = 'Gagal mengunduh berkas lampiran';
           isLoading = false;
         });
       }
@@ -83,6 +97,14 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
     }
 
     if (localPath != null) {
+      if (isImage) {
+        return InteractiveViewer(
+          child: Center(
+            child: Image.file(File(localPath!)),
+          ),
+        );
+      }
+
       return PDFView(
         filePath: localPath,
         enableSwipe: true,
@@ -91,7 +113,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
         pageFling: false,
         onError: (error) {
           setState(() {
-            this.error = 'Terjadi kesalahan saat membuka PDF';
+            this.error = 'Terjadi kesalahan saat membuka berkas';
           });
         },
       );

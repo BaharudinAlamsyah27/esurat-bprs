@@ -33,7 +33,7 @@ class RegisteredDeviceResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return 'Perangkat';
+        return __('m1.device_singular');
     }
 
     public static function getPluralModelLabel(): string
@@ -46,32 +46,37 @@ class RegisteredDeviceResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('user.name')
-                    ->label('Pengguna')
+                    ->label(__('m1.user'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('device_name')
-                    ->label('Nama Perangkat')
+                    ->label(__('m1.device_name'))
                     ->searchable()
                     ->placeholder('—'),
                 TextColumn::make('platform')
-                    ->label('Platform')
+                    ->label(__('m1.device_platform'))
                     ->badge(),
                 TextColumn::make('app_version')
-                    ->label('Versi Aplikasi')
+                    ->label(__('m1.device_app_version'))
                     ->placeholder('—'),
                 TextColumn::make('last_used_at')
-                    ->label('Terakhir Aktif')
+                    ->label(__('m1.device_last_active'))
                     ->dateTime('d M Y H:i')
                     ->sortable()
                     ->placeholder('—'),
             ])
             ->actions([
                 DeleteAction::make()
-                    ->label('Cabut')
-                    ->modalHeading('Cabut Akses Perangkat?')
-                    ->modalDescription('Perangkat ini tidak akan menerima notifikasi sampai masuk kembali.')
-                    ->modalSubmitActionLabel('Ya, Cabut'),
-            ]);
+                    ->label(__('m1.device_revoke'))
+                    ->modalHeading(__('m1.device_revoke_heading'))
+                    ->modalDescription(__('m1.device_revoke_description'))
+                    ->modalSubmitActionLabel(__('m1.device_revoke_confirm')),
+            ])
+            ->defaultSort('last_used_at', 'desc')
+            ->striped()
+            ->paginated([10, 25])
+            ->defaultPaginationPageOption(10)
+            ->emptyStateHeading(__('app.no_data'));
     }
 
     public static function getPages(): array

@@ -13,31 +13,26 @@ class HomeSummary {
     required this.unreadDispositions,
     required this.dispositionsTotal,
     required this.recentIncoming,
-    required this.countsArePartial,
+    this.cooperationTotal = 0,
+    this.countsArePartial = false,
   });
 
   final int incomingTotal;
   final int outgoingTotal;
+  final int cooperationTotal;
 
   /// Jumlah disposisi untuk pengguna yang belum dibaca.
-  ///
-  /// TODO(disposisi): API belum menyediakan endpoint hitung belum dibaca,
-  /// jadi angka ini dihitung dari maksimal 50 disposisi terbaru.
   final int unreadDispositions;
   final int dispositionsTotal;
 
   /// Maksimal 5 surat masuk terbaru.
   final List<IncomingLetter> recentIncoming;
 
-  /// Benar bila jumlah disposisi melebihi data yang bisa dihitung (> 50).
+  /// Dipertahankan untuk kompatibilitas pengujian widget.
   final bool countsArePartial;
 }
 
-/// Mengambil data ringkasan Beranda dari endpoint API yang sudah ada.
-///
-/// Tidak ada endpoint baru yang dipanggil di sini: semua angka memakai
-/// `/incoming-letters`, `/outgoing-letters`, dan `/dispositions` dengan
-/// parameter `per_page` yang memang didukung controller.
+/// Mengambil data ringkasan Beranda langsung dari endpoint `/api/dashboard/summary`.
 class HomeProvider extends ChangeNotifier {
   HomeProvider({ApiService? apiService})
       : _apiService = apiService ?? ApiService();
@@ -76,11 +71,11 @@ class HomeProvider extends ChangeNotifier {
       _summary = HomeSummary(
         incomingTotal: (payload['incoming_total'] as num?)?.toInt() ?? 0,
         outgoingTotal: (payload['outgoing_total'] as num?)?.toInt() ?? 0,
+        cooperationTotal: (payload['cooperation_total'] as num?)?.toInt() ?? 0,
         unreadDispositions:
             (payload['unread_dispositions'] as num?)?.toInt() ?? 0,
         dispositionsTotal: (payload['dispositions_total'] as num?)?.toInt() ?? 0,
         recentIncoming: recent,
-        countsArePartial: false,
       );
       _isLoading = false;
       notifyListeners();

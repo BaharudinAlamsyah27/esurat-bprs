@@ -27,6 +27,15 @@ class AuthController extends Controller
         $user = User::where('username', $request->username)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
+            activity('authentication')
+                ->event('failed_login')
+                ->withProperties([
+                    'identity' => $request->input('username'),
+                    'channel' => 'api',
+                    'ip' => $request->ip(),
+                ])
+                ->log(__('m1.audit_failed_login'));
+
             throw ValidationException::withMessages([
                 'username' => [__('api.invalid_credentials')],
             ]);
@@ -38,7 +47,16 @@ class AuthController extends Controller
             ], 403);
         }
 
-        $user->forceFill(['last_login_at' => now()])->save();
+        $user->forceFill(['last_login_at' => now()])->saveQuietly();
+
+        activity('authentication')
+            ->causedBy($user)
+            ->event('login')
+            ->withProperties([
+                'channel' => 'api',
+                'ip' => $request->ip(),
+            ])
+            ->log(__('m1.audit_login'));
 
         $token = $user->createToken($request->device_name)->plainTextToken;
 
@@ -73,6 +91,15 @@ class AuthController extends Controller
 
             $accessToken->delete();
         }
+
+        activity('authentication')
+            ->causedBy($user)
+            ->event('logout')
+            ->withProperties([
+                'channel' => 'api',
+                'ip' => $request->ip(),
+            ])
+            ->log(__('m1.audit_logout'));
 
         return response()->json([
             'message' => __('api.logged_out'),

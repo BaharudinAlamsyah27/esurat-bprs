@@ -33,6 +33,7 @@ class Classification extends Model
 
     public function usageCount(): int
     {
-        return $this->incomingLetters()->count() + $this->outgoingLetters()->count();
+        return $this->incomingLetters()->withTrashed()->count()
+            + $this->outgoingLetters()->withTrashed()->count();
     }
 }

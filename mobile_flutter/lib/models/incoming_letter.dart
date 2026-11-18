@@ -10,6 +10,7 @@ class IncomingLetter {
   final Classification classification;
   final String? attachmentUrl;
   final bool hasDisposition;
+  final IncomingLetterDisposition? disposition;
   final DateTime createdAt;
 
   IncomingLetter({
@@ -24,10 +25,13 @@ class IncomingLetter {
     required this.classification,
     this.attachmentUrl,
     required this.hasDisposition,
+    this.disposition,
     required this.createdAt,
   });
 
   factory IncomingLetter.fromJson(Map<String, dynamic> json) {
+    final dispositionJson = json['disposition'];
+
     return IncomingLetter(
       id: json['id'],
       agendaNumber: json['agenda_number'],
@@ -40,7 +44,40 @@ class IncomingLetter {
       classification: Classification.fromJson(json['classification']),
       attachmentUrl: json['attachment_url'],
       hasDisposition: json['has_disposition'] ?? false,
+      disposition: dispositionJson is Map<String, dynamic>
+          ? IncomingLetterDisposition.fromJson(dispositionJson)
+          : null,
       createdAt: DateTime.parse(json['created_at']),
+    );
+  }
+}
+
+class IncomingLetterDisposition {
+  final String nature;
+  final List<int> recipientUserIds;
+  final List<String> instructions;
+  final String? instructionOther;
+  final String? note;
+
+  const IncomingLetterDisposition({
+    required this.nature,
+    required this.recipientUserIds,
+    required this.instructions,
+    this.instructionOther,
+    this.note,
+  });
+
+  factory IncomingLetterDisposition.fromJson(Map<String, dynamic> json) {
+    return IncomingLetterDisposition(
+      nature: (json['nature'] as String?) ?? 'biasa',
+      recipientUserIds: (json['recipient_user_ids'] as List<dynamic>? ?? [])
+          .map((e) => (e as num).toInt())
+          .toList(),
+      instructions: (json['instructions'] as List<dynamic>? ?? [])
+          .map((e) => e.toString())
+          .toList(),
+      instructionOther: json['instruction_other'] as String?,
+      note: json['note'] as String?,
     );
   }
 }

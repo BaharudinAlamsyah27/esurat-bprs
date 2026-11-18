@@ -29,7 +29,7 @@ class DeviceTokenController extends Controller
         $deviceToken = $action->execute($user, $data);
 
         return response()->json([
-            'message' => 'Device token registered successfully.',
+            'message' => __('api.device_registered'),
             'id' => $deviceToken->id,
         ]);
     }
@@ -49,7 +49,7 @@ class DeviceTokenController extends Controller
         $revoked = $action->execute($user, $data['token']);
 
         return response()->json([
-            'message' => $revoked ? 'Device token revoked successfully.' : 'Token not found.',
+            'message' => $revoked ? __('api.device_revoked') : __('api.device_not_found'),
         ]);
     }
 }

@@ -98,10 +98,6 @@ class ApiService {
     return await _dio.get('/incoming-letters', queryParameters: queryParams);
   }
 
-  Future<Response> getIncomingLetterDetail(int id) async {
-    return await _dio.get('/incoming-letters/$id');
-  }
-
   Future<Response> getOutgoingLetters(
       {String? search, int page = 1, int? perPage}) async {
     Map<String, dynamic> queryParams = {'page': page};
@@ -113,10 +109,6 @@ class ApiService {
     }
 
     return await _dio.get('/outgoing-letters', queryParameters: queryParams);
-  }
-
-  Future<Response> getOutgoingLetterDetail(int id) async {
-    return await _dio.get('/outgoing-letters/$id');
   }
 
   Future<Response> getCooperationAgreements(

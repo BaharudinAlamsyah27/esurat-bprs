@@ -39,6 +39,15 @@ class IncomingLetterResource extends JsonResource
                 ? route('api.attachments.show', $attachment)
                 : null,
             'has_disposition' => $letter->disposition !== null,
+            'disposition' => $letter->disposition !== null ? [
+                'nature' => $letter->disposition->nature->value,
+                'recipient_user_ids' => $letter->disposition->relationLoaded('recipients')
+                    ? $letter->disposition->recipients->pluck('user_id')->map(fn ($id): int => (int) $id)->values()->all()
+                    : [],
+                'instructions' => $letter->disposition->instructions ?? [],
+                'instruction_other' => $letter->disposition->instruction_other,
+                'note' => $letter->disposition->note,
+            ] : null,
             'created_at' => $letter->created_at?->format('Y-m-d H:i:s'),
         ];
     }

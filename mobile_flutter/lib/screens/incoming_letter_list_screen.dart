@@ -266,6 +266,7 @@ class _DispositionFormSheet extends StatefulWidget {
 
 class _DispositionFormSheetState extends State<_DispositionFormSheet> {
   final _noteController = TextEditingController();
+  final _instructionOtherController = TextEditingController();
   bool _loadingOptions = true;
   bool _submitting = false;
   String? _error;
@@ -281,12 +282,21 @@ class _DispositionFormSheetState extends State<_DispositionFormSheet> {
   @override
   void initState() {
     super.initState();
+    final existing = widget.letter.disposition;
+    if (existing != null) {
+      _selectedNature = existing.nature;
+      _selectedRecipientIds.addAll(existing.recipientUserIds);
+      _selectedInstructions.addAll(existing.instructions);
+      _instructionOtherController.text = existing.instructionOther ?? '';
+      _noteController.text = existing.note ?? '';
+    }
     _loadOptions();
   }
 
   @override
   void dispose() {
     _noteController.dispose();
+    _instructionOtherController.dispose();
     super.dispose();
   }
 
@@ -300,7 +310,7 @@ class _DispositionFormSheetState extends State<_DispositionFormSheet> {
             List<Map<String, dynamic>>.from(data['instructions'] ?? []);
         _recipients =
             List<Map<String, dynamic>>.from(data['recipients'] ?? []);
-        if (_natures.isNotEmpty) {
+        if (_selectedNature == null && _natures.isNotEmpty) {
           _selectedNature = _natures.first['value'] as String?;
         }
         _loadingOptions = false;
@@ -325,12 +335,25 @@ class _DispositionFormSheetState extends State<_DispositionFormSheet> {
       return;
     }
 
+    if (_selectedInstructions.contains('lainnya') &&
+        _instructionOtherController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tuliskan instruksi lainnya terlebih dahulu.'),
+        ),
+      );
+      return;
+    }
+
     setState(() => _submitting = true);
     try {
       await ApiService().saveDispositionForLetter(widget.letter.id, {
         'nature': _selectedNature,
         'recipient_user_ids': _selectedRecipientIds.toList(),
         'instructions': _selectedInstructions.toList(),
+        'instruction_other': _selectedInstructions.contains('lainnya')
+            ? _instructionOtherController.text.trim()
+            : null,
         'note': _noteController.text.trim(),
         'disposition_date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
       });
@@ -439,6 +462,17 @@ class _DispositionFormSheetState extends State<_DispositionFormSheet> {
                             );
                           }).toList(),
                         ),
+                        if (_selectedInstructions.contains('lainnya')) ...[
+                          const SizedBox(height: AppSpacing.gap),
+                          TextField(
+                            controller: _instructionOtherController,
+                            decoration: const InputDecoration(
+                              labelText: 'Isi disposisi lainnya',
+                              hintText: 'Tuliskan instruksi lainnya',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: AppSpacing.gap),
                         TextField(
                           controller: _noteController,

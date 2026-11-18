@@ -206,8 +206,8 @@ class CooperationAgreementResource extends Resource
                         return $query->whereYear('agreement_date', (int) $value);
                     }),
             ])
-            ->filtersTriggerAction(fn (Action $action): Action => $action->extraAttributes([
-                'class' => 'fi-esurat-filter-trigger',
+            ->filtersTriggerAction(fn (Action $action, Table $table): Action => $action->extraAttributes([
+                'data-active-filters' => $table->getActiveFiltersCount(),
             ]))
             ->actions([
                 ViewAction::make()->label(__('app.view'))->icon('heroicon-o-eye'),

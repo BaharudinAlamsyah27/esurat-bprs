@@ -25,7 +25,6 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Foundation\Vite;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\HtmlString;
@@ -56,14 +55,6 @@ class AdminPanelProvider extends PanelProvider
                 '<link rel="apple-touch-icon" href="'.asset('images/bprs-sragen.png').'">'.
                 '<link rel="manifest" href="'.asset('manifest.json').'">'
             ))
-            ->renderHook(PanelsRenderHook::BODY_END, function (): HtmlString {
-                /** @var Vite $vite */
-                $vite = app(Vite::class);
-
-                // Memuat mobile-bridge.js agar APK Android bisa mendaftarkan token
-                // notifikasi dan menangani tombol kembali.
-                return $vite(['resources/js/app.js']);
-            })
             ->userMenuItems([
                 MenuItem::make()
                     ->label(__('m1.profile'))
